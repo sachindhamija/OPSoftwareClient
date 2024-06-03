@@ -1,0 +1,12 @@
+.common-modal {
+	display: flex;
+	justify-content: center !important;
+}
+
+@media (max-width: 768px) {
+	.common-card-container {
+		margin: 0 !important;
+
+		overflow-x: hidden !important;
+	}
+}

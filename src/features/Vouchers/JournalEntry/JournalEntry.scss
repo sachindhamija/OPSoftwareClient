@@ -1,0 +1,12 @@
+@media (max-width: 768px) {
+	.journal-entry-table-container {
+		// width: 700px !important;
+		overflow-x: auto !important;
+	}
+	.journal-dropdown {
+		width: 200px !important;
+	}
+	.journal-amount-input {
+		width: 100px !important;
+	}
+}
