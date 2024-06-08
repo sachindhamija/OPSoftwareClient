@@ -38,7 +38,6 @@ function SelectCompany() {
 				dispatch(setLoading(false));
 			}
 		};
-
 		loadCompanies();
 	}, []);
 

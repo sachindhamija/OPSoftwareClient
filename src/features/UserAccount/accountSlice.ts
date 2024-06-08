@@ -21,7 +21,9 @@ export const signInUser = createAsyncThunk<User, FieldValues>(
     try {
       const user = await agent.UserAccount.login(data);
       if (user) {
-        localStorage.setItem("user", JSON.stringify(user)); // Store user in local storage only if not null
+        localStorage.setItem("user", JSON.stringify(user));
+        console.log(JSON.stringify(user));
+        
         return user;
       } else {
         toast.error("Login failed");
@@ -78,6 +80,8 @@ export const accountSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = action.payload;
+      console.log(state.user);
+      
     },
   },
   extraReducers: (builder) => {
@@ -90,9 +94,11 @@ export const accountSlice = createSlice({
       })
       .addCase(signInUser.rejected, (state) => {
         state.user = null;
+        localStorage.removeItem("user");
       })
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.user = null;
+        localStorage.removeItem("user");
       });
   },
 });

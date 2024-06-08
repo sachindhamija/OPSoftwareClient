@@ -22,11 +22,9 @@ function Login() {
 	} = useForm({ mode: 'all' });
 
 	async function submitForm(data: any) {
-		console.log('submitForm function called with data:', data);
 		try {
 			const actionResult = await dispatch(signInUser(data));
 			if (signInUser.fulfilled.match(actionResult)) {
-				console.log('login clicked');
 				navigate(location.state?.from?.pathname || '/select-company');
 			}
 		} catch (error) {
