@@ -25,11 +25,12 @@ export interface ItemSalePurchaseVoucherDto {
 }
 
 export interface TransportDetailDto {
+  
   deliveryAddress?: string;
-  firmName?: string;
-  gstNo?: string;
-  contactPersonName?: string;
-  contactPersonMobileNumber?: string;
+  deliveryFirmName?: string;
+  deliveryFirmGSTNo?: string;
+  deliveryFirmContactPersonName?: string;
+  deliveryFirmPersonMobileNumber?: string;
 
   transporterName?: string;
   vehicleNumber?: string;

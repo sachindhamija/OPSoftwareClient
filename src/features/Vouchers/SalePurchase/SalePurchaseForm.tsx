@@ -63,6 +63,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [showTransportModal, setShowTransportModal] = useState(false);
     const [transportDetails, setTransportDetails] = useState<TransportDetailDto>(defaultTransportDetails);
     const updateParentStateOfTransportDetails = (data: TransportDetailDto) => {
+        console.log(`transporter =>`,data)
         setTransportDetails(data);
     };
 
@@ -176,10 +177,10 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 grDate: voucher?.voucherMasterExtended?.grDate,
                 brokerName: voucher?.voucherMasterExtended?.brokerName,
                 deliveryAddress: voucher?.voucherMasterExtended?.deliveryAddress,
-                firmName: voucher?.voucherMasterExtended?.deliveryFirmName,
-                gstNo: voucher?.voucherMasterExtended?.deliveryFirmGSTNo,
-                contactPersonName: voucher?.voucherMasterExtended?.deliveryFirmContactPersonName,
-                contactPersonMobileNumber: voucher?.voucherMasterExtended?.deliveryFirmPersonMobileNumber,
+                deliveryFirmName: voucher?.voucherMasterExtended?.deliveryFirmName,
+                deliveryFirmGSTNo: voucher?.voucherMasterExtended?.deliveryFirmGSTNo,
+                deliveryFirmContactPersonName: voucher?.voucherMasterExtended?.deliveryFirmContactPersonName,
+                deliveryFirmPersonMobileNumber: voucher?.voucherMasterExtended?.deliveryFirmPersonMobileNumber,
             });
 
             // Update the customerDetail state

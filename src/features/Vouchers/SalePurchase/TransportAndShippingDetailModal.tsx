@@ -77,20 +77,20 @@ const TransportAndShippingDetailModal: React.FC<TransportDetailsModalProps> = ({
                                 onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })} />
                         </Col>
                         <Col md={6} xs={12}>
-                            <CustomInput label="Shipping Firm Name" name="firmName" value={formData.firmName}
-                                onChange={(e) => setFormData({ ...formData, firmName: e.target.value })} />
+                            <CustomInput label="Shipping Firm Name" name="deliveryFirmName" value={formData.deliveryFirmName}
+                                onChange={(e) => setFormData({ ...formData, deliveryFirmName: e.target.value })} />
                         </Col>
                         <Col md={6} xs={12}>
-                            <CustomInput label="GST Number" name="gstNo" value={formData.gstNo}
-                                onChange={(e) => setFormData({ ...formData, gstNo: e.target.value })} />
+                            <CustomInput label="GST Number" name="deliveryFirmGSTNo" value={formData.deliveryFirmGSTNo}
+                                onChange={(e) => setFormData({ ...formData, deliveryFirmGSTNo: e.target.value })} />
                         </Col>
                         <Col md={6} xs={12}>
-                            <CustomInput label="Contact Person Name" name="contactPersonName" value={formData.contactPersonName}
-                                onChange={(e) => setFormData({ ...formData, contactPersonName: e.target.value })} />
+                            <CustomInput label="Contact Person Name" name="deliveryFirmContactPersonName" value={formData.deliveryFirmContactPersonName}
+                                onChange={(e) => setFormData({ ...formData, deliveryFirmContactPersonName: e.target.value })} />
                         </Col>
                         <Col md={6} xs={12}>
-                            <CustomInput label="Contact Person Mobile Number" name="contactPersonMobileNumber" value={formData.contactPersonMobileNumber}
-                                onChange={(e) => setFormData({ ...formData, contactPersonMobileNumber: e.target.value })} />
+                            <CustomInput label="Contact Person Mobile Number" name="deliveryFirmPersonMobileNumber" value={formData.deliveryFirmPersonMobileNumber}
+                                onChange={(e) => setFormData({ ...formData, deliveryFirmPersonMobileNumber: e.target.value })} />
                         </Col>
                         <Col md={12} xs={12}>
                             <CustomInput label="Broker Name" name="brokerName" value={formData.brokerName}
