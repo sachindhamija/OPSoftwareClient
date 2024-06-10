@@ -24,7 +24,6 @@ const fetchCurrentFinancialYear = async (accessId: string) => {
         "currentFinancialYear",
         JSON.stringify(financialYear)
       );
-      console.log(financialYear);
 
       return financialYear;
     } else {
@@ -88,7 +87,6 @@ export const financialYearSlice = createSlice({
     builder
       .addCase(getCurrentFinancialYear.fulfilled, (state, action) => {
         state.currentFinancialYear = action.payload;
-        console.log(action.payload);
       })
       .addCase(getCurrentFinancialYear.rejected, (state) => {
         state.currentFinancialYear = null;

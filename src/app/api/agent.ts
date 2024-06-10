@@ -94,7 +94,6 @@ function handleBadRequest(errors: Record<string, string[]> | undefined) {
 }
 
 const handleUnauthorized = (data: string | undefined) => {
-  console.log(data);
   toast.error(data || "Unauthorized");
 
   const currentPath = window.location.pathname;
@@ -182,7 +181,6 @@ const Company = {
 const FinancialYear = {
   create: async (accessId: string, financialYears: FinancialYearDto) => {
     const params = new URLSearchParams({ accessId: accessId });
-    console.log(createFormData(financialYears), params);
     return await requests.post(
       "FinancialYear/CreateFinancialYear",
       financialYears,
@@ -191,7 +189,6 @@ const FinancialYear = {
   },
   update: async (accessId: string, financialYears: FinancialYearDto) => {
     const params = new URLSearchParams({ accessId: accessId });
-    console.log(createFormData(financialYears), params);
     return await requests.post(
       "FinancialYear/UpdateFinancialYear",
       financialYears,
@@ -440,7 +437,6 @@ const Account = {
     if (search.trim() !== "") {
       params.append("searchTerm", search);
     }
-    console.log(search);
     return await requests.get("/account", params);
   },
   getAccountById: async (
@@ -515,7 +511,6 @@ const ItemCategory = {
     itemCategory: ItemCategoryDto
   ) => {
     const params = new URLSearchParams({ accessId });
-    console.log(itemCategory);
 
     return await requests.post(
       "itemCategory/CreateItemCategory",
@@ -572,7 +567,6 @@ const Item = {
       params.append("searchTerm", search);
     }
 
-    console.log(search);
     return await requests.get("/items/GetAllItems", params);
   },
   getItemById: async (
@@ -751,6 +745,16 @@ const Vouchers = {
     });
     return await requests.delete(`voucher/${voucherId}`, params);
   },
+  getVoucherById: async (
+    accessId: string,
+    voucherId: string
+  ) => {
+    const params = new URLSearchParams({
+      accessId: accessId,
+      voucherId: voucherId
+    });
+    return await requests.get(`voucher/${voucherId}`, params);
+  },
 };
 const ControlOptions = {
   list: async (
@@ -874,7 +878,6 @@ const BillBook = {
     billBook: BillBookDto
   ) => {
     const params = new URLSearchParams({ accessId });
-    console.log(billBookId);
 
     return await requests.put(`billBook/${billBookId}`, billBook, params);
   },
@@ -915,6 +918,27 @@ const SalePurchase = {
   ) => {
     const params = new URLSearchParams({ accessId, existingVoucherId });
     return await requests.post("SalePurchase/SaveVoucher", dto, params);
+  },updateVoucher: async (
+    accessId: string,
+    dto: ItemSalePurchaseVoucherDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `SalePurchase/UpdateVoucher`,
+      dto,
+      params
+    );
+  },
+
+  deleteVoucher: async (
+    accessId: string,
+    voucherId: string
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(
+      `SalePurchase/DeleteVoucher/${voucherId}`,
+      params
+    );
   },
 };
 
