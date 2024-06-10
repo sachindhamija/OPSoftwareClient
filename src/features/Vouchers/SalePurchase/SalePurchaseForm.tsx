@@ -40,7 +40,7 @@ interface SalePurchaseFormProps {
     onSuccessfulSubmit?: () => void;
 }
 
-export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false }: SalePurchaseFormProps) {
+export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false,onSuccessfulSubmit }: SalePurchaseFormProps) {
 
     const accessId = getAccessIdOrRedirect();
     const financialYear = useAppSelector(selectCurrentFinancialYear);
@@ -203,7 +203,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 append(defaultItems);
             }
             voucher.voucherItemDetails.forEach((item, index) => {
-                console.log(`item id => `, item.item.salePurAccountID)
                 setValue(`items[${index}].itemId`, item.itemId);
                 setValue(`items[${index}].mainQty`, item.mainQty);
                 setValue(`items[${index}].altQty`, item.altQty);
@@ -567,7 +566,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     setCustomerDetail(defaultCustomerDetails);
                     setBillSummary(defaultBillSummary);
                 }
-
+                if (isInModal && onSuccessfulSubmit) {
+                    onSuccessfulSubmit();
+                }
 
             }
 
@@ -595,7 +596,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             toast.error("Net invoice value cannot be null.");
             throw new Error("Net invoice value is required.");
         }
-        console.log('data.items => ', data.items)
         const processedItems = processItems(data.items);
         if (processedItems.length === 0) {
             toast.error("No items in the invoice. Data cannot be saved.");

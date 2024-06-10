@@ -475,54 +475,6 @@ const LedgerReport = ({
 				{(
 					renderVoucherForm(selectedVoucher.voucherTypeId, selectedVoucher.voucherId)
 				)}
-				{/* {selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-					VoucherTypeEnum.Payment && (
-						<PaymentAndReceiptForm
-							voucherId={selectedVoucher.voucherId}
-							voucherType={VoucherTypeEnum.Payment}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-					VoucherTypeEnum.Receipt && (
-						<PaymentAndReceiptForm
-							voucherId={selectedVoucher.voucherId}
-							voucherType={VoucherTypeEnum.Receipt}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-					VoucherTypeEnum.BankEntry && (
-						<BankEntryForm
-							voucherId={selectedVoucher.voucherId}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-					VoucherTypeEnum.JournalEntry && (
-						<JournalEntryForm
-							voucherId={selectedVoucher.voucherId}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-					VoucherTypeEnum.ItemSale && (
-						<SalePurchaseForm
-							voucherType={VoucherTypeEnum.ItemSale}
-							voucherId={selectedVoucher.voucherId}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)} */}
 			</CommonModal>}
 		</>
 	);
