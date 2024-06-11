@@ -30,6 +30,8 @@ import { VoucherTypeEnum } from '../../features/Vouchers/VoucherCommon/voucherTy
 import TrialBalanceReport from '../../features/Reports/TrialBalance/TrialBalanceReport';
 import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
 import { SalePurchaseForm } from '../../features/Vouchers/SalePurchase/SalePurchaseForm';
+import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
+import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
 
 export const router = createBrowserRouter([
 	{
@@ -54,14 +56,8 @@ export const router = createBrowserRouter([
 					{ path: 'create-company', element: <CreateCompany /> },
 					{ path: 'edit-company', element: <CreateCompany /> },
 					{ path: 'dashboard', element: <Dashboard /> },
-					{
-						path: 'add-financial-year',
-						element: <FinancialYearForm />,
-					},
-					{
-						path: 'edit-financial-year',
-						element: <FinancialYearForm />,
-					},
+					{ path: 'add-financial-year', element: <FinancialYearForm />, },
+					{ path: 'edit-financial-year', element: <FinancialYearForm />, },
 					{ path: 'account-group', element: <AccountGroupForm /> },
 					{ path: 'city', element: <CityForm /> },
 					{ path: 'item-unit', element: <ItemUnitForm /> },
@@ -113,6 +109,8 @@ export const router = createBrowserRouter([
 						element: <TrialBalanceReport />,
 					},
 					{ path: 'sale-billbook', element: <BillBookForm /> },
+					{ path: 'mandi', element: <MandiForm /> },
+					{ path: 'commissionagent-item', element: <CommissionAgentItemForm /> },
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },

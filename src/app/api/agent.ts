@@ -29,6 +29,8 @@ import {
   ItemFormDto,
 } from "../../features/Masters/Item/ItemDto";
 import { ItemSalePurchaseVoucherDto } from "../../features/Vouchers/SalePurchase/salePurchaseVoucherDto";
+import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
+import { CommissionAgentItemDto } from "../../features/CommissionAgent/CommissionAgentItem/commissionAgentItem";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -919,6 +921,74 @@ const SalePurchase = {
   },
 };
 
+const CommissionAgentItem = {
+  getAllCommissionAgentItems: async (
+    accessId: string
+  ): Promise<CommissionAgentItemDto[]> => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(
+      "commissionAgentItem/GetAllCommissionAgentItems",
+      params
+    );
+  },
+  getCommissionAgentItemById: async (accessId: string, itemId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`commissionAgentItem/${itemId}`, params);
+  },
+  createCommissionAgentItem: async (
+    accessId: string,
+    item: CommissionAgentItemDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post(
+      "commissionAgentItem/CreateCommissionAgentItem",
+      item,
+      params
+    );
+  },
+  updateCommissionAgentItem: async (
+    accessId: string,
+    itemId: number,
+    item: CommissionAgentItemDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`commissionAgentItem/${itemId}`, item, params);
+  },
+  deleteCommissionAgentItem: async (accessId: string, itemId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`commissionAgentItem/${itemId}`, params);
+  },
+};
+const Mandi = {
+  getAllMandis: async (accessId: string): Promise<MandiDto[]> => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("mandi/GetAllMandis", params);
+  },
+  getMandiById: async (
+    accessId: string,
+    mandiId: number
+  ): Promise<MandiDto> => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`mandi/${mandiId}`, params);
+  },
+  createMandi: async (accessId: string, mandi: MandiDto): Promise<MandiDto> => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post("mandi/CreateMandi", mandi, params);
+  },
+  updateMandi: async (
+    accessId: string,
+    mandiId: number,
+    mandi: MandiDto
+  ): Promise<void> => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`mandi/${mandiId}`, mandi, params);
+  },
+  deleteMandi: async (accessId: string, mandiId: number): Promise<void> => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`mandi/${mandiId}`, params);
+  },
+};
+
 const agent = {
   UserAccount,
   Company,
@@ -941,6 +1011,8 @@ const agent = {
   Reports,
   BillBook,
   SalePurchase,
+  CommissionAgentItem,
+  Mandi,
 };
 
 export default agent;

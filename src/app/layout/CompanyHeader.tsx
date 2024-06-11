@@ -38,6 +38,7 @@ function CompanyHeader() {
 	const [showMastersDropdown, setShowMastersDropdown] = useState(false);
 	const [showVouchersDropdown, setShowVouchersDropdown] = useState(false);
 	const [showReportsDropdown, setShowReportsDropdown] = useState(false);
+	const [showCommissionAgentDropdown, setShowCommissionAgentDropdown] = useState(false);
 
 	// Event handlers to toggle dropdown visibility
 	const handleMastersDropdownHover = () => setShowMastersDropdown(true);
@@ -48,6 +49,9 @@ function CompanyHeader() {
 
 	const handleReportsDropdownHover = () => setShowReportsDropdown(true);
 	const handleReportsDropdownLeave = () => setShowReportsDropdown(false);
+
+	const handleCommissionAgentDropdownHover = () => setShowCommissionAgentDropdown(true);
+	const handleCommissionAgentDropdownLeave = () => setShowCommissionAgentDropdown(false);
 
 	const formatCompanyName = (name: string) => {
 		if (name.length > 50) {
@@ -105,7 +109,7 @@ function CompanyHeader() {
 		return (
 			currentFinancialYear &&
 			financialYear.financialYearFrom ===
-				currentFinancialYear.financialYearFrom
+			currentFinancialYear.financialYearFrom
 		);
 	};
 	const handleEditFinancialYear = (financialYear: FinancialYearDto) => {
@@ -137,9 +141,8 @@ function CompanyHeader() {
 						Masters
 					</Dropdown.Toggle>
 					<Dropdown.Menu
-						className={`custom-dropdown-menu ${
-							showMastersDropdown ? '' : 'hidden'
-						}`}
+						className={`custom-dropdown-menu ${showMastersDropdown ? '' : 'hidden'
+							}`}
 						onMouseEnter={handleMastersDropdownHover}
 						onMouseLeave={handleMastersDropdownLeave}
 					>
@@ -204,9 +207,8 @@ function CompanyHeader() {
 						Vouchers
 					</Dropdown.Toggle>
 					<Dropdown.Menu
-						className={`custom-dropdown-menu ${
-							showVouchersDropdown ? '' : 'hidden'
-						}`}
+						className={`custom-dropdown-menu ${showVouchersDropdown ? '' : 'hidden'
+							}`}
 						onMouseEnter={handleVouchersDropdownHover}
 						onMouseLeave={handleVouchersDropdownLeave}
 					>
@@ -242,9 +244,8 @@ function CompanyHeader() {
 						Reports
 					</Dropdown.Toggle>
 					<Dropdown.Menu
-						className={`custom-dropdown-menu ${
-							showReportsDropdown ? '' : 'hidden'
-						}`}
+						className={`custom-dropdown-menu ${showReportsDropdown ? '' : 'hidden'
+							}`}
 						onMouseEnter={handleReportsDropdownHover}
 						onMouseLeave={handleReportsDropdownLeave}
 					>
@@ -256,6 +257,36 @@ function CompanyHeader() {
 							Trial Balance
 						</Dropdown.Item>
 						<Dropdown.Divider />
+					</Dropdown.Menu>
+				</Dropdown>
+				<Dropdown as="div" className="dropdown-on-hover">
+					<Dropdown.Toggle
+						as={Nav.Link}
+						id="dropdown-autoclose-true"
+						className="dropdown-toggle"
+						onMouseEnter={handleCommissionAgentDropdownHover}
+						onMouseLeave={handleCommissionAgentDropdownLeave}
+					>
+						Commission Agent
+					</Dropdown.Toggle>
+					<Dropdown.Menu
+						className={`custom-dropdown-menu ${showCommissionAgentDropdown ? '' : 'hidden'
+							}`}
+						onMouseEnter={handleCommissionAgentDropdownHover}
+						onMouseLeave={handleCommissionAgentDropdownLeave}
+					>
+						<Dropdown.Item as={Link} to={'/IJ Form'}>
+							IJ Form
+						</Dropdown.Item>
+						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/mandi'}>
+							Mandi
+						</Dropdown.Item>
+						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/commissionagent-item'}>
+							Item
+						</Dropdown.Item>
+
 					</Dropdown.Menu>
 				</Dropdown>
 			</Nav>
@@ -293,21 +324,21 @@ function CompanyHeader() {
 										const financialYearTo =
 											financialYear.financialYearTo
 												? toCustomDateFormat(
-														new Date(
-															financialYear.financialYearTo
-														)
-												  )
+													new Date(
+														financialYear.financialYearTo
+													)
+												)
 												: null;
 										const itemStyle =
 											isCurrentFinancialYear(
 												financialYear
 											)
 												? {
-														backgroundColor:
-															'#f0f0f0 !important',
-														fontWeight:
-															'bold !important',
-												  }
+													backgroundColor:
+														'#f0f0f0 !important',
+													fontWeight:
+														'bold !important',
+												}
 												: {};
 
 										return (
