@@ -934,10 +934,12 @@ const SalePurchase = {
     accessId: string,
     voucherId: string
   ) => {
-    const params = new URLSearchParams({ accessId });
+    const params = new URLSearchParams({
+      accessId: accessId,
+      voucherId: voucherId
+    });
     return await requests.delete(
-      `SalePurchase/DeleteVoucher/${voucherId}`,
-      params
+      `SalePurchase/${voucherId}`,params
     );
   },
 };

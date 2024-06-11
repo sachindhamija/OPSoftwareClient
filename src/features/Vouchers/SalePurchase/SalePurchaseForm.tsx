@@ -139,7 +139,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             }
         }
     };
-
+    const deleteVoucher=()=>{
+        if (window.confirm("Are you sure you want to delete this row?")) {
+            agent.SalePurchase.deleteVoucher(accessId,(voucherId??'')).then(()=>{
+                onSuccessfulSubmit();
+                toast.success('Voucher deleted successfully');
+            })
+        }
+    }
     useEffect(() => {
         calculateBillSummary();
     }, [watchedItems]);
@@ -1011,7 +1018,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                     }} /></Col>
                                 <Col><CustomButton size="sm" variant="outline-info" text="Charges/Discount (F2)" className="w-100" /></Col>
                                 <Col><CustomButton size="sm" variant="success" type="submit" text="Save Invoice (Ctrl+S)" className="w-100" /></Col>
-                                <Col><CustomButton size="sm" variant="outline-danger" text="Final Delete (Ctrl+D)" className="w-100" /></Col>
+                                {<Col><CustomButton size="sm" variant="outline-danger" text="Final Delete (Ctrl+D)" className="w-100" onClick={()=>deleteVoucher()}/></Col>}
                                 <Col><CustomButton size="sm" variant="success" text="Print Invoice (Ctrl+P)" className="w-100" /></Col>
                             </Row>
                         </div>
