@@ -30,6 +30,7 @@ import BankEntryForm from '../../Vouchers/BankEntry/BankEntryForm';
 import getLastVoucherDate from '../../../app/hooks/useLastVoucherDate';
 import JournalEntryForm from '../../Vouchers/JournalEntry/JournalEntryForm';
 import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation';
+import { SalePurchaseForm } from '../../Vouchers/SalePurchase/SalePurchaseForm';
 
 export interface LedgerReportDto {
 	voucherId: string;
@@ -94,8 +95,8 @@ const LedgerReport = ({
 		return currentTotal > 0
 			? `${formatNumberIST(Math.abs(currentTotal))} DR`
 			: currentTotal < 0
-			? `${formatNumberIST(Math.abs(currentTotal))} CR`
-			: 'NIL';
+				? `${formatNumberIST(Math.abs(currentTotal))} CR`
+				: 'NIL';
 	};
 
 	const {
@@ -217,7 +218,27 @@ const LedgerReport = ({
 		setSelectedVoucher(voucher);
 		setShowVoucherModal(true);
 	};
+	const renderVoucherForm = (voucherTypeId: VoucherTypeEnum, voucherId: string) => {
+		const commonProps = {
+			voucherId,
+			isInModal: true,
+			onSuccessfulSubmit: handleCloseModal,
+		};
 
+		switch (voucherTypeId) {
+			case VoucherTypeEnum.Payment:
+			case VoucherTypeEnum.Receipt:
+				return <PaymentAndReceiptForm {...commonProps} voucherType={voucherTypeId} />;
+			case VoucherTypeEnum.BankEntry:
+				return <BankEntryForm {...commonProps} />;
+			case VoucherTypeEnum.JournalEntry:
+				return <JournalEntryForm {...commonProps} />;
+			case VoucherTypeEnum.ItemSale:
+				return <SalePurchaseForm {...commonProps} voucherType={voucherTypeId} />;
+			default:
+				return null;
+		}
+	};
 	return (
 		<>
 			<CommonCard header="Ledger" size="100%">
@@ -369,10 +390,10 @@ const LedgerReport = ({
 															}}
 														>
 															{entry.debitAmount >
-															0
+																0
 																? formatNumberIST(
-																		entry.debitAmount
-																  )
+																	entry.debitAmount
+																)
 																: ''}
 														</td>
 														<td
@@ -382,10 +403,10 @@ const LedgerReport = ({
 															}}
 														>
 															{entry.creditAmount >
-															0
+																0
 																? formatNumberIST(
-																		entry.creditAmount
-																  )
+																	entry.creditAmount
+																)
 																: ''}
 														</td>
 														<td
@@ -421,8 +442,8 @@ const LedgerReport = ({
 										<td className="text-end">
 											{openingBalance !== 0
 												? calculateRunningBalanceLabel(
-														openingBalance
-												  )
+													openingBalance
+												)
 												: ''}
 										</td>
 										<td className="text-end">
@@ -443,7 +464,7 @@ const LedgerReport = ({
 					</Row>
 				</FormNavigator>
 			</CommonCard>
-			<CommonModal
+			{selectedVoucher && <CommonModal
 				show={showVoucherModal}
 				onHide={() => {
 					setShowVoucherModal(false);
@@ -451,45 +472,10 @@ const LedgerReport = ({
 				}}
 				size="xl"
 			>
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-						VoucherTypeEnum.Payment && (
-						<PaymentAndReceiptForm
-							voucherId={selectedVoucher.voucherId}
-							voucherType={VoucherTypeEnum.Payment}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-						VoucherTypeEnum.Receipt && (
-						<PaymentAndReceiptForm
-							voucherId={selectedVoucher.voucherId}
-							voucherType={VoucherTypeEnum.Receipt}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-						VoucherTypeEnum.BankEntry && (
-						<BankEntryForm
-							voucherId={selectedVoucher.voucherId}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-				{selectedVoucher &&
-					selectedVoucher.voucherTypeId ===
-						VoucherTypeEnum.JournalEntry && (
-						<JournalEntryForm
-							voucherId={selectedVoucher.voucherId}
-							isInModal={true}
-							onSuccessfulSubmit={handleCloseModal}
-						/>
-					)}
-			</CommonModal>
+				{(
+					renderVoucherForm(selectedVoucher.voucherTypeId, selectedVoucher.voucherId)
+				)}
+			</CommonModal>}
 		</>
 	);
 };

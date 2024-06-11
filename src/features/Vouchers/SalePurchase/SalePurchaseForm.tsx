@@ -40,10 +40,11 @@ interface SalePurchaseFormProps {
     onSuccessfulSubmit?: () => void;
 }
 
-export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false }: SalePurchaseFormProps) {
+export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false,onSuccessfulSubmit }: SalePurchaseFormProps) {
 
     const accessId = getAccessIdOrRedirect();
     const financialYear = useAppSelector(selectCurrentFinancialYear);
+    const [voucher, setVoucher] = useState<any | null>(null);
     const [lastVoucherDate, setLastVoucherDate] = useState<Date | null>(null);
     const [billBookList, setBillBookList] = useState<OptionType[]>([]);
     const [showBillBookModal, setShowBillBookModal] = useState(false);
@@ -62,6 +63,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [showTransportModal, setShowTransportModal] = useState(false);
     const [transportDetails, setTransportDetails] = useState<TransportDetailDto>(defaultTransportDetails);
     const updateParentStateOfTransportDetails = (data: TransportDetailDto) => {
+        console.log(`transporter =>`,data)
         setTransportDetails(data);
     };
 
@@ -84,8 +86,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     useEffect(() => {
         if (focusRemarks) {
             const remarksInput = document.getElementById('remarks'); // Get the element
-            console.log(remarksInput);
-
             if (remarksInput) {  // Check if the element is not null
                 remarksInput.focus(); // Safely call focus
                 setFocusRemarks(false);  // Reset focus state to prevent re-focusing on subsequent renders
@@ -146,21 +146,83 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
     const paymentMode = watch('paymentMode', '');
     const voucherDate = watch("voucherDate");
+    const getVoucherById = async (voucherId: string) => {
+        const resp = await agent.Vouchers.getVoucherById(accessId, voucherId);
+        setVoucher(resp)
+    }
+    // useEffect(() => {
+    //     if (accessId && financialYear && voucherType !== undefined && voucherId == undefined) { // this condition is to create a new voucher
+    //         getLastVoucherDate(accessId, voucherType, financialYear)
+    //             .then(date => {
+    //                 setLastVoucherDate(date);
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error fetching last voucher date:', error);
+    //                 toast.error('Failed to fetch last voucher date.');
+    //             });
 
+    //     }
+    //     else if (accessId && financialYear && voucherType !== undefined && voucherId != undefined) {
+    //         getVoucherById(voucherId)
+    //     }
+    // }, [accessId, financialYear, voucherType, voucherId]);
     useEffect(() => {
-        if (accessId && financialYear && voucherType !== undefined && voucherId == undefined) {
-            getLastVoucherDate(accessId, voucherType, financialYear)
-                .then(date => {
-                    setLastVoucherDate(date);
-                })
-                .catch(error => {
-                    console.error('Error fetching last voucher date:', error);
-                    toast.error('Failed to fetch last voucher date.');
-                });
 
+        if (voucher) {
+            setTransportDetails({
+                transporterName: voucher?.voucherMasterExtended?.transporterName,
+                vehicleNumber: voucher?.voucherMasterExtended?.vehicleNumber,
+                driverName: voucher?.voucherMasterExtended?.driverName,
+                grNo: voucher?.voucherMasterExtended?.grNo,
+                grDate: voucher?.voucherMasterExtended?.grDate,
+                brokerName: voucher?.voucherMasterExtended?.brokerName,
+                deliveryAddress: voucher?.voucherMasterExtended?.deliveryAddress,
+                deliveryFirmName: voucher?.voucherMasterExtended?.deliveryFirmName,
+                deliveryFirmGSTNo: voucher?.voucherMasterExtended?.deliveryFirmGSTNo,
+                deliveryFirmContactPersonName: voucher?.voucherMasterExtended?.deliveryFirmContactPersonName,
+                deliveryFirmPersonMobileNumber: voucher?.voucherMasterExtended?.deliveryFirmPersonMobileNumber,
+            });
+
+            // Update the customerDetail state
+            setCustomerDetail({
+                customerName: voucher?.voucherMasterExtended?.customerName,
+                customerAddress: voucher?.voucherMasterExtended?.customerAddress,
+                customerContactNo: voucher?.voucherMasterExtended?.customerContactNo,
+                customerGSTNo: voucher?.voucherMasterExtended?.customerGSTNo,
+                customerPAN: voucher?.voucherMasterExtended?.customerPAN,
+                customerAadhar: voucher?.voucherMasterExtended?.customerAadhar,
+            });
+            setValue('billBookId', voucher?.voucherMasterExtended?.billBookId);
+            setValue('voucherDate', voucher.voucherDate);
+            setValue('voucherId', voucher.voucherId);
+            setValue('paymentMode', voucher?.voucherMasterExtended?.paymentMode);
+            setValue('accountId', voucher.voucherDetails[0]?.accountId);
+            setValue('voucherNo', voucher.voucherNumber);
+            setValue('remarks', voucher.remarks);
+            const itemsToAdd = Math.max(0, voucher.voucherItemDetails.length - fields.length) + (fields.length === 1 ? 1 : 0);
+            for (let i = 0; i < itemsToAdd; i++) {
+                append(defaultItems);
+            }
+            voucher.voucherItemDetails.forEach((item, index) => {
+                setValue(`items[${index}].itemId`, item.itemId);
+                setValue(`items[${index}].mainQty`, item.mainQty);
+                setValue(`items[${index}].altQty`, item.altQty);
+                setValue(`items[${index}].free`, item.free);
+                setValue(`items[${index}].rate`, item.rateWithoutGST);
+                setValue(`items[${index}].pricePer`, item.pricePer);
+                setValue(`items[${index}].basicAmount`, item.grossAmount);
+                setValue(`items[${index}].discountPercentage`, item.discountPercentage);
+                setValue(`items[${index}].discountAmount`, item.discountAmount);
+                setValue(`items[${index}].iGST`, item.igst);
+                setValue(`items[${index}].sGST`, item.sgst);
+                setValue(`items[${index}].cGST`, item.cgst);
+                setValue(`items[${index}].netAmount`, item.netAmount);
+                setValue(`items[${index}].itemDetail.salePurAccountID`, item?.item?.salePurAccountID);
+
+
+            });
         }
-    }, [accessId, financialYear, voucherType, voucherId]);
-
+    }, [voucher]);
     const loadBillBookOptions = async () => {
         try {
             const response = await agent.BillBook.getAllBillBooks(accessId);
@@ -196,7 +258,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 const lastVoucherInfo = await agent.SalePurchase.getLastVoucherInfoBySaleBillBookId(accessId, selectedOption.value);
                 let { LastVoucherNumber, LastVoucherPrefix } = lastVoucherInfo;
                 LastVoucherNumber = String(parseInt(LastVoucherNumber) || 0);
-                let nextVoucherNumber = parseInt(LastVoucherNumber) + 1;
+                const nextVoucherNumber = parseInt(LastVoucherNumber) + 1;
                 const fullVoucherNumber = `${LastVoucherPrefix || ''}${nextVoucherNumber}`;
                 setValue("voucherNo", fullVoucherNumber);
             } catch (error) {
@@ -236,16 +298,33 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             return Promise.reject();
         }
     };
-
+    const fetchData = async () => {
+        if (voucherDate && validateDate(voucherDate) && financialYear?.financialYearFrom) {
+            fetchAccounts(voucherDate);
+            const options = await fetchItemListForDropdown(accessId, financialYear.financialYearFrom, voucherDate);
+            setItemDropDownList(options);
+        }
+    };
     useEffect(() => {
-        const fetchData = async () => {
-            if (voucherDate && validateDate(voucherDate) && financialYear?.financialYearFrom) {
-                fetchAccounts(voucherDate);
-                const options = await fetchItemListForDropdown(accessId, financialYear.financialYearFrom, voucherDate);
-                setItemDropDownList(options);
+
+        fetchData().then(() => {
+
+            if (accessId && financialYear && voucherType !== undefined && voucherId == undefined) { // this condition is to create a new voucher
+                getLastVoucherDate(accessId, voucherType, financialYear)
+                    .then(date => {
+                        setLastVoucherDate(date);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching last voucher date:', error);
+                        toast.error('Failed to fetch last voucher date.');
+                    });
+
             }
-        };
-        fetchData();
+            else if (accessId && financialYear && voucherType !== undefined && voucherId != undefined) {
+                getVoucherById(voucherId)
+            }
+        });
+
     }, [accessId, voucherDate, financialYear, voucherType]);
 
 
@@ -260,6 +339,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 if (askForCustomerDetailWhenCash && cashAccount) {
                     setFocusBillNo(true);
                     setTimeout(() => {
+                        if(!voucher && !voucherId) // avoid opening in edit mode
                         setShowCustomerDetailModal(true);
                         setFocusBillNo(false);
                     }, 100);
@@ -305,7 +385,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             setValue(`items[${index}].itemId`, itemDetails.itemId);
             setValue(`items[${index}].itemDetail.mainUnitName`, itemDetails.mainUnitName);
 
-            let pricePerOptionsForItem = [{ value: 'main', label: itemDetails.mainUnitName || '' }];
+            const pricePerOptionsForItem = [{ value: 'main', label: itemDetails.mainUnitName || '' }];
             if (itemDetails.alternateUnitName && itemDetails.mainUnitName !== itemDetails.alternateUnitName) {
                 setUseAltQty(true);
                 pricePerOptionsForItem.push({ value: 'alt', label: itemDetails.alternateUnitName || '' });
@@ -360,7 +440,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             altQty = mainQty * conversion;
             const qty = pricePer === 'alt' ? altQty : mainQty;
 
-            let rateValue = rate && parseFloat(rate.toString()) || 0;
+            const rateValue = rate && parseFloat(rate.toString()) || 0;
             let basicAmount = qty * rateValue;
             let discountAmount = enteredDiscountAmount;
 
@@ -472,15 +552,25 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 return;
             }
             const finalData = convertFieldValuesToDto(data);
-            console.log(finalData);
 
             if (voucherType == VoucherTypeEnum.ItemSale) {
-                await agent.SalePurchase.saveVoucher(accessId, finalData, "");
-                toast.success('Voucher created successfully');
-                reset();
-                setTransportDetails(defaultTransportDetails);
-                setCustomerDetail(defaultCustomerDetails);
-                setBillSummary(defaultBillSummary);
+                if (voucherId || voucher) {
+                    // update the invoice   
+                    await agent.SalePurchase.updateVoucher(accessId, finalData);
+                    toast.success('Voucher updated successfully');
+                }
+                else {
+                    await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    toast.success('Voucher created successfully');
+                    reset();
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                }
+                if (isInModal && onSuccessfulSubmit) {
+                    onSuccessfulSubmit();
+                }
+
             }
 
         } catch (error) {
@@ -562,7 +652,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             const newItem = {
                 itemId: item.itemId,
                 salePurAccountID: item.itemDetail?.salePurAccountID,
-                batchId: item.batchId,
+                batchId: (item.batchId ? item.batchId : null),
                 mainQty: item.mainQty || 0,
                 altQty: item.altQty || 0,
                 free: item.free || 0,
@@ -597,7 +687,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
         return processedItems;
     };
-
+    if (voucherId && !voucher) return null;
     return (
         <>
             <CommonCard header={voucherType == undefined ? "" : getVoucherTypeString(voucherType)} size="100%" showControlPanelButton >
@@ -605,6 +695,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     <Row className="gx-2">
                         <Col xs={12} md={3} className="custom-col-billBook">
                             <CustomDropdown
+                                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
                                 name="billBookId"
                                 label="Bill Book [F3-New]"
                                 options={billBookList}
@@ -619,6 +710,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                         </Col>
                         <Col xs={11} sm={5} md={2} className="custom-col-date">
                             <CustomDateInputBox
+
                                 label="Date"
                                 name="voucherDate"
                                 validationRules={{ required: 'Date is required.' }}
@@ -626,7 +718,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 setValue={setValue}
                                 error={errors.voucherDate}
                                 financialYear={financialYear}
-                                defaultDate={lastVoucherDate}
+                                defaultDate={(voucher ? (voucher.voucherDate) : (lastVoucherDate))}
 
                             />
                         </Col>
@@ -638,6 +730,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 control={control}
                                 hideDropdownIcon
                                 hideClearIcon
+                            // defaultValue={voucher?.voucherMasterExtended?.paymentMode}
                             />
                         </Col>
                         <Col xs={12} sm={6} md={5}>
@@ -656,7 +749,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 hideDropdownIcon
                                 hideClearIcon
                                 disabled={askForCustomerDetailWhenCash && paymentMode.toLowerCase().includes("cash")}
-
+                            // defaultValue={voucher?.voucherDetails?.accountId}
                             />
                         </Col>
                         <Col xs={12} md={2} className="custom-col-reduced">
@@ -667,6 +760,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 maxLength={12}
                                 isTextCenter
                                 autoFocus={focusBillNo}
+                            // defaultValue={voucher?.voucherNumber}
                             />
                         </Col>
                     </Row>
