@@ -26,6 +26,8 @@ import './salepurchase.scss'
 import { formatNumberIST } from "../../../app/utils/numberUtils";
 import TransportAndShippingDetailModal from "./TransportAndShippingDetailModal";
 import CustomerDetailModal from "./CustomerDetailModal";
+// import OtherCharges from "./OtherCharges";
+
 
 
 const PAYMENT_MODE_OPTIONS = [
@@ -68,6 +70,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     };
 
     const [showCustomerDetailModal, setShowCustomerDetailModal] = useState(false);
+    // const [showOtherChargesModal, setShowOtherChargesModal] = useState(false);
     const [customerDetail, setCustomerDetail] = useState<CustomerDetailDto>(defaultCustomerDetails);
     const updateParentStateOfCustomerDetail = (data: CustomerDetailDto) => {
         setCustomerDetail(data);
@@ -142,6 +145,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const deleteVoucher=()=>{
         if (window.confirm("Are you sure you want to delete this row?")) {
             agent.SalePurchase.deleteVoucher(accessId,(voucherId??'')).then(()=>{
+                if(onSuccessfulSubmit)
                 onSuccessfulSubmit();
                 toast.success('Voucher deleted successfully');
             })
@@ -210,7 +214,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             for (let i = 0; i < itemsToAdd; i++) {
                 append(defaultItems);
             }
-            voucher.voucherItemDetails.forEach((item, index) => {
+            voucher.voucherItemDetails.forEach((item:ItemsInVoucherDto, index:number) => {
                 setValue(`items[${index}].itemId`, item.itemId);
                 setValue(`items[${index}].mainQty`, item.mainQty);
                 setValue(`items[${index}].altQty`, item.altQty);
@@ -263,7 +267,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             if (voucherNo) return;
             try {
                 const lastVoucherInfo = await agent.SalePurchase.getLastVoucherInfoBySaleBillBookId(accessId, selectedOption.value);
-                let { LastVoucherNumber, LastVoucherPrefix } = lastVoucherInfo;
+                const {LastVoucherPrefix} = lastVoucherInfo;
+                let { LastVoucherNumber } = lastVoucherInfo;
                 LastVoucherNumber = String(parseInt(LastVoucherNumber) || 0);
                 const nextVoucherNumber = parseInt(LastVoucherNumber) + 1;
                 const fullVoucherNumber = `${LastVoucherPrefix || ''}${nextVoucherNumber}`;
@@ -437,8 +442,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             if (fieldName == 'pricePer') {
                 pricePer = value;
             }
-
-            let { mainQty, altQty, rate, discountPercentage, discountAmount: enteredDiscountAmount, itemDetail } = item;
+            const { rate, discountAmount: enteredDiscountAmount, itemDetail}=item;
+            let { mainQty, altQty, discountPercentage } = item;
             const taxRate = itemDetail && itemDetail.gstSlab?.igst || 0;
             const conversion = itemDetail && itemDetail.conversion || 1;
 
@@ -656,7 +661,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             } else if (selectedTaxType === "Exclusive" && taxRate) {
                 rateIncludingGST = rateWithoutGST * (1 + taxRate / 100);
             }
-            const newItem = {
+            const newItem :ItemsInVoucherDto= {
                 itemId: item.itemId,
                 salePurAccountID: item.itemDetail?.salePurAccountID,
                 batchId: (item.batchId ? item.batchId : null),
@@ -1013,13 +1018,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                         setShowTransportModal(true);
                                     }} /></Col>
                                 <Col><CustomButton size="sm" variant="outline-info" text="Customer Detail (F2)" className="w-100"
-                                    onClick={() => {
-                                        setShowCustomerDetailModal(true);
+                                    /></Col>
+                                <Col><CustomButton size="sm" variant="outline-info" text="Charges/Discount (F2)" className="w-100" onClick={() => {
+                                        // setShowOtherChargesModal(true);
                                     }} /></Col>
-                                <Col><CustomButton size="sm" variant="outline-info" text="Charges/Discount (F2)" className="w-100" /></Col>
                                 <Col><CustomButton size="sm" variant="success" type="submit" text="Save Invoice (Ctrl+S)" className="w-100" /></Col>
-                                {<Col><CustomButton size="sm" variant="outline-danger" text="Final Delete (Ctrl+D)" className="w-100" onClick={()=>deleteVoucher()}/></Col>}
                                 <Col><CustomButton size="sm" variant="success" text="Print Invoice (Ctrl+P)" className="w-100" /></Col>
+                                <Col>{voucher && voucherId &&<CustomButton size="sm" variant="outline-danger" text="Final Delete (Ctrl+D)" className="w-100" onClick={()=>deleteVoucher()}/>}</Col>
+                                
                             </Row>
                         </div>
 
@@ -1133,6 +1139,18 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     initialData={customerDetail}
                 />
             }
+            {/* {showOtherChargesModal &&
+                <OtherCharges show={showOtherChargesModal}
+
+                onHide={() => {
+                    setShowOtherChargesModal(false)
+                    setTimeout(() => {
+                        setFocusRemarks(true);
+                    }, 10);
+                }}
+                onSave={()=>{}}
+                initialData={[]}/>
+            } */}
 
         </>
     )
