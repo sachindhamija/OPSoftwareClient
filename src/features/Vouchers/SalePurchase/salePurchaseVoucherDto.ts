@@ -53,7 +53,7 @@ export interface ItemsInVoucherDto {
   itemId: number;
   itemDetail?: ItemDetailDto;
   salePurAccountID?: string;
-  batchId?: number;
+  batchId?: number|null;
   mainQty: number;
   altQty: number;
   free: number;
@@ -71,14 +71,23 @@ export interface ItemsInVoucherDto {
   additionalTax1: number;
   additionalTax2: number;
   netAmount: number;
+  grossAmount?:number;
+  igst?:number;
+  sgst?:number;
+  cgst?:number;
+  item?:ItemDetailDto|null;
 }
 
 export interface OtherChargesDto {
-  otherChargesId: number;
+  key:number;
+  otherChargesId: string;
+  voucherId:string;
   accountId: string;
   onValue: number;
   chargesPercentage: number;
   addedOrSubtracted?: string;
+  tax:string;
+  taxSlab:string;
   grossAmount: number;
   sGST: number;
   cGST: number;
@@ -157,10 +166,10 @@ export const defaultTransportDetails: TransportDetailDto = {
   grNo: "",
   grDate: "",
   deliveryAddress: "",
-  firmName: "",
-  gstNo: "",
-  contactPersonName: "",
-  contactPersonMobileNumber: "",
+  deliveryFirmName: "",
+  deliveryFirmGSTNo: "",
+  deliveryFirmContactPersonName: "",
+  deliveryFirmPersonMobileNumber: "",
   brokerName: "",
 };
 
