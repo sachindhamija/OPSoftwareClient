@@ -67,7 +67,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [showTransportModal, setShowTransportModal] = useState(false);
     const [transportDetails, setTransportDetails] = useState<TransportDetailDto>(defaultTransportDetails);
     const updateParentStateOfTransportDetails = (data: TransportDetailDto) => {
-        console.log(`transporter =>`, data)
         setTransportDetails(data);
     };
 
@@ -82,14 +81,13 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     };
     const updateParentStateOfOtherCharges = (data: OtherChargesDto[]) => {
         setOtherCharges(data);
-        setTimeout(() => {
-            calculateBillSummary();
-        }, 300);
-        
-      
-
+        // calculateBillSummary();
     };
-
+    useEffect(() => {
+        if (otherCharges.length > 0 && (otherCharges[0].grossAmount>0 || otherCharges[0].chargesPercentage>0)) {
+            calculateBillSummary();
+        }
+    }, [otherCharges]);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const scrollToBottom = () => {
@@ -542,7 +540,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         let roundedNetBillAmount = Math.round(netBillAmount);
         const totalRoundOff = parseFloat((netBillAmount - roundedNetBillAmount).toFixed(2));
         const totalCharges: number = otherCharges.reduce((total, item) => {
-            console.log('============== > ',)
             if (item.addedOrSubtracted === '-') {
                 roundedNetBillAmount -= item.grossAmount;
             } else if (item.addedOrSubtracted === '+') {

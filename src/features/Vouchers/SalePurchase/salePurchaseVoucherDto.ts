@@ -80,7 +80,7 @@ export interface ItemsInVoucherDto {
 
 export interface OtherChargesDto {
   key:number;
-  otherChargesId: number;
+  otherChargesId: string|null;
   voucherId:string;
   accountId: string;
   onValue: number;
@@ -198,7 +198,7 @@ export const defaultBillSummary = {
 };
 export const defaultOtherCharges: OtherChargesDto[] = [{
   key: 0,
-  otherChargesId: 0,
+  otherChargesId: null,
   voucherId: '',
   accountId: '',
   onValue: 0,

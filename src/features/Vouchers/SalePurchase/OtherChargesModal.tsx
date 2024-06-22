@@ -23,59 +23,59 @@ interface OtherChargesModalProps {
   onHide: () => void;
   onSave: (data: OtherChargesDto[]) => void;
   initialData: OtherChargesDto[];
-  voucherDate:any;
+  voucherDate: any;
 }
 
-const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onSave, initialData,voucherDate }) => {
+const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onSave, initialData, voucherDate }) => {
   const accessId = getAccessIdOrRedirect();
   const financialYear = useAppSelector(selectCurrentFinancialYear);
   const gstSlabs = useGstSlabs(accessId);
-  // const accountGroupOptions = useAccountGroups(accessId);
+  // const [isFormValid, setIsFormValid] = useState(false)
   const [charges, setCharges] = useState<OtherChargesDto[]>(initialData);
   const [modalShow, setModalShow] = useState(false);
   const { control, formState: { errors }, reset } = useForm<OtherChargesDto[]>({ mode: 'all' });
   const [allAccounts, setAllAccounts] = useState<OptionType[]>([]);
-  
+
   const fetchAccounts = async () => {
     try {
-      
-          const financialYearFrom = financialYear?.financialYearFrom;
-          const accounts = await agent.SalePurchase.getAccountsForDropDownListSalePurchase(
-              accessId,
-              (financialYearFrom==undefined?'':financialYearFrom.toString()),
-              formatDateForBackend(voucherDate),
-          );
-          setAllAccounts(accounts.map(transformAccountToOption));
-        
-      
-        return Promise.resolve();
+
+      const financialYearFrom = financialYear?.financialYearFrom;
+      const accounts = await agent.SalePurchase.getAccountsForDropDownListSalePurchase(
+        accessId,
+        (financialYearFrom == undefined ? '' : financialYearFrom.toString()),
+        formatDateForBackend(voucherDate),
+      );
+      setAllAccounts(accounts.map(transformAccountToOption));
+
+
+      return Promise.resolve();
     } catch (error) {
-        toast.error('Failed to fetch accounts for dropdown.');
-        console.error(error);
-        return Promise.reject();
+      toast.error('Failed to fetch accounts for dropdown.');
+      console.error(error);
+      return Promise.reject();
     }
-};
+  };
   const handleAddRow = () => {
     const previousNetCharges = charges.length > 0 ? charges[charges.length - 1].netCharges : 0;
     const newCharge: OtherChargesDto = {
-        otherChargesId: 0,
-        voucherId: '',
-        key: charges.length + 1,
-        accountId: '',
-        onValue: previousNetCharges,
-        chargesPercentage: 0,
-        addedOrSubtracted: '+', // Default to plus sign, you can adjust as needed
-        tax: 'no',
-        taxSlab: '',
-        grossAmount: 0,
-        sGST: 0,
-        cGST: 0,
-        iGST: 0,
-        netCharges: previousNetCharges,
-      
+      otherChargesId: null,
+      voucherId: '',
+      key: charges.length + 1,
+      accountId: '',
+      onValue: previousNetCharges,
+      chargesPercentage: 0,
+      addedOrSubtracted: '+', // Default to plus sign, you can adjust as needed
+      tax: 'no',
+      taxSlab: '',
+      grossAmount: 0,
+      sGST: 0,
+      cGST: 0,
+      iGST: 0,
+      netCharges: previousNetCharges,
+
     };
     setCharges([...charges, newCharge]);
-};
+  };
 
 
   useEffect(() => {
@@ -83,9 +83,21 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
     reset(initialData);
   }, [initialData, reset]);
 
+ const validateOtherCharges = ():boolean => {
+    const formIsValid = charges.every((item: OtherChargesDto) => {
+        return ((item.grossAmount > 0 || item.chargesPercentage > 0) && (item.addedOrSubtracted && item.accountId));
+    });
+
+    return formIsValid;
+};
+
   const handleSaveAndClose = () => {
     onSave([...charges]);
-    onHide();
+    if (validateOtherCharges())
+      onHide();
+    else {
+      toast.error('Please verify that you have filled all the mendatory firlds.')
+    }
   };
 
   const handleDeleteRow = (key: number) => {
