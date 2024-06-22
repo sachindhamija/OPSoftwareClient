@@ -29,6 +29,7 @@ import {
   ItemFormDto,
 } from "../../features/Masters/Item/ItemDto";
 import { ItemSalePurchaseVoucherDto } from "../../features/Vouchers/SalePurchase/salePurchaseVoucherDto";
+import { SerialNumberDto } from "../../features/Masters/SerialNumberSetting/SerialNumberDto";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -943,7 +944,28 @@ const SalePurchase = {
     );
   },
 };
-
+const SerialNumber = {
+  getAll: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("serialNumber", params);
+  },
+  getById: async (accessId: string, id: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`serialNumber/${id}`, params);
+  },
+  create: async (accessId: string, serialNumberDto: SerialNumberDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post("serialNumber", serialNumberDto, params);
+  },
+  update: async (accessId: string, id: number, serialNumberDto: SerialNumberDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`serialNumber/${id}`, serialNumberDto, params);
+  },
+  delete: async (accessId: string, id: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`serialNumber/${id}`, params);
+  },
+};
 const agent = {
   UserAccount,
   Company,
@@ -966,6 +988,7 @@ const agent = {
   Reports,
   BillBook,
   SalePurchase,
+  SerialNumber
 };
 
 export default agent;

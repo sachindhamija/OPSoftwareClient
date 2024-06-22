@@ -30,6 +30,7 @@ import { VoucherTypeEnum } from '../../features/Vouchers/VoucherCommon/voucherTy
 import TrialBalanceReport from '../../features/Reports/TrialBalance/TrialBalanceReport';
 import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
 import { SalePurchaseForm } from '../../features/Vouchers/SalePurchase/SalePurchaseForm';
+import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/SerialNumberSetting';
 
 export const router = createBrowserRouter([
 	{
@@ -113,6 +114,7 @@ export const router = createBrowserRouter([
 						element: <TrialBalanceReport />,
 					},
 					{ path: 'sale-billbook', element: <BillBookForm /> },
+					{ path: 'serial-number-setting', element: <SerialNumberSetting /> },
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },
