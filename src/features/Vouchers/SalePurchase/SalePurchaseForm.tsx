@@ -1,10 +1,10 @@
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../../../app/store/configureStore";
+import { useAppDispatch, useAppSelector } from "../../../app/store/configureStore";
 import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation";
 import { selectCurrentFinancialYear } from "../../Masters/FinancialYear/financialYearSlice";
 import { VoucherTypeEnum, getVoucherTypeString } from "../VoucherCommon/voucherTypeEnum";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
-import { CustomerDetailDto, ItemSalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultOtherCharges, defaultTransportDetails } from "./salePurchaseVoucherDto";
+import { CustomerDetailDto, ItemSalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultTransportDetails } from "./salePurchaseVoucherDto";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import toast from "react-hot-toast";
 import FormNavigator from "../../../app/components/FormNavigator";
@@ -28,7 +28,9 @@ import TransportAndShippingDetailModal from "./TransportAndShippingDetailModal";
 import CustomerDetailModal from "./CustomerDetailModal";
 import OtherChargesModal from "./OtherChargesModal";
 // import { MdOutlineInsertChartOutlined } from "react-icons/md";
-
+import { setLoading } from '../../../app/layout/loadingSlice';
+import SerialNumberModal from "./SerialNumberModal";
+import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
 
 
 
@@ -45,7 +47,7 @@ interface SalePurchaseFormProps {
 }
 
 export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false, onSuccessfulSubmit }: SalePurchaseFormProps) {
-
+    const dispatch = useAppDispatch();
     const accessId = getAccessIdOrRedirect();
     const financialYear = useAppSelector(selectCurrentFinancialYear);
     const [voucher, setVoucher] = useState<any | null>(null);
@@ -63,28 +65,62 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [focusInclusiveRateInput, setFocusInclusiveRateInput] = useState<string | null>(null);
     const [useAltQty, setUseAltQty] = useState<boolean>(false);
     const [useFree] = useState<boolean>(false);
-
     const [showTransportModal, setShowTransportModal] = useState(false);
     const [transportDetails, setTransportDetails] = useState<TransportDetailDto>(defaultTransportDetails);
     const updateParentStateOfTransportDetails = (data: TransportDetailDto) => {
         setTransportDetails(data);
     };
-
+    
     const [showCustomerDetailModal, setShowCustomerDetailModal] = useState(false);
     const [showOtherChargesModal, setShowOtherChargesModal] = useState(false);
     const [customerDetail, setCustomerDetail] = useState<CustomerDetailDto>(defaultCustomerDetails);
 
-    const [otherCharges, setOtherCharges] = useState<OtherChargesDto[]>([...defaultOtherCharges]);
-
+    const [otherCharges, setOtherCharges] = useState<OtherChargesDto[]>([]);
+    const [serialNumbers, setSerialNumbers] = useState<SerialNumberDto[]>([]);
+    const [showSerialNumberModal, setShowSerialNumberModal] = useState(false);
+    const { register, handleSubmit, setValue, getValues, watch, control, reset, formState: { errors } } = useForm<FieldValues>({
+        mode: "all",
+        defaultValues: {
+            items: [defaultItems]
+        }
+    });
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: 'items',
+    });
+    const watchedItems = watch('items');    
+    const items: ItemsInVoucherDto[] = watchedItems;
+    const handleSaveSerialNumbers = (values: ItemsInVoucherDto[]) => {
+        setValue(`items`, values);
+      };
     const updateParentStateOfCustomerDetail = (data: CustomerDetailDto) => {
         setCustomerDetail(data);
     };
     const updateParentStateOfOtherCharges = (data: OtherChargesDto[]) => {
         setOtherCharges(data);
-        // calculateBillSummary();
     };
+    const fetchSerialNumbers = async () => {
+        dispatch(setLoading(true));
+        try {
+            const fetchedSerialNumbers = await agent.SerialNumber.getAll(accessId);
+            setSerialNumbers(fetchedSerialNumbers);
+        } catch (error) {
+            console.error('Error fetching serial numbers', error);
+            toast.error('Error fetching serial numbers');
+        } finally {
+            dispatch(setLoading(false));
+        }
+    };
+
+    
     useEffect(() => {
-        if (otherCharges.length > 0 && (otherCharges[0].grossAmount>0 || otherCharges[0].chargesPercentage>0)) {
+        fetchSerialNumbers();
+    }, [dispatch]);
+    useEffect(()=>{
+       
+    },[serialNumbers])
+    useEffect(() => {
+        if (otherCharges.length > 0 && (otherCharges[0].grossAmount > 0 || otherCharges[0].chargesPercentage > 0)) {
             calculateBillSummary();
         }
     }, [otherCharges]);
@@ -125,27 +161,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         };
     }, []);
 
-
-
-    //const [useDiscount, setUseDiscount] = useState<boolean>(false);
     const [pricePerOptions, setPricePerOptions] = useState<{ [key: number]: OptionType[] }>({});
     const [askForCustomerDetailWhenCash] = useState<boolean>(true);
-    //const [showAltQtyAndPricePer, setShowAltQtyAndPricePer] = useState<number | null>(null);
 
     const [partyGST, setPartyGST] = useState('');
     const [isAccountOutOfState, setIsAccountOutOfState] = useState<boolean>(false);
-    const { register, handleSubmit, setValue, getValues, watch, control, reset, formState: { errors } } = useForm<FieldValues>({
-        mode: "all",
-        defaultValues: {
-            items: [defaultItems]
-        }
-    });
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: 'items',
-    });
+    
 
-    const watchedItems = watch('items');
+    
 
     const handleDeleteRow = (index: number) => {
         if (window.confirm("Are you sure you want to delete this row?")) {
@@ -212,6 +235,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             for (let i = 0; i < itemsToAdd; i++) {
                 append(defaultItems);
             }
+            
             voucher.voucherItemDetails.forEach((item: ItemsInVoucherDto, index: number) => {
                 setValue(`items[${index}].itemId`, item.itemId);
                 setValue(`items[${index}].mainQty`, item.mainQty);
@@ -227,8 +251,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 setValue(`items[${index}].cGST`, item.cgst);
                 setValue(`items[${index}].netAmount`, item.netAmount);
                 setValue(`items[${index}].itemDetail.salePurAccountID`, item?.item?.salePurAccountID);
-
-
+                setValue(`items[${index}].serialNumberValues`,item.serialNumberValues);
             });
         }
     }, [voucher]);
@@ -349,7 +372,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 if (askForCustomerDetailWhenCash && cashAccount) {
                     setFocusBillNo(true);
                     setTimeout(() => {
-                        console.log(voucher, voucherId)
                         if (!voucher && !voucherId) // avoid opening in edit mode
                             setShowCustomerDetailModal(true);
                         setFocusBillNo(false);
@@ -383,7 +405,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             netAmount: "",
             free: "",
             pricePer: "",
-            itemDetail: {}
+            itemDetail: {},
+            serialNumberValues:serialNumbers,
         });
         setPricePerOptions(prevOptions => ({
             ...prevOptions,
@@ -514,7 +537,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     };
 
     const calculateBillSummary = () => {
-        const items: ItemsInVoucherDto[] = watchedItems;
+        
 
         let totalMainQty = 0;
         let totalAltQty = 0;
@@ -563,12 +586,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             netBillAmount: roundedNetBillAmount,
         });
 
-        if (otherCharges.length == 1) {
-            otherCharges[otherCharges.length - 1].onValue = Math.round(netBillAmount);
-            setOtherCharges(otherCharges);
-        }
-
-
     };
 
     const onSubmit = async (data: FieldValues) => {
@@ -589,7 +606,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     await agent.SalePurchase.saveVoucher(accessId, finalData, "");
                     toast.success('Voucher created successfully');
                     reset();
-                    setOtherCharges(defaultOtherCharges);
                     setTransportDetails(defaultTransportDetails);
                     setCustomerDetail(defaultCustomerDetails);
                     setBillSummary(defaultBillSummary);
@@ -661,7 +677,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             items: processedItems,
             transportDetailDto: transportDetails,
             customerDetailDto: customerDetail,
-            voucherOtherCharges:otherCharges,
+            voucherOtherCharges: otherCharges,
+            
         };
 
         return itemSalePurchaseDto;
@@ -697,6 +714,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 additionalTax1: item.additionalTax1 || 0,
                 additionalTax2: item.additionalTax2 || 0,
                 netAmount: item.netAmount || 0,
+                serialNumberValues:item.serialNumberValues
             };
 
             if ((item.itemId === 0 || item.itemId === null) && index !== items.length - 1) {
@@ -1007,6 +1025,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                             />
                                         </td>
                                         <td>
+                                            {/* <div data-skip-focus="true">
+                                                <CustomButton text="Add Serial" onClick={() => { setCurrentItemID(index); setShowSerialNumberModal(true); }} />
+                                            </div> */}
                                             <div data-skip-focus="true">
                                                 <CustomButton text="X" variant="none" onClick={() => handleDeleteRow(index)} />
                                             </div>
@@ -1040,6 +1061,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 /></Col>
                                 <Col><CustomButton size="sm" variant="outline-info" text="Charges/Discount (F2)" className="w-100" onClick={() => {
                                     setShowOtherChargesModal(true);
+                                }} /></Col>
+                                <Col><CustomButton size="sm" variant="outline-info" text="Serial Number" className="w-100" onClick={() => {
+                                    setShowSerialNumberModal(true);
                                 }} /></Col>
                                 <Col><CustomButton size="sm" variant="success" type="submit" text="Save Invoice (Ctrl+S)" className="w-100" /></Col>
                                 <Col><CustomButton size="sm" variant="success" text="Print Invoice (Ctrl+P)" className="w-100" /></Col>
@@ -1160,9 +1184,11 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             }
             {showOtherChargesModal &&
                 <OtherChargesModal show={showOtherChargesModal}
-                voucherDate={voucherDate}
+                summaryAmount={billSummary.netBillAmount}
+                    voucherDate={voucherDate}
                     onHide={() => {
-                        setShowOtherChargesModal(false)
+                        setShowOtherChargesModal(false);
+                        
                         setTimeout(() => {
                             setFocusRemarks(true);
                         }, 10);
@@ -1170,6 +1196,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     onSave={updateParentStateOfOtherCharges}
                     initialData={otherCharges} />
             }
+            {showSerialNumberModal && <SerialNumberModal
+            
+                show={showSerialNumberModal}
+                onHide={() => setShowSerialNumberModal(false)}
+                onSave={handleSaveSerialNumbers}
+                currentItemID={null}
+                items={items}
+            />}
 
         </>
     )

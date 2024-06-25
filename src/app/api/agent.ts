@@ -754,7 +754,27 @@ const Vouchers = {
       accessId: accessId,
       voucherId: voucherId
     });
-    return await requests.get(`voucher/${voucherId}`, params);
+    // return await requests.get(`voucher/${voucherId}`, params);
+    const response = await requests.get(`voucher/${voucherId}`, params);
+
+    // Assuming response.data contains the voucher data
+    if (response) {
+      const voucherData = response;
+      if (voucherData.voucherItemDetails && voucherData.voucherItemDetails.length > 0) {
+        try {
+          voucherData.voucherItemDetails.map((item: any) => {
+            if (item.serialNumberValues) {
+              item.serialNumberValues = JSON.parse(item.serialNumberValues);
+            }
+          })
+          
+        } catch (error) {
+          console.error('Error parsing SerialNumberValues:', error);
+        }
+      }
+    }
+
+    return response;
   },
 };
 const ControlOptions = {
@@ -919,7 +939,7 @@ const SalePurchase = {
   ) => {
     const params = new URLSearchParams({ accessId, existingVoucherId });
     return await requests.post("SalePurchase/SaveVoucher", dto, params);
-  },updateVoucher: async (
+  }, updateVoucher: async (
     accessId: string,
     dto: ItemSalePurchaseVoucherDto
   ) => {
@@ -940,7 +960,7 @@ const SalePurchase = {
       voucherId: voucherId
     });
     return await requests.delete(
-      `SalePurchase/${voucherId}`,params
+      `SalePurchase/${voucherId}`, params
     );
   },
 };
@@ -957,11 +977,11 @@ const SerialNumber = {
     const params = new URLSearchParams({ accessId });
     return await requests.post("serialNumber", serialNumberDto, params);
   },
-  update: async (accessId: string, id: number, serialNumberDto: SerialNumberDto) => {
+  update: async (accessId: string, id: string, serialNumberDto: SerialNumberDto) => {
     const params = new URLSearchParams({ accessId });
     return await requests.put(`serialNumber/${id}`, serialNumberDto, params);
   },
-  delete: async (accessId: string, id: number) => {
+  delete: async (accessId: string, id: string) => {
     const params = new URLSearchParams({ accessId });
     return await requests.delete(`serialNumber/${id}`, params);
   },

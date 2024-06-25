@@ -1,4 +1,5 @@
 export interface SerialNumberDto {
-    serialNumberID: number;
+    serialNumberID: string;
     serialNumberName : string;
+    description:string;
   }

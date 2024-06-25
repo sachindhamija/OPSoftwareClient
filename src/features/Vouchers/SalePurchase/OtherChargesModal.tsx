@@ -24,9 +24,10 @@ interface OtherChargesModalProps {
   onSave: (data: OtherChargesDto[]) => void;
   initialData: OtherChargesDto[];
   voucherDate: any;
+  summaryAmount:number;
 }
 
-const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onSave, initialData, voucherDate }) => {
+const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onSave, initialData, voucherDate,summaryAmount }) => {
   const accessId = getAccessIdOrRedirect();
   const financialYear = useAppSelector(selectCurrentFinancialYear);
   const gstSlabs = useGstSlabs(accessId);
@@ -56,7 +57,7 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
     }
   };
   const handleAddRow = () => {
-    const previousNetCharges = charges.length > 0 ? charges[charges.length - 1].netCharges : 0;
+    const previousNetCharges = ((charges.length > 0) ? (charges[charges.length - 1].netCharges) : summaryAmount);
     const newCharge: OtherChargesDto = {
       otherChargesId: null,
       voucherId: '',

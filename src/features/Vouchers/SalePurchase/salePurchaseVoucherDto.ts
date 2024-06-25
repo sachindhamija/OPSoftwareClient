@@ -1,4 +1,5 @@
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
+import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
 import { VoucherTypeEnum } from "../VoucherCommon/voucherTypeEnum";
 
 export interface ItemSalePurchaseVoucherDto {
@@ -22,6 +23,7 @@ export interface ItemSalePurchaseVoucherDto {
   customerDetailDto?: CustomerDetailDto;
   items: ItemsInVoucherDto[];
   voucherOtherCharges?: OtherChargesDto[];
+  
 }
 
 export interface TransportDetailDto {
@@ -76,6 +78,7 @@ export interface ItemsInVoucherDto {
   sgst?:number;
   cgst?:number;
   item?:ItemDetailDto|null;
+  serialNumberValues:SerialNumberDto[]
 }
 
 export interface OtherChargesDto {
@@ -159,6 +162,7 @@ export const defaultItems: ItemsInVoucherDto = {
   additionalTax2: 0,
   netAmount: 0,
   itemDetail: defaultItemDetail,
+  serialNumberValues:[],
 };
 export const defaultTransportDetails: TransportDetailDto = {
   transporterName: "",
