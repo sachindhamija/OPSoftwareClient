@@ -31,6 +31,7 @@ import TrialBalanceReport from '../../features/Reports/TrialBalance/TrialBalance
 import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
 import { SalePurchaseForm } from '../../features/Vouchers/SalePurchase/SalePurchaseForm';
 import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/SerialNumberSetting';
+import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetting/AdditionalFieldSetting';
 
 export const router = createBrowserRouter([
 	{
@@ -115,6 +116,7 @@ export const router = createBrowserRouter([
 					},
 					{ path: 'sale-billbook', element: <BillBookForm /> },
 					{ path: 'serial-number-setting', element: <SerialNumberSetting /> },
+					{ path: 'additional-fields-setting', element: <AdditionalFieldSetting /> },
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },

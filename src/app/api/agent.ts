@@ -30,6 +30,7 @@ import {
 } from "../../features/Masters/Item/ItemDto";
 import { ItemSalePurchaseVoucherDto } from "../../features/Vouchers/SalePurchase/salePurchaseVoucherDto";
 import { SerialNumberDto } from "../../features/Masters/SerialNumberSetting/SerialNumberDto";
+import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetting/AdditionalFieldDto";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -973,19 +974,49 @@ const SerialNumber = {
     const params = new URLSearchParams({ accessId });
     return await requests.get(`serialNumber/${id}`, params);
   },
-  create: async (accessId: string, serialNumberDto: SerialNumberDto) => {
+  create: async (accessId: string, data: SerialNumberDto) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.post("serialNumber", serialNumberDto, params);
+    return await requests.post("serialNumber", data, params);
   },
-  update: async (accessId: string, id: string, serialNumberDto: SerialNumberDto) => {
+  update: async (accessId: string, id: string, data: SerialNumberDto) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.put(`serialNumber/${id}`, serialNumberDto, params);
+    return await requests.put(`serialNumber/${id}`, data, params);
   },
   delete: async (accessId: string, id: string) => {
     const params = new URLSearchParams({ accessId });
     return await requests.delete(`serialNumber/${id}`, params);
   },
 };
+const AdditionalField = {
+  getAll: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("AdditionalField",params );
+  },
+  getById: async (accessId: string, id: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`AdditionalField/${id}`,params );
+  },
+  create: async (accessId: string, data: AdditionalFieldDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post("AdditionalField", data,params );
+  },
+  update: async (accessId: string, id: string, data: AdditionalFieldDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`AdditionalField/${id}`, data,params );
+  },
+  delete: async (accessId: string, id: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`AdditionalField/${id}`,params );
+  },
+};
+
+const AdditionalFieldType = {
+  getAll: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("AdditionalFieldType",params );
+  },
+};
+
 const agent = {
   UserAccount,
   Company,
@@ -1008,7 +1039,9 @@ const agent = {
   Reports,
   BillBook,
   SalePurchase,
-  SerialNumber
+  SerialNumber,
+  AdditionalField,
+  AdditionalFieldType
 };
 
 export default agent;

@@ -105,7 +105,7 @@ function CompanyHeader() {
 		return (
 			currentFinancialYear &&
 			financialYear.financialYearFrom ===
-				currentFinancialYear.financialYearFrom
+			currentFinancialYear.financialYearFrom
 		);
 	};
 	const handleEditFinancialYear = (financialYear: FinancialYearDto) => {
@@ -137,9 +137,8 @@ function CompanyHeader() {
 						Masters
 					</Dropdown.Toggle>
 					<Dropdown.Menu
-						className={`custom-dropdown-menu ${
-							showMastersDropdown ? '' : 'hidden'
-						}`}
+						className={`custom-dropdown-menu ${showMastersDropdown ? '' : 'hidden'
+							}`}
 						onMouseEnter={handleMastersDropdownHover}
 						onMouseLeave={handleMastersDropdownLeave}
 					>
@@ -193,6 +192,9 @@ function CompanyHeader() {
 						<Dropdown.Item as={Link} to={'/serial-number-setting'}>
 							Serial Number Setting
 						</Dropdown.Item>
+						<Dropdown.Item as={Link} to={'/additional-fields-setting'}>
+							Additional Fields Setting
+						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
 
@@ -207,9 +209,8 @@ function CompanyHeader() {
 						Vouchers
 					</Dropdown.Toggle>
 					<Dropdown.Menu
-						className={`custom-dropdown-menu ${
-							showVouchersDropdown ? '' : 'hidden'
-						}`}
+						className={`custom-dropdown-menu ${showVouchersDropdown ? '' : 'hidden'
+							}`}
 						onMouseEnter={handleVouchersDropdownHover}
 						onMouseLeave={handleVouchersDropdownLeave}
 					>
@@ -245,9 +246,8 @@ function CompanyHeader() {
 						Reports
 					</Dropdown.Toggle>
 					<Dropdown.Menu
-						className={`custom-dropdown-menu ${
-							showReportsDropdown ? '' : 'hidden'
-						}`}
+						className={`custom-dropdown-menu ${showReportsDropdown ? '' : 'hidden'
+							}`}
 						onMouseEnter={handleReportsDropdownHover}
 						onMouseLeave={handleReportsDropdownLeave}
 					>
@@ -296,21 +296,21 @@ function CompanyHeader() {
 										const financialYearTo =
 											financialYear.financialYearTo
 												? toCustomDateFormat(
-														new Date(
-															financialYear.financialYearTo
-														)
-												  )
+													new Date(
+														financialYear.financialYearTo
+													)
+												)
 												: null;
 										const itemStyle =
 											isCurrentFinancialYear(
 												financialYear
 											)
 												? {
-														backgroundColor:
-															'#f0f0f0 !important',
-														fontWeight:
-															'bold !important',
-												  }
+													backgroundColor:
+														'#f0f0f0 !important',
+													fontWeight:
+														'bold !important',
+												}
 												: {};
 
 										return (
