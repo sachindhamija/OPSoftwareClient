@@ -162,7 +162,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                 name={name}
                 control={control}
                 rules={validationRules}
-                defaultValue={defaultValue || (YesNo ? 'N' : '')}
+                defaultValue={defaultValue?.value || (YesNo ? 'N' : '')}
                 render={({ field }) => (
                     <SelectComponent
                         {...field}

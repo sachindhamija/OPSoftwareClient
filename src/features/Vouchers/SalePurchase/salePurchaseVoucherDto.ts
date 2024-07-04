@@ -1,4 +1,5 @@
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
+import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
 import { VoucherTypeEnum } from "../VoucherCommon/voucherTypeEnum";
 
 export interface ItemSalePurchaseVoucherDto {
@@ -21,7 +22,8 @@ export interface ItemSalePurchaseVoucherDto {
   transportDetailDto?: TransportDetailDto;
   customerDetailDto?: CustomerDetailDto;
   items: ItemsInVoucherDto[];
-  otherCharges?: OtherChargesDto[];
+  voucherOtherCharges?: OtherChargesDto[];
+  
 }
 
 export interface TransportDetailDto {
@@ -76,16 +78,18 @@ export interface ItemsInVoucherDto {
   sgst?:number;
   cgst?:number;
   item?:ItemDetailDto|null;
+  serialNumberValues:SerialNumberDto[]
 }
 
 export interface OtherChargesDto {
   key:number;
-  otherChargesId: string;
+  otherChargesId: string|null;
   voucherId:string;
   accountId: string;
   onValue: number;
   chargesPercentage: number;
-  addedOrSubtracted?: string;
+
+  addedOrSubtracted: string;
   tax:string;
   taxSlab:string;
   grossAmount: number;
@@ -158,6 +162,7 @@ export const defaultItems: ItemsInVoucherDto = {
   additionalTax2: 0,
   netAmount: 0,
   itemDetail: defaultItemDetail,
+  serialNumberValues:[],
 };
 export const defaultTransportDetails: TransportDetailDto = {
   transporterName: "",
@@ -195,3 +200,19 @@ export const defaultBillSummary = {
   totalRoundOff: 0,
   netBillAmount: 0,
 };
+export const defaultOtherCharges: OtherChargesDto[] = [{
+  key: 0,
+  otherChargesId: null,
+  voucherId: '',
+  accountId: '',
+  onValue: 0,
+  chargesPercentage: 0,
+  addedOrSubtracted: '', // Default to plus sign, you can adjust as needed
+  tax: 'no', // Default value, can be 'yes' or 'no'
+  taxSlab: '',
+  grossAmount: 0,
+  sGST: 0,
+  cGST: 0,
+  iGST: 0,
+  netCharges: 0,
+}];

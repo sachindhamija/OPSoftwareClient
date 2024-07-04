@@ -29,6 +29,8 @@ import {
   ItemFormDto,
 } from "../../features/Masters/Item/ItemDto";
 import { ItemSalePurchaseVoucherDto } from "../../features/Vouchers/SalePurchase/salePurchaseVoucherDto";
+import { SerialNumberDto } from "../../features/Masters/SerialNumberSetting/SerialNumberDto";
+import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetting/AdditionalFieldDto";
 import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
 import { CommissionAgentItemDto } from "../../features/CommissionAgent/CommissionAgentItem/commissionAgentItem";
 
@@ -756,7 +758,27 @@ const Vouchers = {
       accessId: accessId,
       voucherId: voucherId
     });
-    return await requests.get(`voucher/${voucherId}`, params);
+    // return await requests.get(`voucher/${voucherId}`, params);
+    const response = await requests.get(`voucher/${voucherId}`, params);
+
+    // Assuming response.data contains the voucher data
+    if (response) {
+      const voucherData = response;
+      if (voucherData.voucherItemDetails && voucherData.voucherItemDetails.length > 0) {
+        try {
+          voucherData.voucherItemDetails.map((item: any) => {
+            if (item.serialNumberValues) {
+              item.serialNumberValues = JSON.parse(item.serialNumberValues);
+            }
+          })
+          
+        } catch (error) {
+          console.error('Error parsing SerialNumberValues:', error);
+        }
+      }
+    }
+
+    return response;
   },
 };
 const ControlOptions = {
@@ -921,7 +943,7 @@ const SalePurchase = {
   ) => {
     const params = new URLSearchParams({ accessId, existingVoucherId });
     return await requests.post("SalePurchase/SaveVoucher", dto, params);
-  },updateVoucher: async (
+  }, updateVoucher: async (
     accessId: string,
     dto: ItemSalePurchaseVoucherDto
   ) => {
@@ -942,8 +964,52 @@ const SalePurchase = {
       voucherId: voucherId
     });
     return await requests.delete(
-      `SalePurchase/${voucherId}`,params
+      `SalePurchase/${voucherId}`, params
     );
+  },
+};
+const SerialNumber = {
+  getAll: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("serialNumber", params);
+  },
+  getById: async (accessId: string, id: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`serialNumber/${id}`, params);
+  },
+  create: async (accessId: string, data: SerialNumberDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post("serialNumber", data, params);
+  },
+  update: async (accessId: string, id: string, data: SerialNumberDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`serialNumber/${id}`, data, params);
+  },
+  delete: async (accessId: string, id: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`serialNumber/${id}`, params);
+  },
+};
+const AdditionalField = {
+  getAll: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("AdditionalField",params );
+  },
+  getById: async (accessId: string, id: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`AdditionalField/${id}`,params );
+  },
+  create: async (accessId: string, data: AdditionalFieldDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post("AdditionalField", data,params );
+  },
+  update: async (accessId: string, id: string, data: AdditionalFieldDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`AdditionalField/${id}`, data,params );
+  },
+  delete: async (accessId: string, id: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`AdditionalField/${id}`,params );
   },
 };
 
@@ -1037,6 +1103,9 @@ const agent = {
   Reports,
   BillBook,
   SalePurchase,
+  SerialNumber,
+  AdditionalField,
+  AdditionalFieldType
   CommissionAgentItem,
   Mandi,
 };

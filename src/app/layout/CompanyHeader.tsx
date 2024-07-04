@@ -193,6 +193,12 @@ function CompanyHeader() {
 						<Dropdown.Item as={Link} to={'/sale-billbook'}>
 							Sale BillBook
 						</Dropdown.Item>
+						<Dropdown.Item as={Link} to={'/serial-number-setting'}>
+							Serial Number Setting
+						</Dropdown.Item>
+						<Dropdown.Item as={Link} to={'/additional-fields-setting'}>
+							Additional Fields Setting
+						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
 

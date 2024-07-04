@@ -30,6 +30,8 @@ import { VoucherTypeEnum } from '../../features/Vouchers/VoucherCommon/voucherTy
 import TrialBalanceReport from '../../features/Reports/TrialBalance/TrialBalanceReport';
 import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
 import { SalePurchaseForm } from '../../features/Vouchers/SalePurchase/SalePurchaseForm';
+import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/SerialNumberSetting';
+import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetting/AdditionalFieldSetting';
 import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
 import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
 
@@ -109,6 +111,8 @@ export const router = createBrowserRouter([
 						element: <TrialBalanceReport />,
 					},
 					{ path: 'sale-billbook', element: <BillBookForm /> },
+					{ path: 'serial-number-setting', element: <SerialNumberSetting /> },
+					{ path: 'additional-fields-setting', element: <AdditionalFieldSetting /> },
 					{ path: 'mandi', element: <MandiForm /> },
 					{ path: 'commissionagent-item', element: <CommissionAgentItemForm /> },
 				],
