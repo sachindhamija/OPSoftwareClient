@@ -263,6 +263,9 @@ function CompanyHeader() {
 							Trial Balance
 						</Dropdown.Item>
 						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/Report/invoice-report-item'}>
+							Invoice Report
+						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
 				<Dropdown as="div" className="dropdown-on-hover">

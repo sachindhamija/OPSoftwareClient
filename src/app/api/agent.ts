@@ -1012,7 +1012,12 @@ const AdditionalField = {
     return await requests.delete(`AdditionalField/${id}`,params );
   },
 };
-
+const AdditionalFieldType = {
+    getAll: async (accessId: string) => {
+        const params = new URLSearchParams({ accessId });
+        return await requests.get("AdditionalFieldType", params);
+    },
+};
 const CommissionAgentItem = {
   getAllCommissionAgentItems: async (
     accessId: string
@@ -1105,7 +1110,7 @@ const agent = {
   SalePurchase,
   SerialNumber,
   AdditionalField,
-  AdditionalFieldType
+  AdditionalFieldType,
   CommissionAgentItem,
   Mandi,
 };

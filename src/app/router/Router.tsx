@@ -34,6 +34,7 @@ import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/Seri
 import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetting/AdditionalFieldSetting';
 import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
 import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
+import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
 
 export const router = createBrowserRouter([
 	{
@@ -115,6 +116,7 @@ export const router = createBrowserRouter([
 					{ path: 'additional-fields-setting', element: <AdditionalFieldSetting /> },
 					{ path: 'mandi', element: <MandiForm /> },
 					{ path: 'commissionagent-item', element: <CommissionAgentItemForm /> },
+					{ path: 'report/invoice-report-item', element: <InvoiceReport /> },
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },
