@@ -39,14 +39,14 @@ const PAYMENT_MODE_OPTIONS = [
     { label: "Credit", value: "CREDIT" },
     { label: "Bank | UPI", value: "BANK" },
 ];
-interface SalePurchaseFormProps {
+interface PurchaseFormProps {
     voucherType: VoucherTypeEnum;
     voucherId?: string;
     isInModal?: boolean;
     onSuccessfulSubmit?: () => void;
 }
 
-export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false, onSuccessfulSubmit }: SalePurchaseFormProps) {
+export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = false, onSuccessfulSubmit }: PurchaseFormProps) {
     const dispatch = useAppDispatch();
     const accessId = getAccessIdOrRedirect();
     const financialYear = useAppSelector(selectCurrentFinancialYear);

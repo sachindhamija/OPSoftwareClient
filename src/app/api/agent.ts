@@ -41,7 +41,7 @@ axios.defaults.baseURL = baseURL;
 
 const responseBody = (response: AxiosResponse) => response.data;
 // const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
+console.log(baseURL);
 // Request Interceptor
 axios.interceptors.request.use((config) => {
   const token = store.getState().account.user?.token;
@@ -55,6 +55,7 @@ axios.interceptors.request.use((config) => {
 axios.interceptors.response.use(
   async (response: AxiosResponse) => {
     // await sleep(1000);
+    console.log(baseURL);
     const pagination = response.headers["pagination"];
     if (pagination) {
       response.data = new PaginatedResponse(

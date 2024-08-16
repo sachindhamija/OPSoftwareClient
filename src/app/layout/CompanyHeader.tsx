@@ -237,6 +237,19 @@ function CompanyHeader() {
 						<Dropdown.Item as={Link} to={'/Voucher/Sale'}>
 							Sale Voucher
 						</Dropdown.Item>
+						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/Voucher/PurchaseVoucher'}>
+							Purchase Voucher
+						</Dropdown.Item>
+						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/Voucher/SalesReturn'}>
+							Sales Return
+						</Dropdown.Item>
+						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/Voucher/PurchaseReturn'}>
+							Purchase Return
+						</Dropdown.Item>
+						<Dropdown.Divider />
 					</Dropdown.Menu>
 				</Dropdown>
 				<Dropdown as="div" className="dropdown-on-hover">
