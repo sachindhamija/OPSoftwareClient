@@ -7,6 +7,8 @@ export enum VoucherTypeEnum {
   ItemPurchase = 6,
   Account = 7,
   GenSale = 8,
+  PurchaseReturn = 9,
+
 }
 
 export function getVoucherTypeString(voucherType: VoucherTypeEnum): string {
@@ -16,9 +18,10 @@ export function getVoucherTypeString(voucherType: VoucherTypeEnum): string {
     [VoucherTypeEnum.BankEntry]: "Bank Entry",
     [VoucherTypeEnum.JournalEntry]: "Journal Entry",
     [VoucherTypeEnum.ItemSale]: "Item Sale",
-    [VoucherTypeEnum.ItemPurchase]: "Item Purchase",
+    [VoucherTypeEnum.ItemPurchase]: "Purchase Voucher",
     [VoucherTypeEnum.Account]: "Account",
-    [VoucherTypeEnum.GenSale]: "Gen Sale",
+    [VoucherTypeEnum.GenSale]: "Gen Sale Return Voucher",
+    [VoucherTypeEnum.PurchaseReturn]: "Purchase Return Voucher",
   };
 
   return typeMap[voucherType] || "";

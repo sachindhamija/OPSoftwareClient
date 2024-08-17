@@ -36,8 +36,8 @@ import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
 import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
 import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
 import { PurchaseForm } from '../../features/Vouchers/Purchase Voucher/PurchaseForm';
-import SalesReturn from '../../features/Vouchers//SalesReturn/SalesReturn';
-import PurchaseReturn from '../../features/Vouchers/PurchaseReturn/PurchaseReturn';
+import { SalesReturn } from '../../features/Vouchers//SalesReturn/SalesReturn';
+import { PurchaseReturn } from '../../features/Vouchers/PurchaseReturn/PurchaseReturn';
 
 
 export const router = createBrowserRouter([
@@ -113,18 +113,20 @@ export const router = createBrowserRouter([
 					{ path: 'Voucher/PurchaseVoucher',
 						element: (
 							<PurchaseForm
-								voucherType={VoucherTypeEnum.ItemSale}
+								voucherType={VoucherTypeEnum.ItemPurchase}
 							/>
 						),
 					 },
 					 { path: 'Voucher/SalesReturn',
 						element: (
-							<SalesReturn/>
+							<SalesReturn
+							voucherType={VoucherTypeEnum.GenSale}/>
 						),
 					 },
 					 { path: 'Voucher/PurchaseReturn',
 						element: (
-							<PurchaseReturn />
+							<PurchaseReturn
+							voucherType={VoucherTypeEnum.PurchaseReturn} />
 						),
 					 },
 					{ path: 'Report/Ledger', element: <LedgerReport /> },
