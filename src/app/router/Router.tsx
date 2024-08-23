@@ -38,6 +38,8 @@ import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
 import { PurchaseForm } from '../../features/Vouchers/Purchase Voucher/PurchaseForm';
 import { SalesReturn } from '../../features/Vouchers//SalesReturn/SalesReturn';
 import { PurchaseReturn } from '../../features/Vouchers/PurchaseReturn/PurchaseReturn';
+import SalesCrDr  from '../../features/Vouchers/SalesCRDR/SalesCrDr';
+import PurchaseCrDr from '../../features/Vouchers/PurchaseCrDr/purchaseCrDr';
 
 
 export const router = createBrowserRouter([
@@ -127,6 +129,16 @@ export const router = createBrowserRouter([
 						element: (
 							<PurchaseReturn
 							voucherType={VoucherTypeEnum.PurchaseReturn} />
+						),
+					 },
+					 { path: 'Voucher/SalesCrDr',
+						element: (
+							<SalesCrDr/>
+						),
+					 },
+					 { path: 'Voucher/PurchaseCrDr',
+						element: (
+							<PurchaseCrDr/>
 						),
 					 },
 					{ path: 'Report/Ledger', element: <LedgerReport /> },

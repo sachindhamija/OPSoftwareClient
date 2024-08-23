@@ -250,6 +250,13 @@ function CompanyHeader() {
 							Purchase Return
 						</Dropdown.Item>
 						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/Voucher/SalesCrDr'}>
+							Sales CR/DR
+						</Dropdown.Item>
+						<Dropdown.Divider />
+						<Dropdown.Item as={Link} to={'/Voucher/purchaseCrDr'}>
+							Purchase CR/DR
+						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
 				<Dropdown as="div" className="dropdown-on-hover">
