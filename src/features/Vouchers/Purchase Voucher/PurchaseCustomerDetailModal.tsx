@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { CustomInput, FormNavigator } from '../../../app/components/Components';
-import { CustomerDetailDto } from './salePurchaseVoucherDto';
+import { CustomerDetailDto } from './PurchasesalePurchaseVoucherDto';
 
 
-interface CustomerDetailModalProps {
+interface PurchaseCustomerDetailModalProps {
     show: boolean;
     onHide: () => void;
     onSave: (data: CustomerDetailDto) => void;
     initialData: CustomerDetailDto;
 }
 
-const CustomerDetailModal: React.FC<CustomerDetailModalProps> = ({ show, onHide, onSave, initialData }) => {
+const PurchaseCustomerDetailModal: React.FC<PurchaseCustomerDetailModalProps> = ({ show, onHide, onSave, initialData }) => {
     const { register, reset } = useForm<CustomerDetailDto>({
         defaultValues: initialData
     });
@@ -75,4 +75,4 @@ const CustomerDetailModal: React.FC<CustomerDetailModalProps> = ({ show, onHide,
     );
 };
 
-export default CustomerDetailModal;
+export default PurchaseCustomerDetailModal;

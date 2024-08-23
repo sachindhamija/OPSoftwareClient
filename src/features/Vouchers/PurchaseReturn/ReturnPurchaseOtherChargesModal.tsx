@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Table, Button, Form, FormControl, Modal } from 'react-bootstrap';
-import { OtherChargesDto } from './salePurchaseVoucherDto';
+import { OtherChargesDto } from './PurchaseReturnsalePurchaseVoucherDto';
 import { useForm } from 'react-hook-form';
 import { useGstSlabs } from '../../../app/hooks/useGSTSlabsOptions';
 import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation';
@@ -18,7 +18,7 @@ import { formatDateForBackend } from '../../../app/utils/dateUtils';
 // import { AccountDtoForDropDownList } from '../../Masters/Account/accountDto';
 import { transformAccountToOption } from '../../../app/utils/accountUtils';
 
-interface OtherChargesModalProps {
+interface ReturnPurchaseOtherChargesModalProps {
   show: boolean;
   onHide: () => void;
   onSave: (data: OtherChargesDto[]) => void;
@@ -27,7 +27,7 @@ interface OtherChargesModalProps {
   summaryAmount:number;
 }
 
-const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onSave, initialData, voucherDate,summaryAmount }) => {
+const ReturnPurchaseOtherChargesModal: React.FC<ReturnPurchaseOtherChargesModalProps> = ({ show, onHide, onSave, initialData, voucherDate,summaryAmount }) => {
   const accessId = getAccessIdOrRedirect();
   const financialYear = useAppSelector(selectCurrentFinancialYear);
   const gstSlabs = useGstSlabs(accessId);
@@ -327,4 +327,4 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
   );
 };
 
-export default OtherChargesModal;
+export default ReturnPurchaseOtherChargesModal;

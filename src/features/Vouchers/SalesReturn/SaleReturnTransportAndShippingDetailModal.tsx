@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Row, Col, Form } from 'react-bootstrap';
 import { CustomInput, FormNavigator } from '../../../app/components/Components';
-import { TransportDetailDto } from './salePurchaseVoucherDto';
+import { TransportDetailDto } from './saleReturnPurchaseVoucherDto';
 import { useForm } from 'react-hook-form';
 
 interface TransportDetailsModalProps {
@@ -13,7 +13,7 @@ interface TransportDetailsModalProps {
 
 }
 
-const TransportAndShippingDetailModal: React.FC<TransportDetailsModalProps> = ({ show,
+const SaleReturnTransportAndShippingDetailModal: React.FC<TransportDetailsModalProps> = ({ show,
     onHide,
     onSave,
     initialData }) => {
@@ -104,4 +104,4 @@ const TransportAndShippingDetailModal: React.FC<TransportDetailsModalProps> = ({
     );
 };
 
-export default TransportAndShippingDetailModal;
+export default SaleReturnTransportAndShippingDetailModal;
