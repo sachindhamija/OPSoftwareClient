@@ -2,7 +2,7 @@ import { ItemDetailDto } from "../../Masters/Item/ItemDto";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
 import { VoucherTypeEnum } from "../VoucherCommon/voucherTypeEnum";
 
-export interface ItemSalePurchaseVoucherDto {
+export interface ItemPurchasesalePurchaseVoucherDto {
   voucherId: string; // Guid in C# is string in TypeScript
   voucherTypeId: VoucherTypeEnum; // Assuming VoucherType is an enum or similar structure
   billBookId: number;

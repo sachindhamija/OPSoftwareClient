@@ -12,7 +12,7 @@ import {
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import {
   CustomerDetailDto,
-  ItemSalePurchaseVoucherDto,
+  ItemPurchaseReturnsalePurchaseVoucherDto,
   ItemsInVoucherDto,
   OtherChargesDto,
   TransportDetailDto,
@@ -20,7 +20,7 @@ import {
   defaultCustomerDetails,
   defaultItems,
   defaultTransportDetails,
-} from "./salePurchaseVoucherDto";
+} from "./PurchaseReturnsalePurchaseVoucherDto";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import toast from "react-hot-toast";
 import FormNavigator from "../../../app/components/FormNavigator";
@@ -33,8 +33,7 @@ import {
   CustomDropdown,
   CustomDateInputBox,
   CommonModal,
-  CustomInput,
-  CustomButton,
+  CustomInput
 } from "../../../app/components/Components";
 import SaleBillBookForm from "../../Masters/BillBook/SaleBillBookForm";
 import {
@@ -42,26 +41,26 @@ import {
   validateDate,
 } from "../../../app/utils/dateUtils";
 import { AccountDtoForDropDownList } from "../../Masters/Account/accountDto";
-import { transformAccountToOption } from "../../../app/utils/accountUtils";
+// import { transformAccountToOption } from "../../../app/utils/accountUtils";
 import AccountForm from "../../Masters/Account/AccountForm";
 import ItemForm from "../../Masters/Item/ItemForm";
 import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
 import "./salepurchase.scss";
-import { formatNumberIST } from "../../../app/utils/numberUtils";
-import TransportAndShippingDetailModal from "./TransportAndShippingDetailModal";
-import CustomerDetailModal from "./CustomerDetailModal";
-import OtherChargesModal from "./OtherChargesModal";
+// import { formatNumberIST } from "../../../app/utils/numberUtils";
+import TransportAndShippingDetailModal from "./ReturnPurchaseTransportAndShippingDetailModal";
+import CustomerDetailModal from "./ReturnPurchaseCustomerDetailModal";
+import OtherChargesModal from "./ReturnPurchaseOtherChargesModal";
 // import { MdOutlineInsertChartOutlined } from "react-icons/md";
 import { setLoading } from "../../../app/layout/loadingSlice";
-import SerialNumberModal from "./SerialNumberModal";
+import SerialNumberModal from "./PurchaseReturnSerialNumberModal";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
 
-const PAYMENT_MODE_OPTIONS = [
-  { label: "Cash", value: "CASH" },
-  { label: "Credit", value: "CREDIT" },
-  { label: "Bank | UPI", value: "BANK" },
-];
+// const PAYMENT_MODE_OPTIONS = [
+//   { label: "Cash", value: "CASH" },
+//   { label: "Credit", value: "CREDIT" },
+//   { label: "Bank | UPI", value: "BANK" },
+// ];
 interface SalePurchaseFormProps {
   voucherType: VoucherTypeEnum;
   voucherId?: string;
@@ -88,19 +87,19 @@ export function PurchaseReturn({
   );
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
-  const [displayedAccounts, setDisplayedAccounts] = useState<
-    AccountDtoForDropDownList[]
-  >([]);
+  // const [displayedAccounts, setDisplayedAccounts] = useState<
+  //   AccountDtoForDropDownList[]
+  // >([]);
   const [itemDropDownList, setItemDropDownList] = useState<OptionType[]>([]);
-  const [showInclusiveRateInput, setShowInclusiveRateInput] = useState<
-    number | null
-  >(null);
-  const [inclusiveRate, setInclusiveRate] = useState("");
-  const [focusInclusiveRateInput, setFocusInclusiveRateInput] = useState<
-    string | null
-  >(null);
-  const [useAltQty, setUseAltQty] = useState<boolean>(false);
-  const [useFree] = useState<boolean>(false);
+  // const [showInclusiveRateInput, setShowInclusiveRateInput] = useState<
+  //   number | null
+  // >(null);
+  // const [inclusiveRate, setInclusiveRate] = useState("");
+  // const [focusInclusiveRateInput, setFocusInclusiveRateInput] = useState<
+  //   string | null
+  // >(null);
+  // const [useAltQty, setUseAltQty] = useState<boolean>(false);
+  // const [useFree] = useState<boolean>(false);
   const [showTransportModal, setShowTransportModal] = useState(false);
   const [transportDetails, setTransportDetails] = useState<TransportDetailDto>(
     defaultTransportDetails
@@ -133,7 +132,11 @@ export function PurchaseReturn({
       items: [defaultItems],
     },
   });
-  const { fields, append, remove } = useFieldArray({
+  // const { fields, append, remove } = useFieldArray({
+  //   control,
+  //   name: "items",
+  // });
+  const { fields, append } = useFieldArray({
     control,
     name: "items",
   });
@@ -212,36 +215,36 @@ export function PurchaseReturn({
     };
   }, []);
 
-  const [pricePerOptions, setPricePerOptions] = useState<{
-    [key: number]: OptionType[];
-  }>({});
-  const [askForCustomerDetailWhenCash] = useState<boolean>(true);
+  // const [pricePerOptions, setPricePerOptions] = useState<{
+  //   [key: number]: OptionType[];
+  // }>({});
+  // const [askForCustomerDetailWhenCash] = useState<boolean>(true);
 
-  const [partyGST, setPartyGST] = useState("");
-  const [isAccountOutOfState, setIsAccountOutOfState] =
-    useState<boolean>(false);
+  // const [partyGST, setPartyGST] = useState("");
+  // const [isAccountOutOfState, setIsAccountOutOfState] =
+  //   useState<boolean>(false);
 
-  const handleDeleteRow = (index: number) => {
-    if (window.confirm("Are you sure you want to delete this row?")) {
-      remove(index);
-      if (fields.length === 1) {
-        append(defaultItems); // Append a new row only if there are no other rows left
-      }
-    }
-  };
-  const deleteVoucher = () => {
-    if (window.confirm("Are you sure you want to delete this row?")) {
-      agent.SalePurchase.deleteVoucher(accessId, voucherId ?? "").then(() => {
-        if (onSuccessfulSubmit) onSuccessfulSubmit();
-        toast.success("Voucher deleted successfully");
-      });
-    }
-  };
+  // const handleDeleteRow = (index: number) => {
+  //   if (window.confirm("Are you sure you want to delete this row?")) {
+  //     remove(index);
+  //     if (fields.length === 1) {
+  //       append(defaultItems); // Append a new row only if there are no other rows left
+  //     }
+  //   }
+  // };
+  // const deleteVoucher = () => {
+  //   if (window.confirm("Are you sure you want to delete this row?")) {
+  //     agent.SalePurchase.deleteVoucher(accessId, voucherId ?? "").then(() => {
+  //       if (onSuccessfulSubmit) onSuccessfulSubmit();
+  //       toast.success("Voucher deleted successfully");
+  //     });
+  //   }
+  // };
   useEffect(() => {
     calculateBillSummary();
   }, [watchedItems]);
 
-  const paymentMode = watch("paymentMode", "");
+  // const paymentMode = watch("paymentMode", "");
   const voucherDate = watch("voucherDate");
   const getVoucherById = async (voucherId: string) => {
     const resp = await agent.Vouchers.getVoucherById(accessId, voucherId);
@@ -375,23 +378,23 @@ export function PurchaseReturn({
       }
     }
   };
-  const handleAccountChange = async (selectedOption: OptionType | null) => {
-    if (selectedOption != null) {
-      const selectedAccount = allAccounts.find(
-        (account) => account.accountID === selectedOption.value
-      );
-      if (selectedAccount) {
-        const isOutsideState =
-          selectedAccount.partyType.includes("Out of State");
-        setIsAccountOutOfState(isOutsideState);
-        const partyTypeWithGST = `${selectedAccount.gstNo || ""} ${
-          selectedAccount.partyType
-        }`;
-        setPartyGST(partyTypeWithGST || "");
-      }
-      setValue("accountId", selectedOption.value);
-    }
-  };
+  // const handleAccountChange = async (selectedOption: OptionType | null) => {
+  //   if (selectedOption != null) {
+  //     const selectedAccount = allAccounts.find(
+  //       (account) => account.accountID === selectedOption.value
+  //     );
+  //     if (selectedAccount) {
+  //       const isOutsideState =
+  //         selectedAccount.partyType.includes("Out of State");
+  //       setIsAccountOutOfState(isOutsideState);
+  //       const partyTypeWithGST = `${selectedAccount.gstNo || ""} ${
+  //         selectedAccount.partyType
+  //       }`;
+  //       setPartyGST(partyTypeWithGST || "");
+  //     }
+  //     setValue("accountId", selectedOption.value);
+  //   }
+  // };
 
   const fetchAccounts = async (currentVoucherDate: Date | string) => {
     if (!financialYear) return Promise.resolve();
@@ -454,44 +457,44 @@ export function PurchaseReturn({
     });
   }, [accessId, voucherDate, financialYear, voucherType]);
 
-  useEffect(() => {
-    let filteredAccounts: AccountDtoForDropDownList[] = [];
-    if (paymentMode.toLowerCase().includes("cash")) {
-      const cashAccount = allAccounts.find((acc) => acc.accountName === "CASH");
-      const otherAccounts = allAccounts.filter(
-        (acc) => acc.accountName !== "CASH"
-      );
-      if (cashAccount) {
-        filteredAccounts = [cashAccount, ...otherAccounts];
-        setValue("accountId", cashAccount.accountID);
-        if (askForCustomerDetailWhenCash && cashAccount) {
-          setFocusBillNo(true);
-          setTimeout(() => {
-            if (!voucher && !voucherId)
-              // avoid opening in edit mode
-              setShowCustomerDetailModal(true);
-            setFocusBillNo(false);
-          }, 100);
-        }
-      } else {
-        filteredAccounts = otherAccounts;
-      }
-    } else if (paymentMode.toLowerCase().includes("credit")) {
-      filteredAccounts = allAccounts.filter(
-        (account) =>
-          account.accountGroupName !== "BANK ACCOUNTS" &&
-          account.accountGroupName !== "CASH-IN-HAND"
-      );
-    } else if (
-      paymentMode.toLowerCase().includes("upi") ||
-      paymentMode.toLowerCase().includes("bank")
-    ) {
-      filteredAccounts = allAccounts.filter(
-        (account) => account.accountGroupName === "BANK ACCOUNTS"
-      );
-    }
-    setDisplayedAccounts(filteredAccounts);
-  }, [paymentMode, allAccounts, setValue]);
+  // useEffect(() => {
+  //   let filteredAccounts: AccountDtoForDropDownList[] = [];
+  //   if (paymentMode.toLowerCase().includes("cash")) {
+  //     const cashAccount = allAccounts.find((acc) => acc.accountName === "CASH");
+  //     const otherAccounts = allAccounts.filter(
+  //       (acc) => acc.accountName !== "CASH"
+  //     );
+  //     if (cashAccount) {
+  //       filteredAccounts = [cashAccount, ...otherAccounts];
+  //       setValue("accountId", cashAccount.accountID);
+  //       if (askForCustomerDetailWhenCash && cashAccount) {
+  //         setFocusBillNo(true);
+  //         setTimeout(() => {
+  //           if (!voucher && !voucherId)
+  //             // avoid opening in edit mode
+  //             setShowCustomerDetailModal(true);
+  //           setFocusBillNo(false);
+  //         }, 100);
+  //       }
+  //     } else {
+  //       filteredAccounts = otherAccounts;
+  //     }
+  //   } else if (paymentMode.toLowerCase().includes("credit")) {
+  //     filteredAccounts = allAccounts.filter(
+  //       (account) =>
+  //         account.accountGroupName !== "BANK ACCOUNTS" &&
+  //         account.accountGroupName !== "CASH-IN-HAND"
+  //     );
+  //   } else if (
+  //     paymentMode.toLowerCase().includes("upi") ||
+  //     paymentMode.toLowerCase().includes("bank")
+  //   ) {
+  //     filteredAccounts = allAccounts.filter(
+  //       (account) => account.accountGroupName === "BANK ACCOUNTS"
+  //     );
+  //   }
+  //   // setDisplayedAccounts(filteredAccounts);
+  // }, [paymentMode, allAccounts, setValue]);
 
   const fetchItemDetails = async (itemId: number, index: number) => {
     setValue(`items[${index}]`, {
@@ -510,10 +513,10 @@ export function PurchaseReturn({
       itemDetail: {},
       serialNumberValues: serialNumbers,
     });
-    setPricePerOptions((prevOptions) => ({
-      ...prevOptions,
-      [index]: [],
-    }));
+    // setPricePerOptions((prevOptions) => ({
+    //   ...prevOptions,
+    //   [index]: [],
+    // }));
 
     try {
       const itemDetails: ItemDetailDto = await agent.Item.getItemDetailById(
@@ -530,20 +533,20 @@ export function PurchaseReturn({
       const pricePerOptionsForItem = [
         { value: "main", label: itemDetails.mainUnitName || "" },
       ];
-      if (
-        itemDetails.alternateUnitName &&
-        itemDetails.mainUnitName !== itemDetails.alternateUnitName
-      ) {
-        setUseAltQty(true);
-        pricePerOptionsForItem.push({
-          value: "alt",
-          label: itemDetails.alternateUnitName || "",
-        });
-      }
-      setPricePerOptions((prevOptions) => ({
-        ...prevOptions,
-        [index]: pricePerOptionsForItem,
-      }));
+      // if (
+      //   itemDetails.alternateUnitName &&
+      //   itemDetails.mainUnitName !== itemDetails.alternateUnitName
+      // ) {
+      //   setUseAltQty(true);
+      //   pricePerOptionsForItem.push({
+      //     value: "alt",
+      //     label: itemDetails.alternateUnitName || "",
+      //   });
+      // }
+      // setPricePerOptions((prevOptions) => ({
+      //   ...prevOptions,
+      //   [index]: pricePerOptionsForItem,
+      // }));
 
       if (voucherType == VoucherTypeEnum.ItemSale) {
         const matchingOption = pricePerOptionsForItem.find((option) =>
@@ -577,99 +580,99 @@ export function PurchaseReturn({
     }
   };
 
-  const calculateItemRow = (
-    index: number,
-    fieldName: string,
-    value: string
-  ) => {
-    if (fieldName != "pricePer") {
-      setValue(`items[${index}].${fieldName}`, value);
-    }
+  // const calculateItemRow = (
+  //   index: number,
+  //   fieldName: string,
+  //   value: string
+  // ) => {
+  //   if (fieldName != "pricePer") {
+  //     setValue(`items[${index}].${fieldName}`, value);
+  //   }
 
-    setTimeout(() => {
-      const item: ItemsInVoucherDto = getValues(`items[${index}]`);
-      let pricePer = item.pricePer;
-      if (fieldName == "pricePer") {
-        pricePer = value;
-      }
-      const { rate, discountAmount: enteredDiscountAmount, itemDetail } = item;
-      let { mainQty, altQty, discountPercentage } = item;
-      const taxRate = (itemDetail && itemDetail.gstSlab?.igst) || 0;
-      const conversion = (itemDetail && itemDetail.conversion) || 1;
+  //   setTimeout(() => {
+  //     const item: ItemsInVoucherDto = getValues(`items[${index}]`);
+  //     let pricePer = item.pricePer;
+  //     if (fieldName == "pricePer") {
+  //       pricePer = value;
+  //     }
+  //     const { rate, discountAmount: enteredDiscountAmount, itemDetail } = item;
+  //     let { mainQty, altQty, discountPercentage } = item;
+  //     const taxRate = (itemDetail && itemDetail.gstSlab?.igst) || 0;
+  //     const conversion = (itemDetail && itemDetail.conversion) || 1;
 
-      mainQty = parseFloat(mainQty.toString()) || 0;
-      discountPercentage = parseFloat(discountPercentage.toString()) || 0;
-      altQty = mainQty * conversion;
-      const qty = pricePer === "alt" ? altQty : mainQty;
+  //     mainQty = parseFloat(mainQty.toString()) || 0;
+  //     discountPercentage = parseFloat(discountPercentage.toString()) || 0;
+  //     altQty = mainQty * conversion;
+  //     const qty = pricePer === "alt" ? altQty : mainQty;
 
-      const rateValue = (rate && parseFloat(rate.toString())) || 0;
-      let basicAmount = qty * rateValue;
-      let discountAmount = enteredDiscountAmount;
+  //     const rateValue = (rate && parseFloat(rate.toString())) || 0;
+  //     let basicAmount = qty * rateValue;
+  //     let discountAmount = enteredDiscountAmount;
 
-      if (fieldName === "discountPercentage") {
-        discountAmount =
-          basicAmount * (parseFloat(discountPercentage.toString()) / 100);
-        setValue(`items[${index}].discountAmount`, discountAmount.toFixed(2));
-      } else if (fieldName === "discountAmount") {
-        const calculatedDiscountPercentage =
-          (discountAmount / basicAmount) * 100;
-        setValue(
-          `items[${index}].discountPercentage`,
-          calculatedDiscountPercentage.toFixed(2)
-        );
-      } else if (discountPercentage > 0) {
-        discountAmount =
-          basicAmount * (parseFloat(discountPercentage.toString()) / 100);
-        setValue(`items[${index}].discountAmount`, discountAmount.toFixed(2));
-      }
+  //     if (fieldName === "discountPercentage") {
+  //       discountAmount =
+  //         basicAmount * (parseFloat(discountPercentage.toString()) / 100);
+  //       setValue(`items[${index}].discountAmount`, discountAmount.toFixed(2));
+  //     } else if (fieldName === "discountAmount") {
+  //       const calculatedDiscountPercentage =
+  //         (discountAmount / basicAmount) * 100;
+  //       setValue(
+  //         `items[${index}].discountPercentage`,
+  //         calculatedDiscountPercentage.toFixed(2)
+  //       );
+  //     } else if (discountPercentage > 0) {
+  //       discountAmount =
+  //         basicAmount * (parseFloat(discountPercentage.toString()) / 100);
+  //       setValue(`items[${index}].discountAmount`, discountAmount.toFixed(2));
+  //     }
 
-      basicAmount -= discountAmount;
-      basicAmount = parseFloat(basicAmount.toFixed(2));
+  //     basicAmount -= discountAmount;
+  //     basicAmount = parseFloat(basicAmount.toFixed(2));
 
-      let iGST = 0,
-        cGST = 0,
-        sGST = 0;
-      let taxAmount = 0,
-        netAmount = 0;
-      if (selectedTaxType === "Inclusive" && basicAmount > 0) {
-        const amountBeforeTax = basicAmount / (1 + taxRate / 100);
-        taxAmount = basicAmount - amountBeforeTax;
-        netAmount = basicAmount;
-        basicAmount = amountBeforeTax;
-      } else if (basicAmount > 0) {
-        taxAmount = basicAmount * (taxRate / 100);
-        netAmount = basicAmount + taxAmount;
-      }
+  //     let iGST = 0,
+  //       cGST = 0,
+  //       sGST = 0;
+  //     let taxAmount = 0,
+  //       netAmount = 0;
+  //     if (selectedTaxType === "Inclusive" && basicAmount > 0) {
+  //       const amountBeforeTax = basicAmount / (1 + taxRate / 100);
+  //       taxAmount = basicAmount - amountBeforeTax;
+  //       netAmount = basicAmount;
+  //       basicAmount = amountBeforeTax;
+  //     } else if (basicAmount > 0) {
+  //       taxAmount = basicAmount * (taxRate / 100);
+  //       netAmount = basicAmount + taxAmount;
+  //     }
 
-      if (isAccountOutOfState) {
-        iGST = taxAmount;
-      } else {
-        cGST = sGST = taxAmount / 2;
-        cGST = parseFloat(cGST.toFixed(2));
-        sGST = parseFloat(sGST.toFixed(2));
-      }
-      netAmount = parseFloat((basicAmount + cGST + sGST + iGST).toFixed(2));
+  //     // if (isAccountOutOfState) {
+  //     //   iGST = taxAmount;
+  //     // } else {
+  //     //   cGST = sGST = taxAmount / 2;
+  //     //   cGST = parseFloat(cGST.toFixed(2));
+  //     //   sGST = parseFloat(sGST.toFixed(2));
+  //     // }
+  //     netAmount = parseFloat((basicAmount + cGST + sGST + iGST).toFixed(2));
 
-      setValue(`items[${index}].altQty`, altQty.toFixed(2));
-      setValue(`items[${index}].basicAmount`, basicAmount.toFixed(2));
-      setValue(`items[${index}].netAmount`, netAmount.toFixed(2));
-      setValue(`items[${index}].iGST`, iGST.toFixed(2));
-      setValue(`items[${index}].sGST`, sGST.toFixed(2));
-      setValue(`items[${index}].cGST`, cGST.toFixed(2));
-      setValue(`items[${index}].netAmount`, netAmount.toFixed(2));
+  //     setValue(`items[${index}].altQty`, altQty.toFixed(2));
+  //     setValue(`items[${index}].basicAmount`, basicAmount.toFixed(2));
+  //     setValue(`items[${index}].netAmount`, netAmount.toFixed(2));
+  //     setValue(`items[${index}].iGST`, iGST.toFixed(2));
+  //     setValue(`items[${index}].sGST`, sGST.toFixed(2));
+  //     setValue(`items[${index}].cGST`, cGST.toFixed(2));
+  //     setValue(`items[${index}].netAmount`, netAmount.toFixed(2));
 
-      if (item.itemId && item.basicAmount > 0) {
-        const items = getValues("items");
-        if (index === items.length - 1) {
-          append(defaultItems);
-        }
-      }
-    }, 0);
+  //     if (item.itemId && item.basicAmount > 0) {
+  //       const items = getValues("items");
+  //       if (index === items.length - 1) {
+  //         append(defaultItems);
+  //       }
+  //     }
+  //   }, 0);
 
-    setTimeout(() => {
-      calculateBillSummary();
-    }, 0);
-  };
+  //   setTimeout(() => {
+  //     calculateBillSummary();
+  //   }, 0);
+  // };
 
   const calculateBillSummary = () => {
     let totalMainQty = 0;
@@ -762,7 +765,7 @@ export function PurchaseReturn({
 
   const convertFieldValuesToDto = (
     data: FieldValues
-  ): ItemSalePurchaseVoucherDto => {
+  ): ItemPurchaseReturnsalePurchaseVoucherDto => {
     if (!data.billBookId) {
       toast.error("Please select a bill book.");
       throw new Error("Bill book is required.");
@@ -799,7 +802,7 @@ export function PurchaseReturn({
       throw new Error("Invalid account selection.");
     }
 
-    const itemSalePurchaseDto: ItemSalePurchaseVoucherDto = {
+    const itemSalePurchaseDto: ItemPurchaseReturnsalePurchaseVoucherDto = {
       voucherId: data.voucherId,
       voucherTypeId: voucherType,
       billBookId: data.billBookId,
@@ -903,7 +906,7 @@ export function PurchaseReturn({
               <CustomDropdown
                 // defaultValue={voucher?.voucherMasterExtended?.billBookId}
                 name="billBookId"
-                label="Book Type"
+                label="Supplier"
                 options={billBookList}
                 control={control}
                 onCreateButtonClick={() => {
@@ -916,7 +919,7 @@ export function PurchaseReturn({
                 hideClearIcon
               />
             </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-date">
+            {/* <Col xs={11} sm={5} md={2} className="custom-col-date">
               <CustomDateInputBox
                 label="Date"
                 name="voucherDate"
@@ -962,10 +965,10 @@ export function PurchaseReturn({
                 }
                 // defaultValue={voucher?.voucherDetails?.accountId}
               />
-            </Col>
+            </Col> */}
             <Col xs={12} md={2} className="custom-col-reduced">
               <CustomInput
-                label="Invoice No"
+                label="Bill No"
                 name="voucherNo"
                 register={register}
                 maxLength={12}
@@ -974,9 +977,77 @@ export function PurchaseReturn({
                 // defaultValue={voucher?.voucherNumber}
               />
             </Col>
+            <Col xs={12} md={2} className="custom-col-reduced">
+              <CustomInput
+                label="Select Bill No"
+                name="voucherNo"
+                register={register}
+                maxLength={12}
+                isTextCenter
+                autoFocus={focusBillNo}
+                // defaultValue={voucher?.voucherNumber}
+              />
+            </Col>
+            <Col xs={12} md={2} className="custom-col-billBook">
+              <CustomDropdown
+                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
+                name="billBookId"
+                label="POS"
+                options={billBookList}
+                control={control}
+                onCreateButtonClick={() => {
+                  setShowBillBookModal(true);
+                }}
+                onChangeCallback={handleBillBookChange}
+                badgeText={selectedTaxType}
+                dropDownWidth="400px"
+                hideDropdownIcon
+                hideClearIcon
+              />
+            </Col>
+            <Col xs={12} md={2} className="custom-col-reduced">
+              <CustomInput
+                label="Address"
+                name="voucherNo"
+              />
+            </Col>
+            <Col xs={12} md={2} className="custom-col-billBook">
+              <CustomDropdown
+                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
+                name="billBookId"
+                label="GST Type"
+                options={billBookList}
+                control={control}
+                onCreateButtonClick={() => {
+                  setShowBillBookModal(true);
+                }}
+                onChangeCallback={handleBillBookChange}
+                badgeText={selectedTaxType}
+                dropDownWidth="400px"
+                hideDropdownIcon
+                hideClearIcon
+              />
+            </Col>
+            <Col xs={12} md={2} className="custom-col-billBook">
+              <CustomDropdown
+                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
+                name="billBookId"
+                label="Item Center"
+                options={billBookList}
+                control={control}
+                onCreateButtonClick={() => {
+                  setShowBillBookModal(true);
+                }}
+                onChangeCallback={handleBillBookChange}
+                badgeText={selectedTaxType}
+                dropDownWidth="400px"
+                hideDropdownIcon
+                hideClearIcon
+              />
+            </Col>
             <Col xs={11} sm={5} md={2} className="custom-col-date">
               <CustomDateInputBox
-                label="Due Date"
+                label="Bill Date"
                 name="voucherDate"
                 // validationRules={{ required: 'Date is required.' }}
                 register={register}
@@ -986,13 +1057,87 @@ export function PurchaseReturn({
                 defaultDate={voucher ? voucher.voucherDate : lastVoucherDate}
               />
             </Col>
+            <Col xs={12} md={2} className="custom-col-reduced">
+              <CustomInput
+                label="Mobile No"
+                name="voucherNo"
+                register={register}
+                maxLength={10}
+                isTextCenter
+                autoFocus={focusBillNo}
+                // defaultValue={voucher?.voucherNumber}
+              />
+            </Col>
+          </Row>
+          <Row className="justify-content-center my-4">
+            <Col xs="auto">
+              <button type="button" className="btn btn-success">Show Bill</button>
+            </Col>
           </Row>
           <Row className="gx-2">
+            <Col xs={8} md={3} className="custom-col-reduced">
+              <CustomInput
+                label="SKU/Barcode"
+                name="voucherNo"
+                isTextCenter
+              />
+            </Col>
             <Col xs={8} md={3} className="custom-col-billBook">
               <CustomDropdown
                 // defaultValue={voucher?.voucherMasterExtended?.billBookId}
                 name="billBookId"
-                label="GST Slab"
+                label="Item Name"
+                options={billBookList}
+                control={control}
+                onCreateButtonClick={() => {
+                  setShowBillBookModal(true);
+                }}
+                onChangeCallback={handleBillBookChange}
+                badgeText={selectedTaxType}
+                dropDownWidth="400px"
+                hideDropdownIcon
+                hideClearIcon
+              />
+            </Col>
+            <Col xs={8} md={3} className="custom-col-billBook">
+              <CustomDropdown
+                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
+                name="billBookId"
+                label="Unit"
+                options={billBookList}
+                control={control}
+                onCreateButtonClick={() => {
+                  setShowBillBookModal(true);
+                }}
+                onChangeCallback={handleBillBookChange}
+                badgeText={selectedTaxType}
+                dropDownWidth="400px"
+                hideDropdownIcon
+                hideClearIcon
+              />
+            </Col>
+            <Col xs={8} md={3} className="custom-col-billBook">
+              <CustomDropdown
+                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
+                name="billBookId"
+                label="Item Color"
+                options={billBookList}
+                control={control}
+                onCreateButtonClick={() => {
+                  setShowBillBookModal(true);
+                }}
+                onChangeCallback={handleBillBookChange}
+                badgeText={selectedTaxType}
+                dropDownWidth="400px"
+                hideDropdownIcon
+                hideClearIcon
+              />
+            </Col>
+            <Col xs={8} md={3} className="custom-col-billBook">
+              <CustomDropdown
+                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
+                name="billBookId"
+                label="Item Size"
                 options={billBookList}
                 control={control}
                 onCreateButtonClick={() => {
@@ -1007,114 +1152,101 @@ export function PurchaseReturn({
             </Col>
             <Col xs={8} md={3} className="custom-col-reduced">
               <CustomInput
-                label="Description"
+                label="Qty"
                 name="voucherNo"
-                register={register}
-                maxLength={12}
                 isTextCenter
-                autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
             </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-date">
+            <Col xs={8} md={3} className="custom-col-reduced">
               <CustomInput
-                label="Amount"
+                label="BasePrice"
                 name="voucherNo"
-                register={register}
-                maxLength={12}
                 isTextCenter
-                autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
             </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-date">
+            <Col xs={8} md={3} className="custom-col-reduced">
               <CustomInput
-                label="Actual Amt."
+                label="Dis. %"
                 name="voucherNo"
-                register={register}
-                maxLength={12}
                 isTextCenter
-                autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
             </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-date">
+            <Col xs={8} md={3} className="custom-col-reduced">
               <CustomInput
-                label="CGST"
+                label="Dis. Amt"
                 name="voucherNo"
-                register={register}
-                maxLength={12}
                 isTextCenter
-                autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
             </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-date">
+            <Col xs={8} md={3} className="custom-col-reduced">
               <CustomInput
-                label="SGST"
+                label="Total"
                 name="voucherNo"
-                register={register}
-                maxLength={12}
                 isTextCenter
-                autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
             </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-date">
-              <CustomInput
-                label="IGST"
-                name="voucherNo"
-                register={register}
-                maxLength={12}
-                isTextCenter
-                autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
-              />
-            </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-date">
-              <CustomInput
-                label="Net Value"
-                name="voucherNo"
-                register={register}
-                maxLength={12}
-                isTextCenter
-                autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
-              />
+            <Col xs={8} md={3} className="custom-col-reduced my-auto">
+              <Button variant="primary mt-4">Add</Button>
             </Col>
           </Row>
-          <Row className="gx-2 justify-content-end">
-      <Col xs="auto" className="me-4">
-        <Button variant="primary">Add</Button>
-      </Col>
-    </Row>
           <div className="scrollable-table-container" ref={scrollContainerRef}>
             <Table bordered hover className="mt-2 custom-sale-table">
               <thead className="custom-sale-thead">
                 <tr>
-                  <th style={{ width: "4%", textAlign: "center" }}>SrNo</th>
-                  <th style={{ width: "15%", textAlign: "center" }}>GSTSlab</th>
-                  <th style={{ width: "15%", textAlign: "center" }}> Description</th>
-
-                  <th style={{ width: "10%", textAlign: "center" }}>Amount</th>
-                  <th style={{ width: "10%", textAlign: "center" }}>
-                    Actual Amount
-                  </th>
-
-                  <th style={{ width: "10%", textAlign: "center" }}>IGST</th>
-
-                  <th style={{ width: "10%", textAlign: "center" }}>SGST</th>
-                  <th style={{ width: "10%", textAlign: "center" }}>CGST</th>
-
-                  <th style={{ width: "10%", textAlign: "center" }}>
-                    Net Amount
-                  </th>
+                  <th style={{ textAlign: "center" }}>Item Name</th>
+                  <th style={{ textAlign: "center" }}> SKU/Barcode</th>
+                  <th style={{ textAlign: "center" }}>Unit</th>
+                  <th style={{ textAlign: "center" }}>Item Color</th>
+                  <th style={{ textAlign: "center" }}>Item Size</th>
+                  <th style={{ textAlign: "center" }}>Purchased (Qty)</th>
+                  <th style={{ textAlign: "center" }}>Return (Qty)</th>
+                  <th style={{ textAlign: "center" }}>Base Price</th>
+                  <th style={{ textAlign: "center" }}>Our Price</th>
+                  <th style={{ textAlign: "center" }}>Discount(%)</th>
+                  <th style={{ textAlign: "center" }}>Discount Amt</th>
+                  <th style={{ textAlign: "center" }}>Total</th>
+                  <th style={{ textAlign: "center" }}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {fields.map((field, index) => (
                   <tr key={field.id}>
-                    <td style={{ textAlign: "center" }}>{index + 1}</td>
+                    <td>
+                      <CustomDropdown
+                        name={`items[${index}].itemId`}
+                        options={itemDropDownList}
+                        control={control}
+                        isCreatable
+                        onCreateButtonClick={() => {
+                          setShowItemModal(true);
+                        }}
+                        dropDownWidth="400px"
+                        onChangeCallback={(
+                          selectedOption: OptionType | null
+                        ) => {
+                          if (selectedOption) {
+                            setTimeout(
+                              () =>
+                                fetchItemDetails(selectedOption.value, index),
+                              0
+                            );
+                          }
+                        }}
+                        hideDropdownIcon
+                        hideClearIcon
+                        isInTable
+                        onFocus={
+                          index === fields.length - 1
+                            ? scrollToBottom
+                            : undefined
+                        }
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
                     <td>
                       <CustomDropdown
                         name={`items[${index}].itemId`}
@@ -1146,7 +1278,6 @@ export function PurchaseReturn({
                         }
                       />
                     </td>
-
                     <td>
                       <CustomDropdown
                         name={`items[${index}].itemId`}
@@ -1178,36 +1309,98 @@ export function PurchaseReturn({
                         }
                       />
                     </td>
-
-                    {/* Alternate Qty */}
-                    {useAltQty && (
+                    <td>
+                      <CustomDropdown
+                        name={`items[${index}].itemId`}
+                        options={itemDropDownList}
+                        control={control}
+                        isCreatable
+                        onCreateButtonClick={() => {
+                          setShowItemModal(true);
+                        }}
+                        dropDownWidth="800px"
+                        onChangeCallback={(
+                          selectedOption: OptionType | null
+                        ) => {
+                          if (selectedOption) {
+                            setTimeout(
+                              () =>
+                                fetchItemDetails(selectedOption.value, index),
+                              0
+                            );
+                          }
+                        }}
+                        hideDropdownIcon
+                        hideClearIcon
+                        isInTable
+                        onFocus={
+                          index === fields.length - 1
+                            ? scrollToBottom
+                            : undefined
+                        }
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
+                    <td>
+                      <CustomInput
+                        name={`items[${index}].itemId`}
+                      />
+                    </td>
+                    <td>
+                      <button type="button" className="btn btn-danger">Delete</button>
+                    </td>
+                    {/* {useAltQty && (
                       <td>
                         <CustomInput
                           name={`items[${index}].altQty`}
                           register={register}
-                          allowedChars="numericDecimal"
                           onChange={(e) =>
                             calculateItemRow(index, "altQty", e.target.value)
                           }
                         />
                       </td>
-                    )}
-
-                    {useFree && (
+                    )} */}
+                    {/* {useFree && (
                       <td>
                         <CustomInput
                           name={`items[${index}].free`}
                           register={register}
-                          allowedChars="numericDecimal"
                         />
                       </td>
-                    )}
-
-                    <td>
+                    )} */}
+                    {/* <td>
                       <CustomInput
                         name={`items[${index}].rate`}
                         register={register}
-                        allowedChars="numericDecimal"
                         onChange={(e) =>
                           calculateItemRow(index, "rate", e.target.value)
                         }
@@ -1229,7 +1422,6 @@ export function PurchaseReturn({
                           className="mt-2"
                           name={`items[${index}].inclusiveRate`}
                           register={register}
-                          allowedChars="numericDecimal"
                           value={inclusiveRate}
                           onChange={(e) => setInclusiveRate(e.target.value)}
                           onBlur={() => {
@@ -1262,9 +1454,8 @@ export function PurchaseReturn({
                           }
                         />
                       )}
-                    </td>
-                    {/* Price Per */}
-                    {useAltQty && (
+                    </td> */}
+                    {/* {useAltQty && (
                       <td>
                         <div data-skip-focus="true">
                           <CustomDropdown
@@ -1288,19 +1479,17 @@ export function PurchaseReturn({
                           />
                         </div>
                       </td>
-                    )}
-                    <td>
+                    )} */}
+                    {/* <td>
                       <CustomInput
                         name={`items[${index}].basicAmount`}
                         register={register}
-                        allowedChars="numericDecimal"
                       />
-                    </td>
-                    <td>
+                    </td> */}
+                    {/* <td>
                       <CustomInput
                         name={`items[${index}].discountPercentage`}
                         register={register}
-                        allowedChars="numericDecimal"
                         onChange={(e) =>
                           calculateItemRow(
                             index,
@@ -1310,12 +1499,11 @@ export function PurchaseReturn({
                         }
                         maxLength={2}
                       />
-                    </td>
-                    <td>
+                    </td> */}
+                    {/* <td>
                       <CustomInput
                         name={`items[${index}].discountAmount`}
                         register={register}
-                        allowedChars="numericDecimal"
                         onChange={(e) =>
                           calculateItemRow(
                             index,
@@ -1324,50 +1512,8 @@ export function PurchaseReturn({
                           )
                         }
                       />
-                    </td>
-
-                    {isAccountOutOfState == true ? (
-                      <td>
-                        <CustomInput
-                          name={`items[${index}].iGST`}
-                          register={register}
-                          allowedChars="numericDecimal"
-                          disabled
-                        />
-                      </td>
-                    ) : (
-                      <>
-                        <td>
-                          <CustomInput
-                            name={`items[${index}].sGST`}
-                            register={register}
-                            allowedChars="numericDecimal"
-                            disabled
-                          />
-                        </td>
-                        <td>
-                          <CustomInput
-                            name={`items[${index}].cGST`}
-                            register={register}
-                            allowedChars="numericDecimal"
-                            disabled
-                          />
-                        </td>
-                      </>
-                    )}
-
-                    {/* <td>
-                      <CustomInput
-                        name={`items[${index}].netAmount`}
-                        register={register}
-                        allowedChars="numericDecimal"
-                        disabled
-                      />
                     </td> */}
-                    <td>
-                      {/* <div data-skip-focus="true">
-                                                <CustomButton text="Add Serial" onClick={() => { setCurrentItemID(index); setShowSerialNumberModal(true); }} />
-                                            </div> */}
+                    {/* <td>
                       <div data-skip-focus="true">
                         <CustomButton
                           text="X"
@@ -1375,7 +1521,7 @@ export function PurchaseReturn({
                           onClick={() => handleDeleteRow(index)}
                         />
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -1393,7 +1539,7 @@ export function PurchaseReturn({
                   />
                 </Col>
               </Row>
-              <Row className="mt-2 p-0 gx-1">
+              {/* <Row className="mt-2 p-0 gx-1">
                 <Col>
                   <CustomButton
                     size="sm"
@@ -1466,41 +1612,41 @@ export function PurchaseReturn({
                     />
                   )}
                 </Col>
-              </Row>
+              </Row> */}
             </div>
 
             <div className="bill-summary">
               <Table>
                 <tbody>
                   <tr>
-                    <td>Main Qty</td>
+                    <td>Total Exclude Tax</td>
                     <td className="text-end">{billSummary.totalMainQty}</td>
-                    <td>SGST</td>
+                    {/* <td>SGST</td>
                     <td className="text-end">
                       {billSummary.totalSGST.toFixed(2)}
-                    </td>
+                    </td> */}
                   </tr>
                   <tr>
-                    <td>Alt Qty</td>
+                    <td>Total GST</td>
                     <td className="text-end">
                       {billSummary.totalAltQty.toFixed(2)}
                     </td>
-                    <td>CGST</td>
+                    {/* <td>CGST</td>
                     <td className="text-end">
                       {billSummary.totalCGST.toFixed(2)}
-                    </td>
+                    </td> */}
                   </tr>
                   <tr>
-                    <td>Basic Amt</td>
+                    <td>Grand Total</td>
                     <td className="text-end">
                       {billSummary.totalBasicAmount.toFixed(2)}
                     </td>
-                    <td>IGST</td>
+                    {/* <td>IGST</td>
                     <td className="text-end">
                       {billSummary.totalIGST.toFixed(2)}
-                    </td>
+                    </td> */}
                   </tr>
-                  <tr>
+                  {/* <tr>
                     <td>Discount</td>
                     <td className="text-end">
                       {billSummary.totalDiscount.toFixed(2)}
@@ -1526,7 +1672,6 @@ export function PurchaseReturn({
                       {billSummary.totalRoundOff.toFixed(2)}
                     </td>
                   </tr>
-
                   <tr>
                     <td colSpan={2}>Bill Amount (Rs.):</td>
                     <td
@@ -1536,7 +1681,7 @@ export function PurchaseReturn({
                     >
                       {formatNumberIST(billSummary.netBillAmount)}
                     </td>
-                  </tr>
+                  </tr> */}
                 </tbody>
               </Table>
             </div>

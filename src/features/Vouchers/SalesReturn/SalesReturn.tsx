@@ -12,7 +12,7 @@ import {
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import {
   CustomerDetailDto,
-  ItemSalePurchaseVoucherDto,
+  ItemsaleReturnPurchaseVoucherDto,
   ItemsInVoucherDto,
   OtherChargesDto,
   TransportDetailDto,
@@ -20,7 +20,7 @@ import {
   defaultCustomerDetails,
   defaultItems,
   defaultTransportDetails,
-} from "./salePurchaseVoucherDto";
+} from "./saleReturnPurchaseVoucherDto";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import toast from "react-hot-toast";
 import FormNavigator from "../../../app/components/FormNavigator";
@@ -49,12 +49,12 @@ import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
 import "./salepurchase.scss";
 import { formatNumberIST } from "../../../app/utils/numberUtils";
-import TransportAndShippingDetailModal from "./TransportAndShippingDetailModal";
-import CustomerDetailModal from "./CustomerDetailModal";
-import OtherChargesModal from "./OtherChargesModal";
+import TransportAndShippingDetailModal from "./SaleReturnTransportAndShippingDetailModal";
+import CustomerDetailModal from "./SaleReturnCustomerDetailModal";
+import OtherChargesModal from "./SaleReturnOtherChargesModal";
 // import { MdOutlineInsertChartOutlined } from "react-icons/md";
 import { setLoading } from "../../../app/layout/loadingSlice";
-import SerialNumberModal from "./SerialNumberModal";
+import SerialNumberModal from "./SaleReturnSerialNumberModal";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
 
 const PAYMENT_MODE_OPTIONS = [
@@ -762,7 +762,7 @@ export function SalesReturn({
 
   const convertFieldValuesToDto = (
     data: FieldValues
-  ): ItemSalePurchaseVoucherDto => {
+  ): ItemsaleReturnPurchaseVoucherDto => {
     if (!data.billBookId) {
       toast.error("Please select a bill book.");
       throw new Error("Bill book is required.");
@@ -799,7 +799,7 @@ export function SalesReturn({
       throw new Error("Invalid account selection.");
     }
 
-    const itemSalePurchaseDto: ItemSalePurchaseVoucherDto = {
+    const itemSalePurchaseDto: ItemsaleReturnPurchaseVoucherDto = {
       voucherId: data.voucherId,
       voucherTypeId: voucherType,
       billBookId: data.billBookId,

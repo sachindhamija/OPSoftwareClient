@@ -4,7 +4,7 @@ import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation"
 import { selectCurrentFinancialYear } from "../../Masters/FinancialYear/financialYearSlice";
 import { VoucherTypeEnum, getVoucherTypeString } from "../VoucherCommon/voucherTypeEnum";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
-import { CustomerDetailDto, ItemSalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultTransportDetails } from "./salePurchaseVoucherDto";
+import { CustomerDetailDto, ItemPurchasesalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultTransportDetails } from "./PurchasesalePurchaseVoucherDto";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import toast from "react-hot-toast";
 import FormNavigator from "../../../app/components/FormNavigator";
@@ -24,12 +24,12 @@ import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
 import './salepurchase.scss'
 import { formatNumberIST } from "../../../app/utils/numberUtils";
-import TransportAndShippingDetailModal from "./TransportAndShippingDetailModal";
-import CustomerDetailModal from "./CustomerDetailModal";
-import OtherChargesModal from "./OtherChargesModal";
+import PurchaseTransportAndShippingDetailModal from "./PurchaseTransportAndShippingDetailModal";
+import PurchaseCustomerDetailModal from "./PurchaseCustomerDetailModal";
+import OtherChargesModal from "./PurchaseOtherChargesModal";
 // import { MdOutlineInsertChartOutlined } from "react-icons/md";
 import { setLoading } from '../../../app/layout/loadingSlice';
-import SerialNumberModal from "./SerialNumberModal";
+import SerialNumberModal from "./PurchaseSerialNumberModal";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
 
 
@@ -71,7 +71,7 @@ export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = f
         setTransportDetails(data);
     };
     
-    const [showCustomerDetailModal, setShowCustomerDetailModal] = useState(false);
+    const [showPurchaseCustomerDetailModal, setShowPurchaseCustomerDetailModal] = useState(false);
     const [showOtherChargesModal, setShowOtherChargesModal] = useState(false);
     const [customerDetail, setCustomerDetail] = useState<CustomerDetailDto>(defaultCustomerDetails);
 
@@ -373,7 +373,7 @@ export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = f
                     setFocusBillNo(true);
                     setTimeout(() => {
                         if (!voucher && !voucherId) // avoid opening in edit mode
-                            setShowCustomerDetailModal(true);
+                            setShowPurchaseCustomerDetailModal(true);
                         setFocusBillNo(false);
                     }, 100);
 
@@ -622,7 +622,7 @@ export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = f
         }
     };
 
-    const convertFieldValuesToDto = (data: FieldValues): ItemSalePurchaseVoucherDto => {
+    const convertFieldValuesToDto = (data: FieldValues): ItemPurchasesalePurchaseVoucherDto => {
         if (!data.billBookId) {
             toast.error("Please select a bill book.");
             throw new Error("Bill book is required.");
@@ -657,7 +657,7 @@ export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = f
             throw new Error("Invalid account selection.");
         }
 
-        const itemSalePurchaseDto: ItemSalePurchaseVoucherDto = {
+        const itemSalePurchaseDto: ItemPurchasesalePurchaseVoucherDto = {
             voucherId: data.voucherId,
             voucherTypeId: voucherType,
             billBookId: data.billBookId,
@@ -1056,7 +1056,7 @@ export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = f
                                     }} /></Col>
                                 <Col><CustomButton size="sm" variant="outline-info" text="Customer Detail (F2)" className="w-100"
                                     onClick={() => {
-                                        setShowCustomerDetailModal(true);
+                                        setShowPurchaseCustomerDetailModal(true);
                                     }}
                                 /></Col>
                                 <Col><CustomButton size="sm" variant="outline-info" text="Charges/Discount (F2)" className="w-100" onClick={() => {
@@ -1156,7 +1156,7 @@ export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = f
             </CommonModal>
 
             {showTransportModal &&
-                <TransportAndShippingDetailModal
+                <PurchaseTransportAndShippingDetailModal
                     show={showTransportModal}
 
                     onHide={() => {
@@ -1169,11 +1169,11 @@ export function PurchaseForm({ voucherType, voucherId = undefined, isInModal = f
                     initialData={transportDetails}
                 />
             }
-            {showCustomerDetailModal &&
-                <CustomerDetailModal
-                    show={showCustomerDetailModal}
+            {showPurchaseCustomerDetailModal &&
+                <PurchaseCustomerDetailModal
+                    show={showPurchaseCustomerDetailModal}
                     onHide={() => {
-                        setShowCustomerDetailModal(false);
+                        setShowPurchaseCustomerDetailModal(false);
                         setTimeout(() => {
                             setFocusBillNo(true);
                         }, 10);

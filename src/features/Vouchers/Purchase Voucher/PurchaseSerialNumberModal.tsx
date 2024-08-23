@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
-import { ItemsInVoucherDto } from './salePurchaseVoucherDto';
+import { ItemsInVoucherDto } from './PurchasesalePurchaseVoucherDto';
 
 const panelStyles = {
   marginBottom: '20px',
@@ -49,7 +49,7 @@ const InfoPanel: React.FC<InfoPanelProps>= ({ heading, children }) => {
   );
 };
 
-interface SerialNumberModalProps {
+interface PurchaseSerialNumberModalProps {
   show: boolean;
   onHide: () => void;
   onSave: (serialValues: ItemsInVoucherDto[]) => void;
@@ -57,7 +57,7 @@ interface SerialNumberModalProps {
   items: ItemsInVoucherDto[];
 }
 
-const SerialNumberModal: React.FC<SerialNumberModalProps> = ({ show, onHide, onSave, items }) => {
+const PurchaseSerialNumberModal: React.FC<PurchaseSerialNumberModalProps> = ({ show, onHide, onSave, items }) => {
   const [serialValues, setSerialValues] = useState<ItemsInVoucherDto[]>(items);
   const serialValuesRef = useRef(serialValues);
 
@@ -147,4 +147,4 @@ const SerialNumberModal: React.FC<SerialNumberModalProps> = ({ show, onHide, onS
   );
 };
 
-export default SerialNumberModal;
+export default PurchaseSerialNumberModal;
