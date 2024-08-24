@@ -33,7 +33,7 @@ import {
   CustomDropdown,
   CustomDateInputBox,
   CommonModal,
-  CustomInput
+  CustomInput,
 } from "../../../app/components/Components";
 import SaleBillBookForm from "../../Masters/BillBook/SaleBillBookForm";
 import {
@@ -41,31 +41,36 @@ import {
   validateDate,
 } from "../../../app/utils/dateUtils";
 import { AccountDtoForDropDownList } from "../../Masters/Account/accountDto";
-// import { transformAccountToOption } from "../../../app/utils/accountUtils";
 import AccountForm from "../../Masters/Account/AccountForm";
 import ItemForm from "../../Masters/Item/ItemForm";
 import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
 import "./salepurchase.scss";
-// import { formatNumberIST } from "../../../app/utils/numberUtils";
 import TransportAndShippingDetailModal from "./ReturnPurchaseTransportAndShippingDetailModal";
 import CustomerDetailModal from "./ReturnPurchaseCustomerDetailModal";
 import OtherChargesModal from "./ReturnPurchaseOtherChargesModal";
-// import { MdOutlineInsertChartOutlined } from "react-icons/md";
+import { Modal } from "react-bootstrap";
+
 import { setLoading } from "../../../app/layout/loadingSlice";
 import SerialNumberModal from "./PurchaseReturnSerialNumberModal";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
-
-// const PAYMENT_MODE_OPTIONS = [
-//   { label: "Cash", value: "CASH" },
-//   { label: "Credit", value: "CREDIT" },
-//   { label: "Bank | UPI", value: "BANK" },
-// ];
 interface SalePurchaseFormProps {
   voucherType: VoucherTypeEnum;
   voucherId?: string;
   isInModal?: boolean;
   onSuccessfulSubmit?: () => void;
+}
+
+interface Supplier {
+  value: string;
+  label: string;
+  barcode: string;
+  itemName: string;
+  itemQty: number;
+  itemColor: string;
+  itemSize: string;
+  basePrice: number;
+  totalPrice: number;
 }
 
 export function PurchaseReturn({
@@ -113,6 +118,11 @@ export function PurchaseReturn({
   const [customerDetail, setCustomerDetail] = useState<CustomerDetailDto>(
     defaultCustomerDetails
   );
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowBill = () => setShowModal(true);
+  const handleClose = () => setShowModal(false);
 
   const [otherCharges, setOtherCharges] = useState<OtherChargesDto[]>([]);
   const [serialNumbers, setSerialNumbers] = useState<SerialNumberDto[]>([]);
@@ -164,6 +174,63 @@ export function PurchaseReturn({
     }
   };
 
+  const [, setItems] = useState<Supplier[]>([]);
+
+  const handleAddItems = () => {
+    setItems(dummySuppliers);
+    handleClose();
+  };
+  
+  // const handleSupplierSelect = (supplier) => {
+  //   setSelectedSupplier(supplier);
+  // };
+  
+  // const handleAddItems = () => {
+  //   if (selectedSupplier) {
+  //     setItems([...items, selectedSupplier]);
+  //     handleClose();
+  //   } else {
+  //     alert("Please select a supplier to add.");
+  //   }
+  // };
+  
+  //Dummy Data (Fetch from Backend)
+  const dummySuppliers: Supplier[] = [
+    {
+      value: "supplier1",
+      label: "Darshan Sharma",
+      barcode: "1234567890",
+      itemName: "Biscuit",
+      itemQty: 10,
+      itemColor: "Brown",
+      itemSize: "Medium",
+      basePrice: 5,
+      totalPrice: 50,
+    },
+    {
+      value: "supplier2",
+      label: "Aditya Bhai",
+      barcode: "0987654321",
+      itemName: "Tea",
+      itemQty: 20,
+      itemColor: "Golden",
+      itemSize: "Small",
+      basePrice: 10,
+      totalPrice: 200,
+    },
+    {
+      value: "supplier3",
+      label: "Daksh Sir",
+      barcode: "1122334455",
+      itemName: "Sugar",
+      itemQty: 30,
+      itemColor: "White",
+      itemSize: "Large",
+      basePrice: 2,
+      totalPrice: 60,
+    },
+  ];
+  
   useEffect(() => {
     fetchSerialNumbers();
   }, [dispatch]);
@@ -185,16 +252,33 @@ export function PurchaseReturn({
     }
   };
 
+  const [supplierList, setSupplierList] = useState<Supplier[]>([]);
+  // const [, setSelectedSupplier] = useState<Supplier | null>(
+  //   null
+  // );
+  const [,setShowSupplierModal] = useState(false);
+
+  useEffect(() => {
+    setSupplierList(dummySuppliers);
+  }, []);
+
+  // const handleSupplierChange = (selectedOption: Supplier | null) => {
+  //   if (selectedOption != null) {
+  //     setSelectedSupplier(selectedOption);
+  //     console.log("Selected Supplier Details:", selectedOption);
+  //     setValue("supplierId", selectedOption.value);
+  //   }
+  // };
+
   const [billSummary, setBillSummary] = useState(defaultBillSummary);
   const [focusRemarks, setFocusRemarks] = useState(false);
   const [focusBillNo, setFocusBillNo] = useState(false);
   useEffect(() => {
     if (focusRemarks) {
-      const remarksInput = document.getElementById("remarks"); // Get the element
+      const remarksInput = document.getElementById("remarks");
       if (remarksInput) {
-        // Check if the element is not null
-        remarksInput.focus(); // Safely call focus
-        setFocusRemarks(false); // Reset focus state to prevent re-focusing on subsequent renders
+        remarksInput.focus();
+        setFocusRemarks(false);
       }
     }
   }, [focusRemarks]);
@@ -215,31 +299,6 @@ export function PurchaseReturn({
     };
   }, []);
 
-  // const [pricePerOptions, setPricePerOptions] = useState<{
-  //   [key: number]: OptionType[];
-  // }>({});
-  // const [askForCustomerDetailWhenCash] = useState<boolean>(true);
-
-  // const [partyGST, setPartyGST] = useState("");
-  // const [isAccountOutOfState, setIsAccountOutOfState] =
-  //   useState<boolean>(false);
-
-  // const handleDeleteRow = (index: number) => {
-  //   if (window.confirm("Are you sure you want to delete this row?")) {
-  //     remove(index);
-  //     if (fields.length === 1) {
-  //       append(defaultItems); // Append a new row only if there are no other rows left
-  //     }
-  //   }
-  // };
-  // const deleteVoucher = () => {
-  //   if (window.confirm("Are you sure you want to delete this row?")) {
-  //     agent.SalePurchase.deleteVoucher(accessId, voucherId ?? "").then(() => {
-  //       if (onSuccessfulSubmit) onSuccessfulSubmit();
-  //       toast.success("Voucher deleted successfully");
-  //     });
-  //   }
-  // };
   useEffect(() => {
     calculateBillSummary();
   }, [watchedItems]);
@@ -378,23 +437,6 @@ export function PurchaseReturn({
       }
     }
   };
-  // const handleAccountChange = async (selectedOption: OptionType | null) => {
-  //   if (selectedOption != null) {
-  //     const selectedAccount = allAccounts.find(
-  //       (account) => account.accountID === selectedOption.value
-  //     );
-  //     if (selectedAccount) {
-  //       const isOutsideState =
-  //         selectedAccount.partyType.includes("Out of State");
-  //       setIsAccountOutOfState(isOutsideState);
-  //       const partyTypeWithGST = `${selectedAccount.gstNo || ""} ${
-  //         selectedAccount.partyType
-  //       }`;
-  //       setPartyGST(partyTypeWithGST || "");
-  //     }
-  //     setValue("accountId", selectedOption.value);
-  //   }
-  // };
 
   const fetchAccounts = async (currentVoucherDate: Date | string) => {
     if (!financialYear) return Promise.resolve();
@@ -457,45 +499,6 @@ export function PurchaseReturn({
     });
   }, [accessId, voucherDate, financialYear, voucherType]);
 
-  // useEffect(() => {
-  //   let filteredAccounts: AccountDtoForDropDownList[] = [];
-  //   if (paymentMode.toLowerCase().includes("cash")) {
-  //     const cashAccount = allAccounts.find((acc) => acc.accountName === "CASH");
-  //     const otherAccounts = allAccounts.filter(
-  //       (acc) => acc.accountName !== "CASH"
-  //     );
-  //     if (cashAccount) {
-  //       filteredAccounts = [cashAccount, ...otherAccounts];
-  //       setValue("accountId", cashAccount.accountID);
-  //       if (askForCustomerDetailWhenCash && cashAccount) {
-  //         setFocusBillNo(true);
-  //         setTimeout(() => {
-  //           if (!voucher && !voucherId)
-  //             // avoid opening in edit mode
-  //             setShowCustomerDetailModal(true);
-  //           setFocusBillNo(false);
-  //         }, 100);
-  //       }
-  //     } else {
-  //       filteredAccounts = otherAccounts;
-  //     }
-  //   } else if (paymentMode.toLowerCase().includes("credit")) {
-  //     filteredAccounts = allAccounts.filter(
-  //       (account) =>
-  //         account.accountGroupName !== "BANK ACCOUNTS" &&
-  //         account.accountGroupName !== "CASH-IN-HAND"
-  //     );
-  //   } else if (
-  //     paymentMode.toLowerCase().includes("upi") ||
-  //     paymentMode.toLowerCase().includes("bank")
-  //   ) {
-  //     filteredAccounts = allAccounts.filter(
-  //       (account) => account.accountGroupName === "BANK ACCOUNTS"
-  //     );
-  //   }
-  //   // setDisplayedAccounts(filteredAccounts);
-  // }, [paymentMode, allAccounts, setValue]);
-
   const fetchItemDetails = async (itemId: number, index: number) => {
     setValue(`items[${index}]`, {
       mainQty: "",
@@ -513,10 +516,6 @@ export function PurchaseReturn({
       itemDetail: {},
       serialNumberValues: serialNumbers,
     });
-    // setPricePerOptions((prevOptions) => ({
-    //   ...prevOptions,
-    //   [index]: [],
-    // }));
 
     try {
       const itemDetails: ItemDetailDto = await agent.Item.getItemDetailById(
@@ -533,20 +532,6 @@ export function PurchaseReturn({
       const pricePerOptionsForItem = [
         { value: "main", label: itemDetails.mainUnitName || "" },
       ];
-      // if (
-      //   itemDetails.alternateUnitName &&
-      //   itemDetails.mainUnitName !== itemDetails.alternateUnitName
-      // ) {
-      //   setUseAltQty(true);
-      //   pricePerOptionsForItem.push({
-      //     value: "alt",
-      //     label: itemDetails.alternateUnitName || "",
-      //   });
-      // }
-      // setPricePerOptions((prevOptions) => ({
-      //   ...prevOptions,
-      //   [index]: pricePerOptionsForItem,
-      // }));
 
       if (voucherType == VoucherTypeEnum.ItemSale) {
         const matchingOption = pricePerOptionsForItem.find((option) =>
@@ -579,100 +564,6 @@ export function PurchaseReturn({
       setValue(`items[${index}].pricePer`, fallbackPricePer);
     }
   };
-
-  // const calculateItemRow = (
-  //   index: number,
-  //   fieldName: string,
-  //   value: string
-  // ) => {
-  //   if (fieldName != "pricePer") {
-  //     setValue(`items[${index}].${fieldName}`, value);
-  //   }
-
-  //   setTimeout(() => {
-  //     const item: ItemsInVoucherDto = getValues(`items[${index}]`);
-  //     let pricePer = item.pricePer;
-  //     if (fieldName == "pricePer") {
-  //       pricePer = value;
-  //     }
-  //     const { rate, discountAmount: enteredDiscountAmount, itemDetail } = item;
-  //     let { mainQty, altQty, discountPercentage } = item;
-  //     const taxRate = (itemDetail && itemDetail.gstSlab?.igst) || 0;
-  //     const conversion = (itemDetail && itemDetail.conversion) || 1;
-
-  //     mainQty = parseFloat(mainQty.toString()) || 0;
-  //     discountPercentage = parseFloat(discountPercentage.toString()) || 0;
-  //     altQty = mainQty * conversion;
-  //     const qty = pricePer === "alt" ? altQty : mainQty;
-
-  //     const rateValue = (rate && parseFloat(rate.toString())) || 0;
-  //     let basicAmount = qty * rateValue;
-  //     let discountAmount = enteredDiscountAmount;
-
-  //     if (fieldName === "discountPercentage") {
-  //       discountAmount =
-  //         basicAmount * (parseFloat(discountPercentage.toString()) / 100);
-  //       setValue(`items[${index}].discountAmount`, discountAmount.toFixed(2));
-  //     } else if (fieldName === "discountAmount") {
-  //       const calculatedDiscountPercentage =
-  //         (discountAmount / basicAmount) * 100;
-  //       setValue(
-  //         `items[${index}].discountPercentage`,
-  //         calculatedDiscountPercentage.toFixed(2)
-  //       );
-  //     } else if (discountPercentage > 0) {
-  //       discountAmount =
-  //         basicAmount * (parseFloat(discountPercentage.toString()) / 100);
-  //       setValue(`items[${index}].discountAmount`, discountAmount.toFixed(2));
-  //     }
-
-  //     basicAmount -= discountAmount;
-  //     basicAmount = parseFloat(basicAmount.toFixed(2));
-
-  //     let iGST = 0,
-  //       cGST = 0,
-  //       sGST = 0;
-  //     let taxAmount = 0,
-  //       netAmount = 0;
-  //     if (selectedTaxType === "Inclusive" && basicAmount > 0) {
-  //       const amountBeforeTax = basicAmount / (1 + taxRate / 100);
-  //       taxAmount = basicAmount - amountBeforeTax;
-  //       netAmount = basicAmount;
-  //       basicAmount = amountBeforeTax;
-  //     } else if (basicAmount > 0) {
-  //       taxAmount = basicAmount * (taxRate / 100);
-  //       netAmount = basicAmount + taxAmount;
-  //     }
-
-  //     // if (isAccountOutOfState) {
-  //     //   iGST = taxAmount;
-  //     // } else {
-  //     //   cGST = sGST = taxAmount / 2;
-  //     //   cGST = parseFloat(cGST.toFixed(2));
-  //     //   sGST = parseFloat(sGST.toFixed(2));
-  //     // }
-  //     netAmount = parseFloat((basicAmount + cGST + sGST + iGST).toFixed(2));
-
-  //     setValue(`items[${index}].altQty`, altQty.toFixed(2));
-  //     setValue(`items[${index}].basicAmount`, basicAmount.toFixed(2));
-  //     setValue(`items[${index}].netAmount`, netAmount.toFixed(2));
-  //     setValue(`items[${index}].iGST`, iGST.toFixed(2));
-  //     setValue(`items[${index}].sGST`, sGST.toFixed(2));
-  //     setValue(`items[${index}].cGST`, cGST.toFixed(2));
-  //     setValue(`items[${index}].netAmount`, netAmount.toFixed(2));
-
-  //     if (item.itemId && item.basicAmount > 0) {
-  //       const items = getValues("items");
-  //       if (index === items.length - 1) {
-  //         append(defaultItems);
-  //       }
-  //     }
-  //   }, 0);
-
-  //   setTimeout(() => {
-  //     calculateBillSummary();
-  //   }, 0);
-  // };
 
   const calculateBillSummary = () => {
     let totalMainQty = 0;
@@ -859,6 +750,7 @@ export function PurchaseReturn({
         additionalTax2: item.additionalTax2 || 0,
         netAmount: item.netAmount || 0,
         serialNumberValues: item.serialNumberValues,
+        value: undefined
       };
 
       if (
@@ -904,68 +796,19 @@ export function PurchaseReturn({
           <Row className="gx-2">
             <Col xs={8} md={3} className="custom-col-billBook">
               <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
-                name="billBookId"
+                name="supplierId"
                 label="Supplier"
-                options={billBookList}
+                options={supplierList}
                 control={control}
                 onCreateButtonClick={() => {
-                  setShowBillBookModal(true);
+                  setShowSupplierModal(true);
                 }}
-                onChangeCallback={handleBillBookChange}
-                badgeText={selectedTaxType}
                 dropDownWidth="400px"
                 hideDropdownIcon
                 hideClearIcon
               />
             </Col>
-            {/* <Col xs={11} sm={5} md={2} className="custom-col-date">
-              <CustomDateInputBox
-                label="Date"
-                name="voucherDate"
-                validationRules={{ required: "Date is required." }}
-                register={register}
-                setValue={setValue}
-                error={errors.voucherDate}
-                financialYear={financialYear}
-                defaultDate={voucher ? voucher.voucherDate : lastVoucherDate}
-              />
-            </Col>
-            <Col xs={11} sm={5} md={2} className="custom-col-reduced">
-              <CustomDropdown
-                name="paymentMode"
-                label="Cash/Cr."
-                options={PAYMENT_MODE_OPTIONS}
-                control={control}
-                hideDropdownIcon
-                hideClearIcon
-                // defaultValue={voucher?.voucherMasterExtended?.paymentMode}
-              />
-            </Col>
-            <Col xs={10} sm={6} md={3}>
-              <CustomDropdown
-                label="Account Name"
-                name="accountId"
-                options={displayedAccounts.map(transformAccountToOption)}
-                control={control}
-                error={errors.accountId}
-                validationRules={{ required: "Account Name is required." }}
-                isCreatable
-                onCreateButtonClick={() => {
-                  setShowAccountModal(true);
-                }}
-                dropDownWidth="800px"
-                onChangeCallback={handleAccountChange}
-                badgeText={partyGST}
-                hideDropdownIcon
-                hideClearIcon
-                disabled={
-                  askForCustomerDetailWhenCash &&
-                  paymentMode.toLowerCase().includes("cash")
-                }
-                // defaultValue={voucher?.voucherDetails?.accountId}
-              />
-            </Col> */}
+
             <Col xs={12} md={2} className="custom-col-reduced">
               <CustomInput
                 label="Bill No"
@@ -974,10 +817,10 @@ export function PurchaseReturn({
                 maxLength={12}
                 isTextCenter
                 autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
             </Col>
-            <Col xs={12} md={2} className="custom-col-reduced">
+
+            {/* <Col xs={12} md={2} className="custom-col-reduced">
               <CustomInput
                 label="Select Bill No"
                 name="voucherNo"
@@ -985,35 +828,25 @@ export function PurchaseReturn({
                 maxLength={12}
                 isTextCenter
                 autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
-            </Col>
-            <Col xs={12} md={2} className="custom-col-billBook">
-              <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
-                name="billBookId"
-                label="POS"
-                options={billBookList}
-                control={control}
-                onCreateButtonClick={() => {
-                  setShowBillBookModal(true);
-                }}
-                onChangeCallback={handleBillBookChange}
-                badgeText={selectedTaxType}
-                dropDownWidth="400px"
-                hideDropdownIcon
-                hideClearIcon
-              />
-            </Col>
+            </Col> */}
+
             <Col xs={12} md={2} className="custom-col-reduced">
               <CustomInput
-                label="Address"
+                label="POS"
                 name="voucherNo"
+                register={register}
+                maxLength={12}
+                isTextCenter
+                autoFocus={focusBillNo}
               />
+            </Col>
+
+            <Col xs={12} md={2} className="custom-col-reduced">
+              <CustomInput label="Address" name="voucherNo" />
             </Col>
             <Col xs={12} md={2} className="custom-col-billBook">
               <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
                 name="billBookId"
                 label="GST Type"
                 options={billBookList}
@@ -1028,28 +861,21 @@ export function PurchaseReturn({
                 hideClearIcon
               />
             </Col>
-            <Col xs={12} md={2} className="custom-col-billBook">
-              <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
-                name="billBookId"
+            <Col xs={12} md={2} className="custom-col-reduced">
+              <CustomInput
                 label="Item Center"
-                options={billBookList}
-                control={control}
-                onCreateButtonClick={() => {
-                  setShowBillBookModal(true);
-                }}
-                onChangeCallback={handleBillBookChange}
-                badgeText={selectedTaxType}
-                dropDownWidth="400px"
-                hideDropdownIcon
-                hideClearIcon
+                name="voucherNo"
+                register={register}
+                maxLength={12}
+                isTextCenter
+                autoFocus={focusBillNo}
               />
             </Col>
+
             <Col xs={11} sm={5} md={2} className="custom-col-date">
               <CustomDateInputBox
                 label="Bill Date"
                 name="voucherDate"
-                // validationRules={{ required: 'Date is required.' }}
                 register={register}
                 setValue={setValue}
                 error={errors.voucherDate}
@@ -1065,130 +891,189 @@ export function PurchaseReturn({
                 maxLength={10}
                 isTextCenter
                 autoFocus={focusBillNo}
-                // defaultValue={voucher?.voucherNumber}
               />
             </Col>
           </Row>
           <Row className="justify-content-center my-4">
             <Col xs="auto">
-              <button type="button" className="btn btn-success">Show Bill</button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={handleShowBill}
+              >
+                Show Bill
+              </button>
             </Col>
           </Row>
-          <Row className="gx-2">
-            <Col xs={8} md={3} className="custom-col-reduced">
-              <CustomInput
-                label="SKU/Barcode"
-                name="voucherNo"
-                isTextCenter
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-billBook">
-              <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
-                name="billBookId"
-                label="Item Name"
-                options={billBookList}
-                control={control}
-                onCreateButtonClick={() => {
-                  setShowBillBookModal(true);
-                }}
-                onChangeCallback={handleBillBookChange}
-                badgeText={selectedTaxType}
-                dropDownWidth="400px"
-                hideDropdownIcon
-                hideClearIcon
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-billBook">
-              <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
-                name="billBookId"
-                label="Unit"
-                options={billBookList}
-                control={control}
-                onCreateButtonClick={() => {
-                  setShowBillBookModal(true);
-                }}
-                onChangeCallback={handleBillBookChange}
-                badgeText={selectedTaxType}
-                dropDownWidth="400px"
-                hideDropdownIcon
-                hideClearIcon
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-billBook">
-              <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
-                name="billBookId"
-                label="Item Color"
-                options={billBookList}
-                control={control}
-                onCreateButtonClick={() => {
-                  setShowBillBookModal(true);
-                }}
-                onChangeCallback={handleBillBookChange}
-                badgeText={selectedTaxType}
-                dropDownWidth="400px"
-                hideDropdownIcon
-                hideClearIcon
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-billBook">
-              <CustomDropdown
-                // defaultValue={voucher?.voucherMasterExtended?.billBookId}
-                name="billBookId"
-                label="Item Size"
-                options={billBookList}
-                control={control}
-                onCreateButtonClick={() => {
-                  setShowBillBookModal(true);
-                }}
-                onChangeCallback={handleBillBookChange}
-                badgeText={selectedTaxType}
-                dropDownWidth="400px"
-                hideDropdownIcon
-                hideClearIcon
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-reduced">
-              <CustomInput
-                label="Qty"
-                name="voucherNo"
-                isTextCenter
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-reduced">
-              <CustomInput
-                label="BasePrice"
-                name="voucherNo"
-                isTextCenter
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-reduced">
-              <CustomInput
-                label="Dis. %"
-                name="voucherNo"
-                isTextCenter
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-reduced">
-              <CustomInput
-                label="Dis. Amt"
-                name="voucherNo"
-                isTextCenter
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-reduced">
-              <CustomInput
-                label="Total"
-                name="voucherNo"
-                isTextCenter
-              />
-            </Col>
-            <Col xs={8} md={3} className="custom-col-reduced my-auto">
-              <Button variant="primary mt-4">Add</Button>
-            </Col>
-          </Row>
+
+          <Modal show={showModal} onHide={handleClose} size="lg" centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Bill Details</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Row className="gx-2">
+                <Col xs={8} md={3} className="custom-col-reduced">
+                  <CustomInput label="SKU" name="voucherNo" isTextCenter />
+                </Col>
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Item Name"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Unit"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Item Color"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Item Size"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Qty"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Base Price"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Dis %"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Dis. Amt"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+                <Col xs={8} md={3} className="custom-col-billBook">
+                  <CustomDropdown
+                    name="billBookId"
+                    label="Total"
+                    options={billBookList}
+                    control={control}
+                    onCreateButtonClick={() => {
+                      setShowBillBookModal(true);
+                    }}
+                    onChangeCallback={handleBillBookChange}
+                    badgeText={selectedTaxType}
+                    dropDownWidth="400px"
+                    hideDropdownIcon
+                    hideClearIcon
+                  />
+                </Col>
+              </Row>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="primary" onClick={handleAddItems}>
+                Add Items
+              </Button>
+            </Modal.Footer>
+          </Modal>
           <div className="scrollable-table-container" ref={scrollContainerRef}>
             <Table bordered hover className="mt-2 custom-sale-table">
               <thead className="custom-sale-thead">
@@ -1243,9 +1128,7 @@ export function PurchaseReturn({
                       />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
                       <CustomDropdown
@@ -1341,187 +1224,31 @@ export function PurchaseReturn({
                       />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
-                      <CustomInput
-                        name={`items[${index}].itemId`}
-                      />
+                      <CustomInput name={`items[${index}].itemId`} />
                     </td>
                     <td>
-                      <button type="button" className="btn btn-danger">Delete</button>
+                      <button type="button" className="btn btn-danger">
+                        Delete
+                      </button>
                     </td>
-                    {/* {useAltQty && (
-                      <td>
-                        <CustomInput
-                          name={`items[${index}].altQty`}
-                          register={register}
-                          onChange={(e) =>
-                            calculateItemRow(index, "altQty", e.target.value)
-                          }
-                        />
-                      </td>
-                    )} */}
-                    {/* {useFree && (
-                      <td>
-                        <CustomInput
-                          name={`items[${index}].free`}
-                          register={register}
-                        />
-                      </td>
-                    )} */}
-                    {/* <td>
-                      <CustomInput
-                        name={`items[${index}].rate`}
-                        register={register}
-                        onChange={(e) =>
-                          calculateItemRow(index, "rate", e.target.value)
-                        }
-                        onKeyDown={(e) => {
-                          if (
-                            e.key === "F3" &&
-                            selectedTaxType === "Exclusive"
-                          ) {
-                            e.preventDefault();
-                            setShowInclusiveRateInput(index);
-                            setFocusInclusiveRateInput(
-                              `items[${index}].inclusiveRate`
-                            );
-                          }
-                        }}
-                      />
-                      {showInclusiveRateInput === index && (
-                        <CustomInput
-                          className="mt-2"
-                          name={`items[${index}].inclusiveRate`}
-                          register={register}
-                          value={inclusiveRate}
-                          onChange={(e) => setInclusiveRate(e.target.value)}
-                          onBlur={() => {
-                            const itemDetails = getValues(
-                              `items[${index}].itemDetail`
-                            ) as ItemDetailDto;
-                            const taxRate = parseFloat(
-                              itemDetails.gstSlab?.igst?.toString() || "0"
-                            );
-                            const inclusiveRateValue =
-                              parseFloat(inclusiveRate) || 0;
-                            const exclusiveRate =
-                              inclusiveRateValue / (1 + taxRate / 100);
-                            setValue(
-                              `items[${index}].rate`,
-                              exclusiveRate.toFixed(2)
-                            );
-                            calculateItemRow(
-                              index,
-                              "rate",
-                              exclusiveRate.toFixed(2)
-                            );
-                            setShowInclusiveRateInput(null);
-                            setInclusiveRate("");
-                            setFocusInclusiveRateInput(null);
-                          }}
-                          autoFocus={
-                            focusInclusiveRateInput ===
-                            `items[${index}].inclusiveRate`
-                          }
-                        />
-                      )}
-                    </td> */}
-                    {/* {useAltQty && (
-                      <td>
-                        <div data-skip-focus="true">
-                          <CustomDropdown
-                            name={`items[${index}].pricePer`}
-                            control={control}
-                            options={pricePerOptions[index] || []}
-                            hideClearIcon={true}
-                            hideDropdownIcon={true}
-                            onChangeCallback={(
-                              selectedOption: OptionType | null
-                            ) => {
-                              if (selectedOption)
-                                calculateItemRow(
-                                  index,
-                                  "pricePer",
-                                  selectedOption.value
-                                );
-                            }}
-                            dropDownWidth="100px"
-                            isInTable
-                          />
-                        </div>
-                      </td>
-                    )} */}
-                    {/* <td>
-                      <CustomInput
-                        name={`items[${index}].basicAmount`}
-                        register={register}
-                      />
-                    </td> */}
-                    {/* <td>
-                      <CustomInput
-                        name={`items[${index}].discountPercentage`}
-                        register={register}
-                        onChange={(e) =>
-                          calculateItemRow(
-                            index,
-                            "discountPercentage",
-                            e.target.value
-                          )
-                        }
-                        maxLength={2}
-                      />
-                    </td> */}
-                    {/* <td>
-                      <CustomInput
-                        name={`items[${index}].discountAmount`}
-                        register={register}
-                        onChange={(e) =>
-                          calculateItemRow(
-                            index,
-                            "discountAmount",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td> */}
-                    {/* <td>
-                      <div data-skip-focus="true">
-                        <CustomButton
-                          text="X"
-                          variant="none"
-                          onClick={() => handleDeleteRow(index)}
-                        />
-                      </div>
-                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -1539,80 +1266,6 @@ export function PurchaseReturn({
                   />
                 </Col>
               </Row>
-              {/* <Row className="mt-2 p-0 gx-1">
-                <Col>
-                  <CustomButton
-                    size="sm"
-                    variant="outline-info"
-                    text="Transport Info (Ctrl+T)"
-                    className="w-100"
-                    onClick={() => {
-                      setShowTransportModal(true);
-                    }}
-                  />
-                </Col>
-                <Col>
-                  <CustomButton
-                    size="sm"
-                    variant="outline-info"
-                    text="Customer Detail (F2)"
-                    className="w-100"
-                    onClick={() => {
-                      setShowCustomerDetailModal(true);
-                    }}
-                  />
-                </Col>
-                <Col>
-                  <CustomButton
-                    size="sm"
-                    variant="outline-info"
-                    text="Charges/Discount (F2)"
-                    className="w-100"
-                    onClick={() => {
-                      setShowOtherChargesModal(true);
-                    }}
-                  />
-                </Col>
-                <Col>
-                  <CustomButton
-                    size="sm"
-                    variant="outline-info"
-                    text="Serial Number"
-                    className="w-100"
-                    onClick={() => {
-                      setShowSerialNumberModal(true);
-                    }}
-                  />
-                </Col>
-                <Col>
-                  <CustomButton
-                    size="sm"
-                    variant="success"
-                    type="submit"
-                    text="Save Invoice (Ctrl+S)"
-                    className="w-100"
-                  />
-                </Col>
-                <Col>
-                  <CustomButton
-                    size="sm"
-                    variant="success"
-                    text="Print Invoice (Ctrl+P)"
-                    className="w-100"
-                  />
-                </Col>
-                <Col>
-                  {voucher && voucherId && (
-                    <CustomButton
-                      size="sm"
-                      variant="outline-danger"
-                      text="Final Delete (Ctrl+D)"
-                      className="w-100"
-                      onClick={() => deleteVoucher()}
-                    />
-                  )}
-                </Col>
-              </Row> */}
             </div>
 
             <div className="bill-summary">
@@ -1621,67 +1274,19 @@ export function PurchaseReturn({
                   <tr>
                     <td>Total Exclude Tax</td>
                     <td className="text-end">{billSummary.totalMainQty}</td>
-                    {/* <td>SGST</td>
-                    <td className="text-end">
-                      {billSummary.totalSGST.toFixed(2)}
-                    </td> */}
                   </tr>
                   <tr>
                     <td>Total GST</td>
                     <td className="text-end">
                       {billSummary.totalAltQty.toFixed(2)}
                     </td>
-                    {/* <td>CGST</td>
-                    <td className="text-end">
-                      {billSummary.totalCGST.toFixed(2)}
-                    </td> */}
                   </tr>
                   <tr>
                     <td>Grand Total</td>
                     <td className="text-end">
                       {billSummary.totalBasicAmount.toFixed(2)}
                     </td>
-                    {/* <td>IGST</td>
-                    <td className="text-end">
-                      {billSummary.totalIGST.toFixed(2)}
-                    </td> */}
                   </tr>
-                  {/* <tr>
-                    <td>Discount</td>
-                    <td className="text-end">
-                      {billSummary.totalDiscount.toFixed(2)}
-                    </td>
-                    <td>Total Tax</td>
-                    <td className="text-end">
-                      {billSummary.totalTax.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td>Charges</td>
-                    <td className="text-end">
-                      {billSummary.totalCharges.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td>Round Off</td>
-                    <td className="text-end">
-                      {billSummary.totalRoundOff.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={2}>Bill Amount (Rs.):</td>
-                    <td
-                      className="fw-bold"
-                      colSpan={2}
-                      style={{ textAlign: "end", fontSize: "1.25rem" }}
-                    >
-                      {formatNumberIST(billSummary.netBillAmount)}
-                    </td>
-                  </tr> */}
                 </tbody>
               </Table>
             </div>

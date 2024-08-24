@@ -39,7 +39,7 @@ import { PurchaseForm } from '../../features/Vouchers/Purchase Voucher/PurchaseF
 import { SalesReturn } from '../../features/Vouchers//SalesReturn/SalesReturn';
 import { PurchaseReturn } from '../../features/Vouchers/PurchaseReturn/PurchaseReturn';
 import SalesCrDr  from '../../features/Vouchers/SalesCRDR/SalesCrDr';
-import PurchaseCrDr from '../../features/Vouchers/PurchaseCrDr/purchaseCrDr';
+import PurchaseCrDr from '../../features/Vouchers/PurchaseCrDr/PurchaseCrDr';
 
 
 export const router = createBrowserRouter([

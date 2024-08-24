@@ -52,6 +52,7 @@ export interface CustomerDetailDto {
 }
 
 export interface ItemsInVoucherDto {
+  value: Key | null | undefined;
   itemId: number;
   itemDetail?: ItemDetailDto;
   salePurAccountID?: string;
