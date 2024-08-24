@@ -215,7 +215,7 @@ const PurchaseCrDr = () => {
           </Table>
         </div>
 
-        {/* Modal for displaying supplier table */}
+        {/* Modal for displaying supplier table ancd */}
         <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>Supplier Selection</Modal.Title>
