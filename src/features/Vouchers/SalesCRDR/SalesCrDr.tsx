@@ -95,7 +95,7 @@ const SalesCrDr = () => {
   const getTotal = (field: keyof Supplier) =>
     mainTableSuppliers.reduce((acc, curr) => acc + Number(curr[field]), 0);
 
-  // Handle bill number changeas
+  // Handle bill number change
   const handleBillNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBillNumber(e.target.value);
   };
