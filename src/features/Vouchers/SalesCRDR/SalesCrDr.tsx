@@ -56,7 +56,6 @@ const defaultSupplier = {
   balance: 0,
 };
 
-
 type Supplier = typeof defaultSupplier;
 
 const SalesCrDr = () => {
