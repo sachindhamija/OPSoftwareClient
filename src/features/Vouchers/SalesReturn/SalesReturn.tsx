@@ -1040,6 +1040,17 @@ export function SalesReturn({
             </Col>
             <Col xs={11} sm={5} md={2} className="custom-col-date">
               <CustomInput
+                label="Return Qty."
+                name="voucherNo"
+                register={register}
+                maxLength={12}
+                isTextCenter
+                autoFocus={focusBillNo}
+                // defaultValue={voucher?.voucherNumber}
+              />
+            </Col>
+            <Col xs={11} sm={5} md={2} className="custom-col-date">
+              <CustomInput
                 label="CGST"
                 name="voucherNo"
                 register={register}
@@ -1099,6 +1110,9 @@ export function SalesReturn({
                   <th style={{ width: "10%", textAlign: "center" }}>Amount</th>
                   <th style={{ width: "10%", textAlign: "center" }}>
                     Actual Amount
+                  </th>
+                  <th style={{ width: "10%", textAlign: "center" }}>
+                    Return Qty
                   </th>
 
                   <th style={{ width: "10%", textAlign: "center" }}>IGST</th>
