@@ -29,7 +29,7 @@ import LedgerReport from '../../features/Reports/Ledger/LedgerReport';
 import { VoucherTypeEnum } from '../../features/Vouchers/VoucherCommon/voucherTypeEnum';
 import TrialBalanceReport from '../../features/Reports/TrialBalance/TrialBalanceReport';
 import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
-import { SalePurchaseForm } from '../../features/Vouchers/SalePurchase/SalePurchaseForm';
+import { SalePurchaseForm } from '../../features/Vouchers/Common Vouchers Form/CommonForm';
 import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/SerialNumberSetting';
 import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetting/AdditionalFieldSetting';
 import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
@@ -103,6 +103,46 @@ export const router = createBrowserRouter([
 						element: (
 							<SalePurchaseForm
 								voucherType={VoucherTypeEnum.ItemSale}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/Purchase',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.ItemPurchase}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/SalesReturn',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.SalesReturn}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/PurchaseReturn',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.PurchaseReturn}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/SaleCrDr',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.SalesCrDr}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/PurchaseCrDr',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.PurchaseCrDr}
 							/>
 						),
 					},

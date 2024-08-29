@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Table, Button, Form, FormControl, Modal } from 'react-bootstrap';
-import { OtherChargesDto } from './salePurchaseVoucherDto';
+import { OtherChargesDto } from './CommonVoucherDto';
 import { useForm } from 'react-hook-form';
 import { useGstSlabs } from '../../../app/hooks/useGSTSlabsOptions';
 import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation';
