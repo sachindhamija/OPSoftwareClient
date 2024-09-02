@@ -25,8 +25,8 @@ export function getVoucherTypeString(voucherType: VoucherTypeEnum): string {
     [VoucherTypeEnum.GenSale]: "Gen Sale",
     [VoucherTypeEnum.SalesReturn]: "Sales Return",
     [VoucherTypeEnum.PurchaseReturn]: "Purchase Return",
-    [VoucherTypeEnum.SalesCrDr]: "Sales Credit/Debit Note",
-    [VoucherTypeEnum.PurchaseCrDr]: "Purchase Credit/Debit Note",
+    [VoucherTypeEnum.SalesCrDr]: "Debit Note",
+    [VoucherTypeEnum.PurchaseCrDr]: "Credit Note",
   };
 
   return typeMap[voucherType] || "";

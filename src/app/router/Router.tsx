@@ -35,6 +35,7 @@ import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetti
 import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
 import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
 import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
+import PasswordSetting from '../../features/Masters/Password/Password';
 
 export const router = createBrowserRouter([
 	{
@@ -131,7 +132,7 @@ export const router = createBrowserRouter([
 						),
 					},
 					{
-						path: 'Voucher/SaleCrDr',
+						path: 'Voucher/DebitNote',
 						element: (
 							<SalePurchaseForm
 								voucherType={VoucherTypeEnum.SalesCrDr}
@@ -139,7 +140,7 @@ export const router = createBrowserRouter([
 						),
 					},
 					{
-						path: 'Voucher/PurchaseCrDr',
+						path: 'Voucher/CreditNote',
 						element: (
 							<SalePurchaseForm
 								voucherType={VoucherTypeEnum.PurchaseCrDr}
@@ -157,6 +158,7 @@ export const router = createBrowserRouter([
 					{ path: 'mandi', element: <MandiForm /> },
 					{ path: 'commissionagent-item', element: <CommissionAgentItemForm /> },
 					{ path: 'report/invoice-report-item', element: <InvoiceReport /> },
+					{ path: 'Password-Delete-Update', element: <PasswordSetting /> },
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },
