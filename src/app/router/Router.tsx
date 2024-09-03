@@ -29,7 +29,7 @@ import LedgerReport from '../../features/Reports/Ledger/LedgerReport';
 import { VoucherTypeEnum } from '../../features/Vouchers/VoucherCommon/voucherTypeEnum';
 import TrialBalanceReport from '../../features/Reports/TrialBalance/TrialBalanceReport';
 import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
-import { SalePurchaseForm } from '../../features/Vouchers/Common Vouchers Form/CommonForm';
+import { SalePurchaseForm } from '../../features/Vouchers/SalesPurchaseCommonVouchers/CommonForm';
 import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/SerialNumberSetting';
 import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetting/AdditionalFieldSetting';
 import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
-import { ItemsInVoucherDto } from './CommonVoucherDto';
+import { ItemsInVoucherDto } from './SalesPurchaseCommonVoucherDto';
 
 const panelStyles = {
   marginBottom: '20px',

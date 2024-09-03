@@ -4,7 +4,7 @@ import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation"
 import { selectCurrentFinancialYear } from "../../Masters/FinancialYear/financialYearSlice";
 import { VoucherTypeEnum, getVoucherTypeString } from "../VoucherCommon/voucherTypeEnum";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
-import { CustomerDetailDto, ItemSalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultTransportDetails } from "./CommonVoucherDto";
+import { CustomerDetailDto, ItemSalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultTransportDetails } from "./SalesPurchaseCommonVoucherDto";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import toast from "react-hot-toast";
 import FormNavigator from "../../../app/components/FormNavigator";
