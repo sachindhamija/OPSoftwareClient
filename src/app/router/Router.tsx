@@ -135,7 +135,7 @@ export const router = createBrowserRouter([
 						path: 'Voucher/DebitNote',
 						element: (
 							<SalePurchaseForm
-								voucherType={VoucherTypeEnum.SalesCrDr}
+								voucherType={VoucherTypeEnum.DebitNote}
 							/>
 						),
 					},
@@ -143,7 +143,7 @@ export const router = createBrowserRouter([
 						path: 'Voucher/CreditNote',
 						element: (
 							<SalePurchaseForm
-								voucherType={VoucherTypeEnum.PurchaseCrDr}
+								voucherType={VoucherTypeEnum.CreditNote}
 							/>
 						),
 					},
