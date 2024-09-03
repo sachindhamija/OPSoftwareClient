@@ -30,7 +30,7 @@ import BankEntryForm from '../../Vouchers/BankEntry/BankEntryForm';
 import getLastVoucherDate from '../../../app/hooks/useLastVoucherDate';
 import JournalEntryForm from '../../Vouchers/JournalEntry/JournalEntryForm';
 import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation';
-import { SalePurchaseForm } from '../../Vouchers/SalePurchase/SalePurchaseForm';
+import { SalePurchaseForm } from '../../Vouchers/SalesPurchaseCommonVouchers/CommonForm';
 
 export interface LedgerReportDto {
 	voucherId: string;

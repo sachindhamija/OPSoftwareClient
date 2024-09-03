@@ -29,12 +29,13 @@ import LedgerReport from '../../features/Reports/Ledger/LedgerReport';
 import { VoucherTypeEnum } from '../../features/Vouchers/VoucherCommon/voucherTypeEnum';
 import TrialBalanceReport from '../../features/Reports/TrialBalance/TrialBalanceReport';
 import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
-import { SalePurchaseForm } from '../../features/Vouchers/SalePurchase/SalePurchaseForm';
+import { SalePurchaseForm } from '../../features/Vouchers/SalesPurchaseCommonVouchers/CommonForm';
 import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/SerialNumberSetting';
 import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetting/AdditionalFieldSetting';
 import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
 import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
 import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
+import PasswordSetting from '../../features/Masters/Password/Password';
 
 export const router = createBrowserRouter([
 	{
@@ -106,6 +107,46 @@ export const router = createBrowserRouter([
 							/>
 						),
 					},
+					{
+						path: 'Voucher/Purchase',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.ItemPurchase}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/SalesReturn',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.SalesReturn}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/PurchaseReturn',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.PurchaseReturn}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/DebitNote',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.DebitNote}
+							/>
+						),
+					},
+					{
+						path: 'Voucher/CreditNote',
+						element: (
+							<SalePurchaseForm
+								voucherType={VoucherTypeEnum.CreditNote}
+							/>
+						),
+					},
 					{ path: 'Report/Ledger', element: <LedgerReport /> },
 					{
 						path: 'Report/TrialBalance',
@@ -117,6 +158,7 @@ export const router = createBrowserRouter([
 					{ path: 'mandi', element: <MandiForm /> },
 					{ path: 'commissionagent-item', element: <CommissionAgentItemForm /> },
 					{ path: 'report/invoice-report-item', element: <InvoiceReport /> },
+					{ path: 'Password-Delete-Update', element: <PasswordSetting /> },
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },

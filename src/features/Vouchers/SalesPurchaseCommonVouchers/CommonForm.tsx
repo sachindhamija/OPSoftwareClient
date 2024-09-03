@@ -4,7 +4,7 @@ import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation"
 import { selectCurrentFinancialYear } from "../../Masters/FinancialYear/financialYearSlice";
 import { VoucherTypeEnum, getVoucherTypeString } from "../VoucherCommon/voucherTypeEnum";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
-import { CustomerDetailDto, ItemSalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultTransportDetails } from "./salePurchaseVoucherDto";
+import { CustomerDetailDto, ItemSalePurchaseVoucherDto, ItemsInVoucherDto, OtherChargesDto, TransportDetailDto, defaultBillSummary, defaultCustomerDetails, defaultItems, defaultTransportDetails } from "./SalesPurchaseCommonVoucherDto";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import toast from "react-hot-toast";
 import FormNavigator from "../../../app/components/FormNavigator";
@@ -22,7 +22,7 @@ import AccountForm from "../../Masters/Account/AccountForm";
 import ItemForm from "../../Masters/Item/ItemForm";
 import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
-import './salepurchase.scss'
+import './Common.scss'
 import { formatNumberIST } from "../../../app/utils/numberUtils";
 import TransportAndShippingDetailModal from "./TransportAndShippingDetailModal";
 import CustomerDetailModal from "./CustomerDetailModal";
@@ -106,7 +106,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             setSerialNumbers(fetchedSerialNumbers);
         } catch (error) {
             console.error('Error fetching serial numbers', error);
-            toast.error('Error fetching serial numbers');
+            // toast.error('Error fetching serial numbers');
         } finally {
             dispatch(setLoading(false));
         }

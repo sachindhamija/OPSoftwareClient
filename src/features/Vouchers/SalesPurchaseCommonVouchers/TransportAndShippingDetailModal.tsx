@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Row, Col, Form } from 'react-bootstrap';
 import { CustomInput, FormNavigator } from '../../../app/components/Components';
-import { TransportDetailDto } from './salePurchaseVoucherDto';
+import { TransportDetailDto } from './SalesPurchaseCommonVoucherDto';
 import { useForm } from 'react-hook-form';
 
 interface TransportDetailsModalProps {

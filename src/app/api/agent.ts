@@ -28,7 +28,7 @@ import {
   ItemDropDownListDto,
   ItemFormDto,
 } from "../../features/Masters/Item/ItemDto";
-import { ItemSalePurchaseVoucherDto } from "../../features/Vouchers/SalePurchase/salePurchaseVoucherDto";
+import { ItemSalePurchaseVoucherDto } from "../../features/Vouchers/SalesPurchaseCommonVouchers/CommonVoucherDto";
 import { SerialNumberDto } from "../../features/Masters/SerialNumberSetting/SerialNumberDto";
 import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetting/AdditionalFieldDto";
 import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
