@@ -1,5 +1,5 @@
 
-import { Container, Row, Col, Table, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CompanyHeader from './InvoiceHeader';
 import CustomerInvoiceDetails from './CustomerInvoiceDetails';
@@ -7,94 +7,94 @@ import ItemDetails from './ItemDetails';
 import TotalAndTaxes from './TotalAndTaxes';
 import Footer from './Footer';
 import React, { useRef } from 'react';
-const invoiceData = {
-  company: {
-    gstin: "03CDLPR3813C1ZU",
-    pan: "CDLPR3813C",
-    name: "M/S A.M. AGRO FOOD PRODUCTS",
-    address: "NEW GRAIN MARKET JALALABAD (W), PUNJAB-03",
-    contact: "97813-42605, 88725-42605",
-    email: "SAM9814549070@GMAIL.COM",
-    terms: "Credit"
-  },
-  invoice: {
-    number: "76",
-    date: "11-05-2023",
-    grNumber: "GR No.",
-    grDate: "GR Date.",
-    ewayNumber: "EWay No.",
-    ewayDate: "EWay Date",
-    vehicleNumber: "RJ45GA0029",
-    state: "PUNJAB-03",
-    transport: "TRANSPORT"
-  },
-  customer: {
-    name: "SRI SWAMI CHITRATH RICE MILLS",
-    address: "MANDI LADHUKA",
-    contact: "9217293242",
-    gstin: "03ABRFS3288G1ZT",
-    deliveryAt: "GLOBUS SPRITIS LTD VILLAGE SHYAMPUR TEHSIL BEHROR, ALWAR GST NO :(08AAACG2634B1Z6)"
-  },
-  items: [
-    {
-      description: "NAKKU",
-      hsn: "10064000",
-      unit: "QTL",
-      rate: 416.10,
-      quantity: 768.00,
-      discountPercentage: 0.00,
-      discountAmount: 0.00,
-      taxableAmount: 927903.00,
-      tax: 0.00,
-      sgst: 0.00,
-      cgst: 0.00,
-      total: 927903.00
-    },
-    {
-      description: "PHUCK 5%",
-      hsn: "10064000",
-      unit: "QTL",
-      rate: 180.00,
-      quantity: 180.00,
-      discountPercentage: 0.00,
-      discountAmount: 0.00,
-      taxableAmount: 30000.00,
-      tax: 5.00,
-      sgst: 750.00,
-      cgst: 750.00,
-      total: 31500.00
-    }
-  ],
-  totals: {
-    class: [
-      {
-        taxableAmount: 927903.00,
-        sgst: 0.00,
-        cgst: 0.00,
-        totalTax: 0.00,
-        totalAmount: 927903.00
-      },
-      {
-        taxableAmount: 30000.00,
-        sgst: 750.00,
-        cgst: 750.00,
-        totalTax: 1500.00,
-        totalAmount: 31500.00
-      }
-    ],
-    totalAmountBeforeTax: 957903.00,
-    sgst: 750.00,
-    cgst: 750.00,
-    totalTaxAmount: 1500.00,
-    billAmount: 959403.00
-  },
-  footer: {
-    terms: "1. We are not responsible for loss and damage occured by Transport in Transit, 2. Interst @18% will be charged if payment is not made within 7",
-    signatory: "Auth. Signatory",
-    company: "For M/S A.M. AGRO FOOD PRODUCTS",
-    page: "Page 1 of 1"
-  }
-};
+// const invoiceData = {
+//   company: {
+//     gstin: "03CDLPR3813C1ZU",
+//     pan: "CDLPR3813C",
+//     name: "M/S A.M. AGRO FOOD PRODUCTS",
+//     address: "NEW GRAIN MARKET JALALABAD (W), PUNJAB-03",
+//     contact: "97813-42605, 88725-42605",
+//     email: "SAM9814549070@GMAIL.COM",
+//     terms: "Credit"
+//   },
+//   invoice: {
+//     number: "76",
+//     date: "11-05-2023",
+//     grNumber: "GR No.",
+//     grDate: "GR Date.",
+//     ewayNumber: "EWay No.",
+//     ewayDate: "EWay Date",
+//     vehicleNumber: "RJ45GA0029",
+//     state: "PUNJAB-03",
+//     transport: "TRANSPORT"
+//   },
+//   customer: {
+//     name: "SRI SWAMI CHITRATH RICE MILLS",
+//     address: "MANDI LADHUKA",
+//     contact: "9217293242",
+//     gstin: "03ABRFS3288G1ZT",
+//     deliveryAt: "GLOBUS SPRITIS LTD VILLAGE SHYAMPUR TEHSIL BEHROR, ALWAR GST NO :(08AAACG2634B1Z6)"
+//   },
+//   items: [
+//     {
+//       description: "NAKKU",
+//       hsn: "10064000",
+//       unit: "QTL",
+//       rate: 416.10,
+//       quantity: 768.00,
+//       discountPercentage: 0.00,
+//       discountAmount: 0.00,
+//       taxableAmount: 927903.00,
+//       tax: 0.00,
+//       sgst: 0.00,
+//       cgst: 0.00,
+//       total: 927903.00
+//     },
+//     {
+//       description: "PHUCK 5%",
+//       hsn: "10064000",
+//       unit: "QTL",
+//       rate: 180.00,
+//       quantity: 180.00,
+//       discountPercentage: 0.00,
+//       discountAmount: 0.00,
+//       taxableAmount: 30000.00,
+//       tax: 5.00,
+//       sgst: 750.00,
+//       cgst: 750.00,
+//       total: 31500.00
+//     }
+//   ],
+//   totals: {
+//     class: [
+//       {
+//         taxableAmount: 927903.00,
+//         sgst: 0.00,
+//         cgst: 0.00,
+//         totalTax: 0.00,
+//         totalAmount: 927903.00
+//       },
+//       {
+//         taxableAmount: 30000.00,
+//         sgst: 750.00,
+//         cgst: 750.00,
+//         totalTax: 1500.00,
+//         totalAmount: 31500.00
+//       }
+//     ],
+//     totalAmountBeforeTax: 957903.00,
+//     sgst: 750.00,
+//     cgst: 750.00,
+//     totalTaxAmount: 1500.00,
+//     billAmount: 959403.00
+//   },
+//   footer: {
+//     terms: "1. We are not responsible for loss and damage occured by Transport in Transit, 2. Interst @18% will be charged if payment is not made within 7",
+//     signatory: "Auth. Signatory",
+//     company: "For M/S A.M. AGRO FOOD PRODUCTS",
+//     page: "Page 1 of 1"
+//   }
+// };
 
 const InvoiceReport: React.FC = () => {
     const printRef = useRef<HTMLDivElement>(null);
