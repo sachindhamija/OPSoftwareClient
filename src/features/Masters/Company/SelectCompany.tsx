@@ -73,9 +73,17 @@ function SelectCompany() {
 		[navigate]
 	);
 
-	const handleEditClick = useCallback(() => {
-		navigate(`/edit-company`);
-	}, [navigate]);
+
+	const handleEditClick = useCallback(
+		(company: CompanyInformation) => {
+			sessionStorage.setItem(
+				'selectedCompanyInformation',
+				JSON.stringify(company)
+			);
+			navigate(`/edit-company`);
+		},
+		[navigate]
+	);
 
 	return (
 		<Container className="select-company">
@@ -154,7 +162,7 @@ function SelectCompany() {
 												className="edit-btn me-2 d-none d-lg-block"
 												onClick={(e) => {
 													e.stopPropagation();
-													handleEditClick();
+													handleEditClick(company);
 												}}
 											>
 												Edit
@@ -165,7 +173,7 @@ function SelectCompany() {
 												className="edit-btn me-2 d-block d-lg-none"
 												onClick={(e) => {
 													e.stopPropagation();
-													handleEditClick();
+													handleEditClick(company);
 												}}
 											>
 												<FaRegEdit className="edit-icon" />
