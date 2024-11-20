@@ -1,15 +1,6 @@
-<<<<<<< HEAD
 {
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": ["/images/*.{png,jpg,gif}", "/css/*"]
   }
 }
-=======
-{
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/images/*.{png,jpg,gif}", "/css/*"]
-  }
-}
->>>>>>> 9d0db189b37ad15c43f4ec818fca2dae58ac00c5
