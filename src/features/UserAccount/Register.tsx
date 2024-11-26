@@ -107,9 +107,8 @@ function Register() {
 								validationRules={{
 									required: 'Password is required',
 									pattern: {
-										value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/,
-										message:
-											'Password does not meet complexity requirements',
+										value: /^.{6,50}$/,
+										message: 'Password must be between 6 and 50 characters long',
 									},
 								}}
 								error={errors?.password}
