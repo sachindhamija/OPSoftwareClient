@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
 	CommonCard,
+	CommonModal,
 	CustomButton,
 	CustomDropdown,
 	CustomInput,
@@ -22,6 +23,10 @@ import handleApiErrors from '../../../app/errors/handleApiErrors';
 import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
 import useDebounce from '../../../app/utils/useDebounce';
 import { ItemFormDto } from './ItemDto';
+import ItemCategoryForm from '../ItemCategory/ItemCategoryForm';
+import ItemGodownForm from '../ItemGodown/ItemGodownForm';
+import ItemCompanyForm from '../ItemCompany/ItemCompanyForm';
+import GSTSlabForm from '../GSTSlab/GSTSlabForm';
 
 interface ItemFormProps {
 	isModalOpen?: boolean;
@@ -59,6 +64,10 @@ function ItemForm({
 	const [hsnCodes, setHsnCodes] = useState<OptionType[]>([]);
 	const debouncedHSNCodeInput = useDebounce(hsnCodeInput, 700);
 	const [dataLoaded, setDataLoaded] = useState(false);
+	const [gstSlabModalShow, setGSTSlabModalShow] = useState(false);
+	const [categoryModalShow, setCategoryModalShow] = useState(false);
+	const [companyModalShow, setCompanyModalShow] = useState(false);
+	const [godownModalShow, setGodownModalShow] = useState(false);
 
 	//Load Units
 	const loadUnits = async () => {
@@ -366,6 +375,11 @@ function ItemForm({
 								required: 'GST Slab is required.',
 							}}
 							error={errors.gstSlabID}
+							isCreatable={true}
+							showCreateButton={true}
+							onCreateButtonClick={() => {
+								setGSTSlabModalShow(true);
+							}}
 						/>
 					</Col>
 					<Col xs={12} md={4}>
@@ -401,6 +415,11 @@ function ItemForm({
 							name="itemCategoryID"
 							control={control}
 							options={itemCategories}
+							isCreatable={true}
+							showCreateButton={true}
+							onCreateButtonClick={() => {
+								setCategoryModalShow(true);
+							}}
 						/>
 					</Col>
 					<Col xs={12} md={4}>
@@ -409,6 +428,11 @@ function ItemForm({
 							name="itemCompanyID"
 							control={control}
 							options={itemCompany}
+							isCreatable={true}
+							showCreateButton={true}
+							onCreateButtonClick={() => {
+								setCompanyModalShow(true);
+							}}
 						/>
 					</Col>
 					<Col xs={12} md={4}>
@@ -417,6 +441,11 @@ function ItemForm({
 							name="itemGodownID"
 							control={control}
 							options={itemGodown}
+							isCreatable={true}
+							showCreateButton={true}
+							onCreateButtonClick={() => {
+								setGodownModalShow(true);
+							}}
 						/>
 					</Col>
 				</Row>
@@ -567,7 +596,56 @@ function ItemForm({
 					</Row>
 				</Row>
 			</FormNavigator>
+			
+			<CommonModal
+					show={gstSlabModalShow}
+					onHide={() => 
+						{
+							setGSTSlabModalShow(false);
+						}
+					}>
+					<Suspense fallback={<div>Loading...</div>}>
+						<GSTSlabForm />
+					</Suspense>
+			</CommonModal>
+			<CommonModal
+					show={categoryModalShow}
+					onHide={() => 
+						{
+							loadItemCategories();
+							setCategoryModalShow(false);
+						}
+					}>
+					<Suspense fallback={<div>Loading...</div>}>
+						<ItemCategoryForm />
+					</Suspense>
+			</CommonModal>
+			<CommonModal
+					show={companyModalShow}
+					onHide={() => 
+						{
+							loadItemCompany();
+							setCompanyModalShow(false);
+						}
+					}>
+					<Suspense fallback={<div>Loading...</div>}>
+						<ItemCompanyForm />
+					</Suspense>
+			</CommonModal>
+			<CommonModal
+					show={godownModalShow}
+					onHide={() => 
+						{
+							loadItemGodown();
+							setGodownModalShow(false);
+						}
+					}>
+					<Suspense fallback={<div>Loading...</div>}>
+						<ItemGodownForm />
+					</Suspense>
+			</CommonModal>
 		</CommonCard>
+		
 	);
 }
 export default ItemForm;
