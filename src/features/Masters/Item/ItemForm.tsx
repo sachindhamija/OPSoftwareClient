@@ -601,47 +601,62 @@ function ItemForm({
 					show={gstSlabModalShow}
 					onHide={() => 
 						{
-							setGSTSlabModalShow(false);
+							//setGSTSlabModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
-						<GSTSlabForm />
+						<GSTSlabForm onSaveSuccess={() => 
+							{
+								setGSTSlabModalShow(false);
+							 }} isModalOpen={gstSlabModalShow} />
 					</Suspense>
 			</CommonModal>
 			<CommonModal
 					show={categoryModalShow}
 					onHide={() => 
 						{
-							loadItemCategories();
-							setCategoryModalShow(false);
+							// loadItemCategories();
+							// setCategoryModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
-						<ItemCategoryForm />
+						<ItemCategoryForm onSaveSuccess={() => 
+							{
+								loadItemCategories();
+								setCategoryModalShow(false);
+							 }} isModalOpen={categoryModalShow} />
 					</Suspense>
 			</CommonModal>
 			<CommonModal
 					show={companyModalShow}
 					onHide={() => 
 						{
-							loadItemCompany();
-							setCompanyModalShow(false);
+							// loadItemCompany();
+							// setCompanyModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
-						<ItemCompanyForm />
+						<ItemCompanyForm onSaveSuccess={() => 
+							{
+								loadItemCompany();
+								setCompanyModalShow(false);
+							}} isModalOpen={companyModalShow} />
 					</Suspense>
 			</CommonModal>
 			<CommonModal
 					show={godownModalShow}
 					onHide={() => 
 						{
-							loadItemGodown();
-							setGodownModalShow(false);
+							// loadItemGodown();
+							// setGodownModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
-						<ItemGodownForm />
+						<ItemGodownForm onSaveSuccess={() => 
+							{
+								loadItemGodown();
+								setGodownModalShow(false);
+							}} isModalOpen={godownModalShow} />
 					</Suspense>
 			</CommonModal>
 		</CommonCard>

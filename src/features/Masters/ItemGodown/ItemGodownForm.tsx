@@ -17,7 +17,12 @@ import {
 } from '../../../app/components/Components';
 import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
 
-function ItemGodownForm() {
+interface ItemGodownFormProps {
+    isModalOpen?: boolean;
+    onSaveSuccess?: () => void;
+}
+
+function ItemGodownForm({ isModalOpen = false, onSaveSuccess }:ItemGodownFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -78,6 +83,9 @@ function ItemGodownForm() {
 					await agent.ItemGodown.createItemGodown(accessId, data);
 					toast.success('Item Godown created successfully');
 				}
+				if (onSaveSuccess && isModalOpen) {
+					onSaveSuccess();
+				}
 				getAllItemGodowns();
 			}
 		} catch (error: any) {
@@ -134,7 +142,7 @@ function ItemGodownForm() {
 
 	return (
 		<CommonCard header="Item Godown">
-			<FormNavigator onSubmit={handleSubmit(onSubmit)}>
+			<FormNavigator onSubmit={handleSubmit(onSubmit)} isModalOpen={isModalOpen}>
 				<Row>
 					<Col xs={12} md={10}>
 						<CustomInput

@@ -15,7 +15,11 @@ import { Col, Row } from 'react-bootstrap';
 import { ColumnDef } from '@tanstack/react-table';
 import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
 
-function ItemCategoryForm() {
+interface ItemCategoryFormProps {
+    isModalOpen?: boolean;
+    onSaveSuccess?: () => void;
+}
+function ItemCategoryForm({ isModalOpen = false, onSaveSuccess }:ItemCategoryFormProps) {
 	const accessId = getAccessIdOrRedirect();
 	const dispatch = useAppDispatch();
 	const [itemCategories, setItemCategories] = useState<ItemCategoryDto[]>([]);
@@ -74,6 +78,9 @@ function ItemCategoryForm() {
 				toast.success('Item category added successfully');
 			}
 			resetForm();
+			if (onSaveSuccess && isModalOpen) {
+				onSaveSuccess();
+			}
 			fetchItemCategories();
 		} catch (error) {
 			console.error('Failed to submit item category:', error);
@@ -131,7 +138,7 @@ function ItemCategoryForm() {
 
 	return (
 		<CommonCard header="Item Category">
-			<FormNavigator onSubmit={handleSubmit(onSubmit)}>
+			<FormNavigator onSubmit={handleSubmit(onSubmit)} isModalOpen={isModalOpen}>
 				<Row>
 					<Col xs={12} md={10}>
 						<CustomInput

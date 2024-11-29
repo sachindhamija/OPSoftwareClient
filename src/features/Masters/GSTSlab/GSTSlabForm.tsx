@@ -18,7 +18,12 @@ import GSTSlabDto from './gstSlabDto';
 import { convertNullOrEmptyToZero } from '../../../app/utils/numberUtils';
 import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
 
-function GSTSlabForm() {
+interface GSTSlabFormProps {
+    isModalOpen?: boolean;
+    onSaveSuccess?: () => void;
+}
+
+function GSTSlabForm({ isModalOpen = false, onSaveSuccess }:GSTSlabFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -110,6 +115,9 @@ function GSTSlabForm() {
 			reset();
 			setIsEditMode(false);
 			setEditingGSTSlab(null);
+			if (onSaveSuccess && isModalOpen) {
+				onSaveSuccess();
+			}
 			getAllGSTSlabs();
 		} catch (error) {
 			handleApiErrors(error);
@@ -173,7 +181,7 @@ function GSTSlabForm() {
 
 	return (
 		<CommonCard header="GST Slab" size="75%">
-			<FormNavigator onSubmit={handleSubmit(onSubmit)}>
+			<FormNavigator onSubmit={handleSubmit(onSubmit)} isModalOpen={isModalOpen}>
 				<Row>
 					<Col xs={12}>
 						<CustomInput

@@ -17,7 +17,12 @@ import {
 } from '../../../app/components/Components';
 import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
 
-function ItemCompanyForm() {
+interface ItemCompanyFormProps {
+    isModalOpen?: boolean;
+    onSaveSuccess?: () => void;
+}
+
+function ItemCompanyForm({ isModalOpen = false, onSaveSuccess }:ItemCompanyFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -78,6 +83,9 @@ function ItemCompanyForm() {
 					await agent.ItemCompany.createItemCompany(accessId, data);
 					toast.success('Item Company created successfully');
 				}
+				if (onSaveSuccess && isModalOpen) {
+					onSaveSuccess();
+				}
 				getAllItemCompanies();
 			}
 		} catch (error: any) {
@@ -134,7 +142,7 @@ function ItemCompanyForm() {
 
 	return (
 		<CommonCard header="Item Company">
-			<FormNavigator onSubmit={handleSubmit(onSubmit)}>
+			<FormNavigator onSubmit={handleSubmit(onSubmit)} isModalOpen={isModalOpen}>
 				<Row>
 					<Col xs={12} md={10}>
 						<CustomInput
