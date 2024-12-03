@@ -526,6 +526,7 @@ function PaymentAndReceiptForm({
 							<CustomButton
 								text={currentVoucherId ? 'Update' : 'Save'}
 								className="mb-2 w-100"
+								type="submit"
 								isSubmitting={isSubmitting}
 							/>
 							{currentVoucherId && (

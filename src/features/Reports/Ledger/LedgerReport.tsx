@@ -294,6 +294,7 @@ const LedgerReport = ({
 						>
 							<CustomButton
 								text="Show"
+								type="submit"
 								className="mb-2 w-100"
 								isSubmitting={isSubmitting}
 							/>
