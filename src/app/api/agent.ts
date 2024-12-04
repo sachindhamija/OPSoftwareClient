@@ -45,7 +45,6 @@ const responseBody = (response: AxiosResponse) => response.data;
 // Request Interceptor
 axios.interceptors.request.use((config) => {
   const token = store.getState().account.user?.token;
-  console.log(token);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

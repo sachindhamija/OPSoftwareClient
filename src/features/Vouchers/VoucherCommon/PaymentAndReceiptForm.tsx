@@ -35,6 +35,8 @@ import {
 import { transformAccountToOption } from '../../../app/utils/accountUtils';
 import getLastVoucherDate from '../../../app/hooks/useLastVoucherDate';
 import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation';
+import { useLocation } from 'react-router-dom';
+
 
 const columns: ColumnDef<PaymentAndReceiptDto>[] = [
 	{
@@ -121,7 +123,8 @@ function PaymentAndReceiptForm({
 	const [useReceiptNumber, setUseReceiptNumber] = useState(true);
 	const [showTradingAccounts, setShowTradingAccounts] = useState(false);
 	const [showBankAccounts, setShowBankAccounts] = useState(false);
-
+	
+	const location = useLocation();
 	const voucherDateRef = useRef<HTMLInputElement>(null);
 	const voucherDate = watch('voucherDate');
 	const basicAmount = watch('basicAmount', 0);
@@ -420,7 +423,7 @@ function PaymentAndReceiptForm({
 
 	useEffect(() => {
 		fetchEntriesAsPerDate();
-	}, [voucherDate]);
+	}, [voucherDate,location]);
 
 	return (
 		<>
