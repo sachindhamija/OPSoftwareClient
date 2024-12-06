@@ -109,8 +109,8 @@ function DefaultFields({
 						label="Mobile No 1"
 						name="mobileNo"
 						register={register}
-						maxLength={25}
-						// validationRules={{ pattern: { value: /^[0-9]+$/, message: "Invalid mobile number" } }}
+						maxLength={10}
+						validationRules={{ pattern: { value: /^[0-9]+$/, message: "Invalid mobile number" } }}
 					/>
 				</Col>
 				<Col md={3}>
@@ -118,8 +118,8 @@ function DefaultFields({
 						label="Mobile No 2"
 						name="mobileNo2"
 						register={register}
-						maxLength={25}
-						// validationRules={{ pattern: { value: /^[0-9]+$/, message: "Invalid mobile number" } }}
+						maxLength={10}
+						validationRules={{ pattern: { value: /^[0-9]+$/, message: "Invalid mobile number" } }}
 					/>
 				</Col>
 				<Col md={3}>
