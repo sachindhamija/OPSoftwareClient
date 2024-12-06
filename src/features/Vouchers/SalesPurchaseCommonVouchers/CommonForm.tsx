@@ -43,10 +43,11 @@ interface SalePurchaseFormProps {
     voucherType: VoucherTypeEnum;
     voucherId?: string;
     isInModal?: boolean;
+    ledgerVoucherDate?: any;
     onSuccessfulSubmit?: () => void;
 }
 
-export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false, onSuccessfulSubmit }: SalePurchaseFormProps) {
+export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal = false,ledgerVoucherDate, onSuccessfulSubmit }: SalePurchaseFormProps) {
     const dispatch = useAppDispatch();
     const accessId = getAccessIdOrRedirect();
     const financialYear = useAppSelector(selectCurrentFinancialYear);
@@ -192,7 +193,12 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     }, [watchedItems]);
 
     const paymentMode = watch('paymentMode', '');
-    const voucherDate = watch("voucherDate");
+    var voucherDate = "";
+    if(!ledgerVoucherDate){
+        voucherDate = watch("voucherDate");
+    }else{
+        voucherDate = ledgerVoucherDate;
+    }
     const getVoucherById = async (voucherId: string) => {
         const resp = await agent.Vouchers.getVoucherById(accessId, voucherId);
         setVoucher(resp)
@@ -339,7 +345,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         }
     };
     useEffect(() => {
-
+        
         fetchData().then(() => {
 
             if (accessId && financialYear && voucherType !== undefined && voucherId == undefined) { // this condition is to create a new voucher

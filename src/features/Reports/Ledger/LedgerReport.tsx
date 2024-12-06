@@ -234,7 +234,7 @@ const LedgerReport = ({
 			case VoucherTypeEnum.JournalEntry:
 				return <JournalEntryForm {...commonProps} />;
 			case VoucherTypeEnum.ItemSale:
-				return <SalePurchaseForm {...commonProps} voucherType={voucherTypeId} />;
+				return <SalePurchaseForm {...commonProps} ledgerVoucherDate={voucherDate} voucherType={voucherTypeId} />;
 			default:
 				return null;
 		}
