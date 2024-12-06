@@ -595,7 +595,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 return;
             }
             const finalData = convertFieldValuesToDto(data);
-
+            
             if (voucherType == VoucherTypeEnum.ItemSale) {
                 if (voucherId || voucher) {
                     // update the invoice   
@@ -714,7 +714,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 additionalTax1: item.additionalTax1 || 0,
                 additionalTax2: item.additionalTax2 || 0,
                 netAmount: item.netAmount || 0,
-                serialNumberValues:item.serialNumberValues
+                serialNumberValues:item.serialNumberValues || []
             };
 
             if ((item.itemId === 0 || item.itemId === null) && index !== items.length - 1) {
