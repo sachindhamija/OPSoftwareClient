@@ -612,6 +612,7 @@ function BankEntryForm({
 							className="d-flex align-items-end justify-content-end justify-content-md-start mt-2 mt-md-4"
 						>
 							<CustomButton
+								type='submit'
 								text={currentVoucherId ? 'Update' : 'Save'}
 								className="mb-2 w-100"
 								isSubmitting={isSubmitting}
