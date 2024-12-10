@@ -38,7 +38,7 @@ interface CustomDropdownProps {
     hideDropdownIcon?: boolean;
     isInTable?: boolean;
     onFocus?: () => void;
-    focusTrigger?: boolean;
+    focusTrigger?: boolean; 
 
 }
 
