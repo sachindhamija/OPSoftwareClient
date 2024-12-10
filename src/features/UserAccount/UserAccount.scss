@@ -2,5 +2,53 @@
 	.login-common-card {
 		width: 100%;
 		overflow-x: hidden;
+		padding: 20px; 
+	}
+
+	.row {
+		margin: 0 auto; 
+	}
+}
+
+
+@media (max-width: 576px) {
+	.login-card-container {
+		padding: 10px; 
+		height: auto; 
+	}
+
+	.login-common-card {
+		padding: 15px; 
+	}
+
+	.row {
+		flex-direction: column; 
+	}
+
+	.col-md-12 {
+		padding: 0; 
+	}
+
+	form {
+		.form-group {
+			margin-bottom: 10px; 
+		}
+	}
+
+	.text-left,
+	.text-md-end {
+		text-align: center; 
+	}
+
+	.d-none.d-md-inline {
+		display: none !important;
+	}
+
+	.d-block.d-md-none {
+		display: block !important; 
+	}
+
+	a {
+		font-size: 0.9rem; 
 	}
 }

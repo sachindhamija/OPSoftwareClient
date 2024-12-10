@@ -306,7 +306,7 @@ function CompanyHeader() {
             onMouseEnter={handleCommissionAgentDropdownHover}
             onMouseLeave={handleCommissionAgentDropdownLeave}
           >
-            <Dropdown.Item as={Link} to={"/IJ Form"}>
+            <Dropdown.Item as={Link} to={"/IJForm"}>
               IJ Form
             </Dropdown.Item>
             <Dropdown.Divider />

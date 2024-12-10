@@ -32,6 +32,7 @@ import BillBookForm from '../../features/Masters/BillBook/SaleBillBookForm';
 import { SalePurchaseForm } from '../../features/Vouchers/SalesPurchaseCommonVouchers/CommonForm';
 import SerialNumberSetting from '../../features/Masters/SerialNumberSetting/SerialNumberSetting';
 import AdditionalFieldSetting from '../../features/Masters/AdditionalFieldsSetting/AdditionalFieldSetting';
+import IJForm from '../../features/CommissionAgent/IJForm/IJForm';
 import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
 import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
 import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
@@ -155,6 +156,7 @@ export const router = createBrowserRouter([
 					{ path: 'sale-billbook', element: <BillBookForm /> },
 					{ path: 'serial-number-setting', element: <SerialNumberSetting /> },
 					{ path: 'additional-fields-setting', element: <AdditionalFieldSetting /> },
+					{ path: 'IJForm', element: <IJForm /> },
 					{ path: 'mandi', element: <MandiForm /> },
 					{ path: 'commissionagent-item', element: <CommissionAgentItemForm /> },
 					{ path: 'report/invoice-report-item', element: <InvoiceReport /> },
