@@ -192,6 +192,7 @@ function AccountForm({
 			return (
 				<DefaultFields
 					register={register}
+					watch={watch}
 					errors={errors}
 					control={control}
 					measurementsOptions={MEASUREMENTS_OPTIONS}
