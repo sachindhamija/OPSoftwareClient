@@ -914,7 +914,12 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].rate`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                onChange={(e) => calculateItemRow(index, 'rate', e.target.value)}
+                                                onChange={(e) => {
+                                                    calculateItemRow(index, 'rate', e.target.value);
+                                                    const rateValue = parseFloat(e.target.value) || 0;
+                                                    // Set fields to read-only if rate is 0
+                                                    setValue(`items[${index}].isRateZero`, rateValue === 0);
+                                                }}
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'F3' && selectedTaxType === 'Exclusive') {
                                                         e.preventDefault();
@@ -972,6 +977,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].basicAmount`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
+                                                disabled={getValues(`items[${index}].isRateZero`)}
                                             />
                                         </td>
                                         <td>
@@ -979,6 +985,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].discountPercentage`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
+                                                disabled={getValues(`items[${index}].isRateZero`)}
                                                 onChange={(e) => calculateItemRow(index, 'discountPercentage', e.target.value)}
                                                 maxLength={2}
                                             />
@@ -988,6 +995,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].discountAmount`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
+                                                disabled={getValues(`items[${index}].isRateZero`)}
                                                 onChange={(e) => calculateItemRow(index, 'discountAmount', e.target.value)}
                                             />
                                         </td>
