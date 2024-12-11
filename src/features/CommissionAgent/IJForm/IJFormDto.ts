@@ -1,14 +1,23 @@
 export interface IJFormDto {
-    id: number;
-    itemName: string;
-    weightPerBag: number | null;
-    utraiPerBag: number | null;
-    chhanaiPerBag: number | null;
-    tulaiPerBag: number | null;
-    silaiPerBag: number | null;
-    loadingPerBag: number | null;
-    dammi: number | null;
+    id:number;
+    date: number;
+    mandi: string;
+    bookNo: number | null;
+    jForm: number | null;
+    soldtogovt: boolean;
+    farmername: string;
+    purchasername: string;
+    itemname: string;
+    Bag: number | null;
+    wt: number | null;
+    extra: number | null;
+    finalBag: number | null;
+    finalwt: number | null;
     rate: number | null;
-    ratePer: string;
+    pricePer: string;
+    amount: number | null;
+    utrai: number | null;
+    chhanai: number | null;
+    netvalue: number | null;
   }
   
