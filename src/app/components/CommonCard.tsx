@@ -38,7 +38,7 @@ const CommonCard: React.FC<CommonCardProps> = ({
 		}
 	};
 	// Adjust the card height based on the size prop
-	const cardStyle = size === '100%' ? { ...style, height: '100vh' } : style;
+	const cardStyle = size === '100%' ? {height: '100vh',  ...style  } : style;
 	const combinedClassName = `shadow-sm ${className || ''}`;
 
 	return (
