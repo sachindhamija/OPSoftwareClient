@@ -178,6 +178,7 @@ function CreateCompany() {
               options={stateOptions}
               control={control}
               error={errors.state}
+              disabled={!!gstin}
               validationRules={{
                 required: "State is required",
               }}
