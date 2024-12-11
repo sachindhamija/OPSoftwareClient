@@ -195,6 +195,9 @@ function CreateCompany() {
               register={register}
               error={errors.companyName}
               maxLength={200}
+              validationRules={{
+                required: "Company Name is required",
+              }}
             />
           </Col>
           {!accessId && (
