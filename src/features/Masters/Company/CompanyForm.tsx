@@ -168,6 +168,7 @@ function CreateCompany() {
               error={errors.panNo}
               maxLength={10}
               onChange={handlePanChange}
+              disabled={!!gstin}
               allowedChars="alphanumeric"
             />
           </Col>
@@ -179,9 +180,9 @@ function CreateCompany() {
               control={control}
               error={errors.state}
               disabled={!!gstin}
-              validationRules={{
-                required: "State is required",
-              }}
+              // validationRules={{
+              //   required: "State is required",
+              // }}
             />
           </Col>
         </Row>

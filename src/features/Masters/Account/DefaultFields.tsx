@@ -226,6 +226,7 @@ function DefaultFields({
       </Row>
 
       <CommonModal show={modalShow} onHide={() => setModalShow(false)}>
+
         <Suspense fallback={<div>Loading...</div>}>
           <CityForm />
         </Suspense>
@@ -235,3 +236,4 @@ function DefaultFields({
 }
 
 export default DefaultFields;
+
