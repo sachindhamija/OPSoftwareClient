@@ -26,7 +26,6 @@ const PRICE_PER = [
 function IJForm() {
   const {
     register,
-    handleSubmit,
     setValue,
     setFocus,
     reset,
@@ -34,9 +33,9 @@ function IJForm() {
   } = useForm<IJFormDto>();
   const accessId = getAccessIdOrRedirect();
   const dispatch = useAppDispatch();
-  const [items, setItems] = useState<IJFormDto[]>([]);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editingItem, setEditingItem] = useState<IJFormDto | null>(null);
+  const [items,] = useState<IJFormDto[]>([]);
+  const [, setIsEditMode] = useState(false);
+  const [, setEditingItem] = useState<IJFormDto | null>(null);
 
   const columns: ColumnDef<IJFormDto>[] = [
     {
@@ -153,20 +152,20 @@ function IJForm() {
 //     getAllItems();
 //   }, [dispatch]);
 
-  const onSubmit = async (data: IJFormDto) => {
-    dispatch(setLoading(true));
-    const numericFields: (keyof IJFormDto)[] = [
-        "Bag",
-        "wt",
-        "extra",
-        "finalBag",
-        "finalwt",
-        "rate",
-        "amount",
-        "utrai",
-        "chhanai",
-      ];
-    }
+  // const onSubmit = async (data: IJFormDto) => {
+  //   dispatch(setLoading(true));
+  //   const numericFields: (keyof IJFormDto)[] = [
+  //       "Bag",
+  //       "wt",
+  //       "extra",
+  //       "finalBag",
+  //       "finalwt",
+  //       "rate",
+  //       "amount",
+  //       "utrai",
+  //       "chhanai",
+  //     ];
+  //   }
 //     const processedData = convertNullOrEmptyToZero(data, numericFields);
 //     try {
 //       if (isEditMode && editingItem && editingItem.id !== undefined) {
@@ -250,7 +249,7 @@ function IJForm() {
 
   return (
     <CommonCard header="J-Form" size="100%">
-      <FormNavigator onSubmit={handleSubmit(onSubmit)}>
+      <FormNavigator>
         <Row>
           <Col xs={2}>
             <CustomInput
