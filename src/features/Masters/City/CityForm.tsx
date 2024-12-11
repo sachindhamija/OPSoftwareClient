@@ -130,7 +130,8 @@ function CityForm() {
 	};
 
 	return (
-		<CommonCard header="City">
+
+		<CommonCard size='100%' style={{"height": "50%"}} header="City">
 			<FormNavigator onSubmit={handleSubmit(onSubmit)}>
 				<Row>
 					<Col xs={12}>
@@ -180,6 +181,7 @@ function CityForm() {
 				showSrNo
 			/>
 		</CommonCard>
+
 	);
 }
 

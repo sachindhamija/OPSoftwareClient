@@ -17,7 +17,11 @@ import {
 import ItemUnitDto from './itemUnitDto';
 import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
 
-function ItemUnitForm() {
+interface ItemUnitFormProps {
+    isModalOpen?: boolean;
+    onSaveSuccess?: () => void;
+}
+function ItemUnitForm({ isModalOpen = false, onSaveSuccess }:ItemUnitFormProps) {
 	const accessId = getAccessIdOrRedirect();
 	const {
 		register,
@@ -82,6 +86,9 @@ function ItemUnitForm() {
 				await agent.ItemUnit.createItemUnit(accessId, data);
 				toast.success('Item Unit added successfully');
 			}
+			if (onSaveSuccess && isModalOpen) {
+				onSaveSuccess();
+			}
 			getAllItemUnits();
 		} catch (error: any) {
 			handleApiErrors(error);
@@ -134,7 +141,7 @@ function ItemUnitForm() {
 
 	return (
 		<CommonCard header="Item Unit">
-			<FormNavigator onSubmit={handleSubmit(onSubmit)}>
+			<FormNavigator onSubmit={handleSubmit(onSubmit)} isModalOpen={isModalOpen}>
 				<Row>
 					<Col xs={12}>
 						<CustomInput

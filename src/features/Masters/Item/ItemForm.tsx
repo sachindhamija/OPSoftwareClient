@@ -27,6 +27,7 @@ import ItemCategoryForm from '../ItemCategory/ItemCategoryForm';
 import ItemGodownForm from '../ItemGodown/ItemGodownForm';
 import ItemCompanyForm from '../ItemCompany/ItemCompanyForm';
 import GSTSlabForm from '../GSTSlab/GSTSlabForm';
+import ItemUnitForm from '../ItemUnit/ItemUnitForm';
 
 interface ItemFormProps {
 	isModalOpen?: boolean;
@@ -68,6 +69,7 @@ function ItemForm({
 	const [categoryModalShow, setCategoryModalShow] = useState(false);
 	const [companyModalShow, setCompanyModalShow] = useState(false);
 	const [godownModalShow, setGodownModalShow] = useState(false);
+	const [mainUnitModalShow, setMainUnitModalShow] = useState(false);
 
 	//Load Units
 	const loadUnits = async () => {
@@ -456,6 +458,11 @@ function ItemForm({
 							name="mainUnitID"
 							control={control}
 							options={itemUnits}
+							isCreatable={true}
+							showCreateButton={true}
+							onCreateButtonClick={() => {
+								setMainUnitModalShow(true);
+							}}
 						/>
 					</Col>
 					<Col xs={12} md={2}>
@@ -601,7 +608,7 @@ function ItemForm({
 					show={gstSlabModalShow}
 					onHide={() => 
 						{
-							//setGSTSlabModalShow(false);
+							setGSTSlabModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
@@ -615,8 +622,7 @@ function ItemForm({
 					show={categoryModalShow}
 					onHide={() => 
 						{
-							// loadItemCategories();
-							// setCategoryModalShow(false);
+							setCategoryModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
@@ -631,8 +637,7 @@ function ItemForm({
 					show={companyModalShow}
 					onHide={() => 
 						{
-							// loadItemCompany();
-							// setCompanyModalShow(false);
+							setCompanyModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
@@ -647,8 +652,7 @@ function ItemForm({
 					show={godownModalShow}
 					onHide={() => 
 						{
-							// loadItemGodown();
-							// setGodownModalShow(false);
+							 setGodownModalShow(false);
 						}
 					}>
 					<Suspense fallback={<div>Loading...</div>}>
@@ -657,6 +661,21 @@ function ItemForm({
 								loadItemGodown();
 								setGodownModalShow(false);
 							}} isModalOpen={godownModalShow} />
+					</Suspense>
+			</CommonModal>
+			<CommonModal
+					show={mainUnitModalShow}
+					onHide={() => 
+						{
+							setMainUnitModalShow(false);
+						}
+					}>
+					<Suspense fallback={<div>Loading...</div>}>
+						<ItemUnitForm onSaveSuccess={() => 
+							{
+								loadUnits();
+								setMainUnitModalShow(false);
+							}} isModalOpen={mainUnitModalShow} />
 					</Suspense>
 			</CommonModal>
 		</CommonCard>

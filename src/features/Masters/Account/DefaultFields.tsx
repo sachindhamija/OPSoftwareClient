@@ -50,23 +50,29 @@ function DefaultFields({
             // validationRules={{ required: "Party type is required" }}
           />
         </Col>
-        {["Un-Registered", "Un-Registered Out of State", "Out of Country (GST Not Applicable)", "Out of Country (GST Applicable)"].includes(partyTypeValue) ? null : (
-    <Col md={3}>
-        <CustomInput
-            label="GSTIN"
-            name="gstNo"
-            register={register}
-            maxLength={16}
-            validationRules={{
+        {[
+          "Un-Registered",
+          "Un-Registered Out of State",
+          "Out of Country (GST Not Applicable)",
+          "Out of Country (GST Applicable)",
+        ].includes(partyTypeValue) ? null : (
+          <Col md={3}>
+            <CustomInput
+              label="GSTIN"
+              name="gstNo"
+              register={register}
+              maxLength={16}
+              validationRules={{
                 required: "GSTIN is required",
                 pattern: {
-                    value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}[Z]{1}[A-Z0-9]{1}$/,
-                    message: "Invalid GSTIN format",
+                  value:
+                    /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}[Z]{1}[A-Z0-9]{1}$/,
+                  message: "Invalid GSTIN format",
                 },
-            }}
-        />
-    </Col>
-)}
+              }}
+            />
+          </Col>
+        )}
 
         <Col md={3}>
           <CustomInput
@@ -83,7 +89,11 @@ function DefaultFields({
             options={stateOptions}
             control={control}
             error={errors.stateId}
-            disabled={["Composition", "GST Party", "GST Party Out of State"].includes(partyTypeValue)}
+            disabled={[
+              "Composition",
+              "GST Party",
+              "GST Party Out of State",
+            ].includes(partyTypeValue)}
             // validationRules={{ required: "State is required" }}
           />
         </Col>
@@ -216,6 +226,7 @@ function DefaultFields({
       </Row>
 
       <CommonModal show={modalShow} onHide={() => setModalShow(false)}>
+
         <Suspense fallback={<div>Loading...</div>}>
           <CityForm />
         </Suspense>
@@ -225,3 +236,4 @@ function DefaultFields({
 }
 
 export default DefaultFields;
+

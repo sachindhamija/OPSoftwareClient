@@ -389,7 +389,7 @@ const ItemUnit = {
   },
   deleteItemUnit: async (accessId: string, itemUnitId: number) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.delete(`itemunit${itemUnitId}`, params);
+    return await requests.delete(`itemunit/${itemUnitId}`, params);
   },
 };
 const GSTSlab = {
