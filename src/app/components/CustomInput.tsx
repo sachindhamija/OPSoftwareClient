@@ -13,7 +13,7 @@ interface CustomInputProps {
 	label?: string;
 	name: string;
 	register?: UseFormRegister<any>;
-	validationRules?: Record<string, any>;
+    validationRules?: Record<string, any>;
 	error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined;
 	asCol?: boolean | 'auto' | number | null;
 	placeholder?: string;

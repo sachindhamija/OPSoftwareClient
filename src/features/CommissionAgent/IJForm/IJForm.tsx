@@ -311,6 +311,121 @@ function IJForm() {
                     onDelete={handleDelete}
                 />
             </div >
+            
+            <CommonCard header="I-Form" size="100%">
+            <FormNavigator onSubmit={handleSubmit(onSubmit)}>
+                <Row>
+                    <Col xs={12}>
+                        <CustomInput
+                            label="Item Name"
+                            name="itemName"
+                            register={register}
+                            validationRules={{
+                                required: 'Item Name cannot be empty.',
+                            }}
+                        />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Weight/Bag"
+                            name="weightPerBag"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Utrai/Bag"
+                            name="utraiPerBag"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Chhanai/Bag"
+                            name="chhanaiPerBag"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Tulai/Bag"
+                            name="tulaiPerBag"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Silai/Bag"
+                            name="silaiPerBag"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Loading/Bag"
+                            name="loadingPerBag"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Dammi"
+                            name="dammi"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+                    <Col xs={2}>
+                        <CustomInput
+                            label="Rate"
+                            name="rate"
+                            register={register}
+                            allowedChars="numericDecimal"
+                        />
+                    </Col>
+                    <Col xs={2}>
+                        <CustomDropdown
+                            label="Rate Per"
+                            name="ratePer"
+                            options={PRICE_PER}
+                            control={control}
+                            validationRules={{
+                                required: 'Rate Per cannot be empty.',
+                            }}
+                        />
+                    </Col>
+                    <Col xs={2} className="d-flex align-items-end">
+                        <CustomButton className='align-items-center'
+                            text={isEditMode ? 'Update' : 'Save'}
+                            variant="primary"
+                            type="submit"
+                            isSubmitting={isSubmitting}
+                            isValid={isValid}
+                        />
+                    </Col>
+                </Row>
+            </FormNavigator>
+
+            <div className='mt-3'>
+                <CommonTable
+                    data={items}
+                    columns={columns}
+                    onRowClick={handleEdit}
+                    onDelete={handleDelete}
+                />
+            </div >
+        </CommonCard>
         </CommonCard>
     );
 }
