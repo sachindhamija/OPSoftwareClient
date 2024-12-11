@@ -73,6 +73,12 @@
 	}
 }
 
+.custom-dropdown-menu .dropdown-item:focus,
+.custom-dropdown-menu .dropdown-item:hover {
+  background-color: #007bff; 
+  color: white; 
+}
+
 .user-menu-toggle {
 	background: transparent !important;
 	border: none !important;
