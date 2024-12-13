@@ -47,6 +47,7 @@ function DefaultFields({
             options={partyTypesOptions}
             control={control}
             error={errors.partyType}
+            defaultValue={partyTypesOptions.find(option => option.value === "Un-Registered")}
             // validationRules={{ required: "Party type is required" }}
           />
         </Col>
