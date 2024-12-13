@@ -378,8 +378,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 if (askForCustomerDetailWhenCash && cashAccount) {
                     setFocusBillNo(true);
                     setTimeout(() => {
-                        if (!voucher && !voucherId) // avoid opening in edit mode
-                            setShowCustomerDetailModal(true);
+                        //if (!voucher && !voucherId) // avoid opening in edit mode
+                        setShowCustomerDetailModal(true);
                         setFocusBillNo(false);
                     }, 100);
 
