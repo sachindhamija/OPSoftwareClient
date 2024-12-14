@@ -140,7 +140,7 @@ function CompanyHeader() {
             onMouseLeave={handleMastersDropdownLeave}
           >
             <Dropdown.Item as={Link} to={"/account"}>
-              Account  <span style={{ marginLeft: "100px" }}>[Ctrl+N]</span>
+              Account <span style={{ marginLeft: "120px" }}>[F3]</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/account-List"}>
@@ -186,17 +186,17 @@ function CompanyHeader() {
             <Dropdown.Item as={Link} to={"/sale-billbook"}>
               Sale BillBook
             </Dropdown.Item>
-			<Dropdown.Divider />
+            <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/serial-number-setting"}>
               Serial Number Setting
             </Dropdown.Item>
-			<Dropdown.Divider />
+            <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/additional-fields-setting"}>
               Additional Fields Setting
             </Dropdown.Item>
-			<Dropdown.Divider />
+            <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Password-Delete-Update"}>
-              Password for Delete/Update 
+              Password for Delete/Update
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
@@ -233,13 +233,31 @@ function CompanyHeader() {
             <Dropdown.Item as={Link} to={"/Voucher/JournalEntry"}>
               Journal Entry <span style={{ marginLeft: "100px" }}>F8</span>
             </Dropdown.Item>
-            <Dropdown.Divider />
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown as="div" className="dropdown-on-hover">
+          <Dropdown.Toggle
+            as={Nav.Link}
+            id="dropdown-autoclose-true"
+            className="dropdown-toggle"
+            onMouseEnter={handleVouchersDropdownHover}
+            onMouseLeave={handleVouchersDropdownLeave}
+          >
+            Sale/Pur
+          </Dropdown.Toggle>
+          <Dropdown.Menu
+            className={`custom-dropdown-menu ${
+              showVouchersDropdown ? "" : "hidden"
+            }`}
+            onMouseEnter={handleVouchersDropdownHover}
+            onMouseLeave={handleVouchersDropdownLeave}
+          >
             <Dropdown.Item as={Link} to={"/Voucher/Sale"}>
-              Sale Voucher
+              Sale Voucher <span style={{ marginLeft: "110px" }}>F9</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/Purchase"}>
-              Purchase Voucher
+              Purchase Voucher <span style={{ marginLeft: "60px" }}>F10</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/SalesReturn"}>
@@ -259,6 +277,7 @@ function CompanyHeader() {
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+
         <Dropdown as="div" className="dropdown-on-hover">
           <Dropdown.Toggle
             id="dropdown-autoclose-true"
@@ -277,11 +296,11 @@ function CompanyHeader() {
             onMouseLeave={handleReportsDropdownLeave}
           >
             <Dropdown.Item as={Link} to={"/Report/Ledger"}>
-              Ledger
+              Ledger <span style={{ marginLeft: "120px" }}>[Ctrl+L]</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Report/TrialBalance"}>
-              Trial Balance
+              Trial Balance <span style={{ marginLeft: "68px" }}>[Ctrl+G]</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Report/invoice-report-item"}>

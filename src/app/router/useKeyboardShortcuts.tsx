@@ -6,17 +6,26 @@ const useKeyboardShortcuts = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key.toLowerCase() === "i") {
-        event.preventDefault();
-        navigate("/item");
-      } else if (event.altKey && event.key.toLowerCase() === "i") {
+       if (event.altKey && event.key.toLowerCase() === "i") {
         event.preventDefault();
         navigate("/item-list");
       } else if (event.ctrlKey && event.key.toLowerCase() === "j") {
         event.preventDefault();
         navigate("/IJForm");
-      } else {
+      } 
+      else if (event.ctrlKey && event.key.toLowerCase() === "l") {
+        event.preventDefault();
+        navigate("/Report/Ledger");
+      }
+      else if (event.ctrlKey && event.key.toLowerCase() === "g") {
+        event.preventDefault();
+        navigate("/Report/TrialBalance");
+      }else {
         switch (event.key) {
+          case "F3":
+            event.preventDefault();
+            navigate("/account");
+            break;
           case "F5":
             event.preventDefault();
             navigate("/Voucher/Payment");
@@ -33,6 +42,14 @@ const useKeyboardShortcuts = () => {
             event.preventDefault();
             navigate("/Voucher/JournalEntry");
             break;
+            case "F9":
+              event.preventDefault();
+              navigate("/Voucher/Sale");
+              break;
+              case "F10":
+              event.preventDefault();
+              navigate("/Voucher/Purchase");
+              break;
           default:
             break;
         }
