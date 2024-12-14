@@ -5,11 +5,14 @@ import { useAppDispatch } from "../store/configureStore";
 import { fetchCurrentUser } from "../../features/UserAccount/accountSlice";
 import { Toaster } from "react-hot-toast";
 import LoadingComponent from "./LoadingComponent";
+import useKeyboardShortcuts from '../router/useKeyboardShortcuts';
 
 const App = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+ 
 
+  useKeyboardShortcuts();
   useEffect(() => {
     const publicPaths = ['/login', '/reset-password', '/not-found'];
     const path = window.location.pathname;

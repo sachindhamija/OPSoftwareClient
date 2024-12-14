@@ -140,7 +140,7 @@ function CompanyHeader() {
             onMouseLeave={handleMastersDropdownLeave}
           >
             <Dropdown.Item as={Link} to={"/account"}>
-              Account
+              Account  <span style={{ marginLeft: "100px" }}>[Ctrl+N]</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/account-List"}>
@@ -176,11 +176,11 @@ function CompanyHeader() {
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/item"}>
-              Item
+              New Item <span style={{ marginLeft: "100px" }}>[Ctrl+I]</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/item-list"}>
-              Item List
+              Item List <span style={{ marginLeft: "118px" }}>[Alt+I]</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/sale-billbook"}>
@@ -219,19 +219,19 @@ function CompanyHeader() {
             onMouseLeave={handleVouchersDropdownLeave}
           >
             <Dropdown.Item as={Link} to={"/Voucher/Payment"}>
-              Payment
+              Payment <span style={{ marginLeft: "140px" }}>F5</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/Receipt"}>
-              Receipt
+              Receipt <span style={{ marginLeft: "150px" }}>F6</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/BankEntry"}>
-              Bank Entry
+              Bank Entry <span style={{ marginLeft: "120px" }}>F7</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/JournalEntry"}>
-              Journal Entry
+              Journal Entry <span style={{ marginLeft: "100px" }}>F8</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/Sale"}>
@@ -307,7 +307,7 @@ function CompanyHeader() {
             onMouseLeave={handleCommissionAgentDropdownLeave}
           >
             <Dropdown.Item as={Link} to={"/IJForm"}>
-              IJ Form
+              I-J Form <span style={{ marginLeft: "120px" }}>[Ctrl+J]</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/mandi"}>
