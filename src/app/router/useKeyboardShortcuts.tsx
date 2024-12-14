@@ -22,10 +22,6 @@ const useKeyboardShortcuts = () => {
         navigate("/Report/TrialBalance");
       }else {
         switch (event.key) {
-          case "F3":
-            event.preventDefault();
-            navigate("/account");
-            break;
           case "F5":
             event.preventDefault();
             navigate("/Voucher/Payment");

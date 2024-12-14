@@ -140,7 +140,7 @@ function CompanyHeader() {
             onMouseLeave={handleMastersDropdownLeave}
           >
             <Dropdown.Item as={Link} to={"/account"}>
-              Account <span style={{ marginLeft: "120px" }}>[F3]</span>
+              Account 
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/account-List"}>
