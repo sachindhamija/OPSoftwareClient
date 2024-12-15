@@ -1,3 +1,4 @@
+import { Suspense, useState, useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 import {
   CustomInput,
@@ -7,8 +8,8 @@ import {
 import { Control, UseFormRegister, UseFormWatch } from "react-hook-form";
 import { AccountDto } from "./accountDto";
 import { OptionType } from "../../../app/models/optionType";
-import { Suspense, useState } from "react";
 import CityForm from "../City/CityForm";
+import agent from "../../../app/api/agent";
 
 interface DefaultFieldsProps {
   register: UseFormRegister<AccountDto>;
@@ -22,9 +23,11 @@ interface DefaultFieldsProps {
   stateOptions: OptionType[];
   accessId: string;
   watch: UseFormWatch<any>;
+  setValue: any;
 }
 
 function DefaultFields({
+  accessId,
   register,
   control,
   errors,
@@ -33,9 +36,59 @@ function DefaultFields({
   cityOptions,
   stateOptions,
   watch,
+  setValue,
 }: DefaultFieldsProps) {
   const [modalShow, setModalShow] = useState(false);
   const partyTypeValue = watch("partyType");
+  const [companyDetails, setCompanyDetails] = useState<any>({});
+  const [tmpStateOptions, setTmpStateOptions] = useState<any>(stateOptions);
+
+  useEffect(() => {
+    if (!accessId) {
+      return;
+    }
+    // console.log({ stateOptions });
+    const getCompanyDetails = async () => {
+      try {
+        const response = await agent.Company.getCompanyDetail(accessId);
+        // setCompanyName(formatCompanyName(response));
+        // console.log({ response });
+        setCompanyDetails(response);
+      } catch (error) {
+        console.error("Error fetching company details:", error);
+      }
+    };
+    getCompanyDetails();
+  }, [accessId]);
+
+  useEffect(() => {
+    if (partyTypeValue === "Un-Registered Out of State") {
+      setTmpStateOptions(
+        stateOptions.filter((option) => option.value !== companyDetails.state)
+      );
+    } else {
+      setTmpStateOptions(stateOptions);
+    }
+  }, [partyTypeValue]);
+
+  useEffect(() => {
+    if (
+      !["Un-Registered"].includes(partyTypeValue) ||
+      !companyDetails.state ||
+      !stateOptions.length
+    ) {
+      return;
+    }
+
+    const matchingState = tmpStateOptions.find(
+      (option: any) => option.value === companyDetails.state
+    );
+
+    if (matchingState) {
+      setValue("stateId", matchingState.value);
+      console.log("Updated stateId to:", matchingState.value);
+    }
+  }, [partyTypeValue, companyDetails, tmpStateOptions]);
 
   return (
     <>
@@ -47,7 +100,9 @@ function DefaultFields({
             options={partyTypesOptions}
             control={control}
             error={errors.partyType}
-            defaultValue={partyTypesOptions.find(option => option.value === "Un-Registered")}
+            defaultValue={partyTypesOptions.find(
+              (option) => option.value === "Un-Registered"
+            )}
             // validationRules={{ required: "Party type is required" }}
           />
         </Col>
@@ -87,14 +142,17 @@ function DefaultFields({
           <CustomDropdown
             name="stateId"
             label="State"
-            options={stateOptions}
+            options={tmpStateOptions}
             control={control}
             error={errors.stateId}
             disabled={[
               "Composition",
               "GST Party",
               "GST Party Out of State",
+              "Un-Registered",
             ].includes(partyTypeValue)}
+            // defaultValue={defaultState}
+            // onChangeCallback={(value) => setDefaultState(value)}
             // validationRules={{ required: "State is required" }}
           />
         </Col>
@@ -227,7 +285,6 @@ function DefaultFields({
       </Row>
 
       <CommonModal show={modalShow} onHide={() => setModalShow(false)}>
-
         <Suspense fallback={<div>Loading...</div>}>
           <CityForm />
         </Suspense>
@@ -237,4 +294,3 @@ function DefaultFields({
 }
 
 export default DefaultFields;
-

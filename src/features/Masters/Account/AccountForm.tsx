@@ -127,23 +127,18 @@ function AccountForm({
 	useEffect(() => {
 		//No change when in edit mode
 		if (!accountId && selectedAccountGroup != null) {
-			if (
-				selectedAccountGroup
-					.toLowerCase()
-					.includes(
-						'liabilities' ||
-							'capital' ||
-							'creditors' ||
-							'loans' ||
-							'payable' ||
-							''
-					)
-			)
-				setValue('debitCredit', 'Credit');
-			else setValue('debitCredit', 'Debit');
+		  if (
+			selectedAccountGroup.toLowerCase().includes("liabilities") ||
+			selectedAccountGroup.toLowerCase().includes("capital") ||
+			selectedAccountGroup.toLowerCase().includes("creditors") ||
+			selectedAccountGroup.toLowerCase().includes("loans") ||
+			selectedAccountGroup.toLowerCase().includes("payable")
+		  )
+			setValue("debitCredit", "Credit");
+		  else setValue("debitCredit", "Debit");
 		}
-	}, [selectedAccountGroup]);
-
+	  }, [selectedAccountGroup]);
+	   
 	useEffect(() => {
 		if (gstin) {
 			const extractedPan = extractPANFromGSTIN(gstin);
@@ -200,6 +195,7 @@ function AccountForm({
 					stateOptions={stateOptions}
 					partyTypesOptions={PARTY_TYPES_OPTIONS}
 					accessId={accessId}
+					setValue={setValue}
 				/>
 			);
 		}
