@@ -187,7 +187,7 @@ function DefaultFields({
         </Col>
       </Row>
       <Row>
-        <Col md={3}>
+        <Col md={2}>
           <CustomInput
             label="Mobile No 1"
             name="mobileNo"
@@ -198,7 +198,7 @@ function DefaultFields({
             }}
           />
         </Col>
-        <Col md={3}>
+        <Col md={2}>
           <CustomInput
             label="Mobile No 2"
             name="mobileNo2"
@@ -209,7 +209,7 @@ function DefaultFields({
             }}
           />
         </Col>
-        <Col md={3}>
+        <Col md={2}>
           <CustomInput
             label="Email"
             name="emailId"
@@ -218,12 +218,31 @@ function DefaultFields({
             // validationRules={{ pattern: { value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/, message: "Invalid email format" } }}
           />
         </Col>
-        <Col md={3}>
+        <Col md={2}>
           <CustomInput
             label="Aadhar No"
             name="aadharNo"
             register={register}
             maxLength={12}
+          />
+        </Col>
+        <Col md={2}>
+          <CustomInput
+            label="Accountant Name"
+            name="accountantName"
+            register={register}
+            maxLength={50}
+          />
+        </Col>
+        <Col md={2}>
+          <CustomInput
+            label="Accountant Mobile No."
+            name="accountantMobileNo"
+            register={register}
+            maxLength={10}
+            validationRules={{
+              pattern: { value: /^[0-9]+$/, message: "Invalid mobile number" },
+            }}
           />
         </Col>
       </Row>

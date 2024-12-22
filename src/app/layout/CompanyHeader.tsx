@@ -140,7 +140,7 @@ function CompanyHeader() {
             onMouseLeave={handleMastersDropdownLeave}
           >
             <Dropdown.Item as={Link} to={"/account"}>
-              Account 
+              Account
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/account-List"}>
@@ -187,17 +187,6 @@ function CompanyHeader() {
               Sale BillBook
             </Dropdown.Item>
             <Dropdown.Divider />
-            <Dropdown.Item as={Link} to={"/serial-number-setting"}>
-              Serial Number Setting
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item as={Link} to={"/additional-fields-setting"}>
-              Additional Fields Setting
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item as={Link} to={"/Password-Delete-Update"}>
-              Password for Delete/Update
-            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
 
@@ -335,6 +324,37 @@ function CompanyHeader() {
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/commissionagent-item"}>
               Item
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+
+        <Dropdown as="div" className="dropdown-on-hover">
+          <Dropdown.Toggle
+            id="dropdown-autoclose-true"
+            as={Nav.Link}
+            className="dropdown-toggle"
+            onMouseEnter={handleReportsDropdownHover}
+            onMouseLeave={handleReportsDropdownLeave}
+          >
+            Tools
+          </Dropdown.Toggle>
+          <Dropdown.Menu
+            className={`custom-dropdown-menu ${
+              showReportsDropdown ? "" : "hidden"
+            }`}
+            onMouseEnter={handleReportsDropdownHover}
+            onMouseLeave={handleReportsDropdownLeave}
+          >
+            <Dropdown.Item as={Link} to={"/serial-number-setting"}>
+              Serial Number Setting
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item as={Link} to={"/additional-fields-setting"}>
+              Additional Fields Setting
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item as={Link} to={"/Password-Delete-Update"}>
+              Password for Delete/Update
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
