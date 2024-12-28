@@ -31,6 +31,7 @@ import OtherChargesModal from "./OtherChargesModal";
 import { setLoading } from '../../../app/layout/loadingSlice';
 import SerialNumberModal from "./SerialNumberModal";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -112,7 +113,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             dispatch(setLoading(false));
         }
     };
-
+    const navigate = useNavigate();
     
     useEffect(() => {
         fetchSerialNumbers();
@@ -366,7 +367,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
     }, [accessId, voucherDate, financialYear, voucherType]);
 
-
+    sessionStorage.setItem(
+        'voucherId',JSON.stringify(voucherId)
+     );
     useEffect(() => {
         let filteredAccounts: AccountDtoForDropDownList[] = [];
         if (paymentMode.toLowerCase().includes("cash")) {
@@ -378,7 +381,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 if (askForCustomerDetailWhenCash && cashAccount) {
                     setFocusBillNo(true);
                     setTimeout(() => {
-                        //if (!voucher && !voucherId) // avoid opening in edit mode
+                        if (!voucher && !voucherId) // avoid opening in edit mode
                         setShowCustomerDetailModal(true);
                         setFocusBillNo(false);
                     }, 100);
@@ -594,6 +597,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
     };
 
+    
     const onSubmit = async (data: FieldValues) => {
         try {
             if (voucherType == undefined) {
@@ -609,7 +613,10 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     toast.success('Voucher updated successfully');
                 }
                 else {
-                    await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    sessionStorage.setItem(
+                        'voucherId',JSON.stringify(newVoucherId)
+                     );
                     toast.success('Voucher created successfully');
                     reset();
                     setTransportDetails(defaultTransportDetails);
@@ -619,7 +626,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 if (isInModal && onSuccessfulSubmit) {
                     onSuccessfulSubmit();
                 }
-
             }
 
         } catch (error) {
@@ -739,6 +745,25 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
         return processedItems;
     };
+
+    
+    const printInvoice = () => {
+        if (voucherId && !voucher) {
+            return null;
+            // handleSubmit(async (data) => {
+            //     const saveSuccessful = await onSubmit(data);
+            //     if (saveSuccessful) { 
+            //         navigate('/Voucher/Sale/print-invoice'); 
+            //     } else {
+            //         alert('Failed to save the invoice. Please try again.');
+            //     }
+            // })();
+        } else {
+            navigate('/Voucher/Sale/print-invoice'); 
+        }
+    };
+    
+
     if (voucherId && !voucher) return null;
     return (
         <>
@@ -1080,7 +1105,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                     setShowSerialNumberModal(true);
                                 }} /></Col>
                                 <Col><CustomButton size="sm" variant="success" type="submit" text="Save Invoice (Ctrl+S)" className="w-100" /></Col>
-                                <Col><CustomButton size="sm" variant="success" text="Print Invoice (Ctrl+P)" className="w-100" /></Col>
+                                <Col><CustomButton size="sm" onClick={() => {
+                                    printInvoice() 
+                                    }} variant="success" text="Print Invoice (Ctrl+P)" className="w-100" /></Col>
                                 <Col>{voucher && voucherId && <CustomButton size="sm" variant="outline-danger" text="Final Delete (Ctrl+D)" className="w-100" onClick={() => deleteVoucher()} />}</Col>
 
                             </Row>

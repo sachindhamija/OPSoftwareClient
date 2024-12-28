@@ -37,6 +37,7 @@ import MandiForm from '../../features/CommissionAgent/Mandi/MandiForm';
 import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAgentItem/CommissionAgentItemForm';
 import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
 import PasswordSetting from '../../features/Masters/Password/Password';
+import { PrintInvoicePage } from '../../features/Vouchers/SalesPurchaseCommonVouchers/PrintInvoicePage';
 
 export const router = createBrowserRouter([
 	{
@@ -161,6 +162,13 @@ export const router = createBrowserRouter([
 					{ path: 'commissionagent-item', element: <CommissionAgentItemForm /> },
 					{ path: 'report/invoice-report-item', element: <InvoiceReport /> },
 					{ path: 'Password-Delete-Update', element: <PasswordSetting /> },
+					{
+						path: 'Voucher/Sale/print-invoice',
+						element: (
+							<PrintInvoicePage
+							/>
+						),
+					},
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },
