@@ -1,16 +1,16 @@
-//import {useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import agent from "../../../app/api/agent";
 import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation";
 
-interface PrintInvoicePageProps {}
+interface PrintInvoicePageProps { }
 
-export function PrintInvoicePage({}: PrintInvoicePageProps) {
+export function PrintInvoicePage({ }: PrintInvoicePageProps) {
   const accessId = getAccessIdOrRedirect();
   const rawVoucherId: string | null = sessionStorage.getItem("voucherId");
   const voucherId = rawVoucherId ? JSON.parse(rawVoucherId) : null;
 
-//  const [voucherData, setVoucherData] = useState<any>(null);
+  const [voucherData, setVoucherData] = useState<any>(null);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
 
   useEffect(() => {
     const fetchVoucher = async () => {
@@ -18,23 +18,60 @@ export function PrintInvoicePage({}: PrintInvoicePageProps) {
         const data = await agent.SalePurchase.getVoucherById(accessId, voucherId ?? "");
         console.log("data")
         console.log(data)
-        //setVoucherData(data);
+        setVoucherData(data);
       } catch (error) {
         console.error("Error fetching voucher:", error);
       }
     };
 
+    const getCompanyDetails = async () => {
+      try {
+        const companyInfo = await agent.Company.getCompanyDetail(accessId);
+        setCompanyInfo(companyInfo);
+        console.log("companyInfo")
+        console.log(companyInfo)
+      } catch (error) {
+        console.error("Error fetching company details:", error);
+      }
+    };
+
+    getCompanyDetails();
     fetchVoucher();
   }, [accessId, voucherId]);
 
-      const invoiceHtml = `
-            <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tax Invoice</title>
-    <style>
+  // If voucher data isn't yet available, return null or a loading state
+  if (!voucherData) return <div>Loading...</div>;
+
+  // Extract data from voucherData
+  const {
+    voucherDate,
+    customerDetailDto,
+    items,
+    transportDetailDto,
+  } = voucherData;
+
+  const customerName = customerDetailDto?.customerName || "";
+  const customerAddress = customerDetailDto?.customerAddress || "";
+  const customerGSTNo = customerDetailDto?.customerGSTNo || "";
+  const customerPAN = customerDetailDto?.customerPAN || "";
+  //const customerAadhar = customerDetailDto?.customerAadhar || "";
+
+  const transportDetails = transportDetailDto || {};
+
+  const formattedVoucherDate = new Date(voucherDate).toLocaleDateString();
+
+  const totalAmountBeforeTax = items?.reduce((sum: number, item: any) => sum + item.basicAmount, 0) || 0;
+  const totalGST = items?.reduce((sum: number, item: any) => sum + item.sgst + item.cgst + item.igst, 0) || 0;
+  const totalAmount = totalAmountBeforeTax + totalGST;
+
+  const invoiceHtml = `
+   <!DOCTYPE html>
+   <html lang="en">
+     <head>
+       <meta charset="UTF-8" />
+       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+       <title>Tax Invoice</title>
+       <style>
       body {
         font-family: "Arial", sans-serif;
         background-color: #f4f6f9;
@@ -220,220 +257,186 @@ export function PrintInvoicePage({}: PrintInvoicePageProps) {
         color: #333;
       }
     </style>
-  </head>
-  <body>
-    <div class="main-container">
-      <div class="TaxInvoiceContainer">
-        <p class="TaxInvoice">Tax Invoice</p>
-        <p class="original-copy">Original Copy</p>
-      </div>
+     </head>
+     <body>
+       <div class="main-container">
+         <div class="TaxInvoiceContainer">
+           <p class="TaxInvoice">Tax Invoice</p>
+           <p class="original-copy">Original Copy</p>
+         </div>
 
-      <div class="invoice-container">
-        <div class="header">
-          <div class="left">
-            <p><strong>GSTIN No:</strong> 03CDLPR3813C1ZU</p>
-            <p><strong>PAN No:</strong> CDLPR3813C</p>
-          </div>
-          <div class="center">
-            <h1>M/S A.M. AGRO FOOD PRODUCTS</h1>
-            <p>NEW GRAIN MARKET ZIRA ZALALABAD (W), PUNJAB</p>
-          </div>
-          <div class="right">
-            <p><strong>Email:</strong> SAM9814549070@GMAIL.COM</p>
-            <p><strong>Tel:</strong> 97813-42605, 88725-42605</p>
-          </div>
-        </div>
+         <div class="invoice-container">
+           <div class="header">
+             <div class="left">
+               <p><strong>GSTIN No:</strong> ${companyInfo?.gstNo}</p>
+               <p><strong>PAN No:</strong> ${companyInfo?.panNo}</p>
+             </div>
+             <div class="center">
+               <h1>${companyInfo?.companyName}</h1>
+               <p>${companyInfo?.address1},${companyInfo?.city},${companyInfo?.district}</p>
+             </div>
+             <div class="right">
+               <p><strong>Email:</strong> ${companyInfo?.email || "N/A"}</p>
+               <p><strong>Tel:</strong> ${companyInfo?.mobileNo}, ${companyInfo?.mobileNo2}</p>
+             </div>
+           </div>
 
-        <div class="party-details">
-          <div class="left-column">
-            <div class="strong">
-              <strong>Party Name:</strong> SOURAB ENTERPRISES<br />
-            </div>
-            <div class="strong">
-              <strong>Address:</strong> SHOP NO 102, NEW ANAJ MANDI HANSI<br />
-            </div>
-            <div class="strong">
-              <strong>GSTIN:</strong> 06LWGPS9621C1Z6<br />
-            </div>
-            <strong>Phone:</strong><br />
-            <div class="strong">
-              <strong>GST NO:</strong> 08AAACG2634B1Z6<br />
-            </div>
-            <div class="strong">
-              <strong>Delivery At:</strong> GLOBUS SPIRITS LTD, VILLAGE
-              SHYAMPUR, TEHSIL BEHROR, ALWAR<br />
-            </div>
-          </div>
-          <div class="right-column">
-            <div class="box">
-              <div class="strong"><strong>INVOICE NO:</strong> 76<br /></div>
-              <div class="strong"><strong>GR No.:</strong><br /></div>
-              <div class="strong"><strong>GR Date:</strong><br /></div>
-              <div class="strong">
-                <strong>Vehicle No.:</strong> RJ45GA0029<br />
-              </div>
-              <div class="strong"><strong>Transport:</strong><br /></div>
-            </div>
-            <div class="box">
-              <div class="strong"><strong>Date:</strong> 11-05-2023<br /></div>
-              <div class="strong"><strong>EWay No.:</strong><br /></div>
-              <div class="strong"><strong>EWay Date:</strong><br /></div>
-              <div class="strong"><strong>State:</strong><br /></div>
-            </div>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>S.N</th>
-              <th>Item Description</th>
-              <th>HSN</th>
-              <th>QTY</th>
-              <th>UOM</th>
-              <th>Rate</th>
-              <th>Discount (%) & Amt</th>
-              <th>Taxable Amt</th>
-              <th>Tax</th>
-              <th>IGST</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>MAIZE</td>
-              <td>1001</td>
-              <td>1000</td>
-              <td>QTL</td>
-              <td>12,000</td>
-              <td>5% / 3,00,000</td>
-              <td>60,00,000</td>
-              <td>1,14,00,000</td>
-              <td>6,00,000</td>
-              <td>1,23,00,000</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>WHEAT</td>
-              <td>1002</td>
-              <td>500</td>
-              <td>QTL</td>
-              <td>15,000</td>
-              <td>10% / 1,50,000</td>
-              <td>37,50,000</td>
-              <td>33,75,000</td>
-              <td>1,68,750</td>
-              <td>36,93,750</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>PADDY</td>
-              <td>1003</td>
-              <td>800</td>
-              <td>QTL</td>
-              <td>10,000</td>
-              <td>8% / 64,000</td>
-              <td>80,00,000</td>
-              <td>73,60,000</td>
-              <td>3,68,000</td>
-              <td>80,96,000</td>
-            </tr>
-            <tr>
-              <td colspan="7" style="text-align: right; font-weight: bold">
-                Total:
-              </td>
-              <td>1,77,50,000</td>
-              <td>1,77,35,000</td>
-              <td>7,68,750</td>
-              <td>1,97,89,750</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="summary-section">
-          <div class="left">
+           <div class="party-details">
+             <div class="left-column">
+               <div class="strong">
+                 <strong>Party Name:</strong> ${customerName || "N/A"}<br />
+               </div>
+               <div class="strong">
+                 <strong>Address:</strong> ${customerAddress || "N/A"}<br />
+               </div>
+               <div class="strong">
+                 <strong>GSTIN:</strong> ${customerGSTNo || "N/A"}<br />
+               </div>
+               <strong>Phone:</strong><br />
+               <div class="strong">
+                 <strong>GST NO:</strong> ${customerPAN || "N/A"}<br />
+               </div>
+               <div class="strong">
+                 <strong>Delivery At:</strong> ${transportDetails.deliveryAddress || "N/A"}<br />
+               </div>
+             </div>
+             <div class="right-column">
+               <div class="box">
+                 <div class="strong"><strong>INVOICE NO:</strong> ${voucherData.voucherNo}<br /></div>
+                 <div class="strong"><strong>GR No.:</strong> ${transportDetails.grNo || "N/A"}<br /></div>
+                 <div class="strong"><strong>GR Date:</strong> ${transportDetails.grDate || "N/A"}<br /></div>
+                 <div class="strong">
+                   <strong>Vehicle No.:</strong> ${transportDetails.vehicleNumber || "N/A"}<br />
+                 </div>
+                 <div class="strong"><strong>Transport:</strong> ${transportDetails.transporterName || "N/A"}<br /></div>
+               </div>
+               <div class="box">
+                 <div class="strong"><strong>Date:</strong> ${formattedVoucherDate}<br /></div>
+                 <div class="strong"><strong>EWay No.:</strong> ${transportDetails.ewayBillNo || "N/A"}<br /></div>
+                 <div class="strong"><strong>EWay Date:</strong> ${transportDetails.ewayDate || "N/A"}<br /></div>
+                 <div class="strong"><strong>State:</strong> ${transportDetails.state || "N/A"}<br /></div>
+               </div>
+             </div>
+           </div>
             <table>
-              <th>Class</th>
-              <th>Taxable Amt.</th>
-              <th>@IGST</th>
-              <th>Total Amt.</th>
-
-              <tr>
-                <td>0.00%</td>
-                <td>927,903.00</td>
-                <td>0.00</td>
-                <td>927,903.00</td>
-              </tr>
-              <tr>
-                <td>5.00%</td>
-                <td>30,000.00</td>
-                <td>1,500.00</td>
-                <td>31,500.00</td>
-              </tr>
+              <thead>
+                <tr>
+                  <th>S.N</th>
+                  <th>Item Description</th>
+                  <th>HSN</th>
+                  <th>QTY</th>
+                  <th>UOM</th>
+                  <th>Rate</th>
+                  <th>Discount (%) & Amt</th>
+                  <th>Taxable Amt</th>
+                  <th>Tax</th>
+                  <th>IGST</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${items?.map((item: any, index: number) => {
+                  return `
+                    <tr key="${item.itemId}">
+                      <td>${index + 1}</td>  
+                      <td>${item.itemDescription || "N/A"}</td>
+                      <td>${item.hsnCode || "N/A"}</td>
+                      <td>${item.mainQty || 0}</td> 
+                      <td>${item.uom || "N/A"}</td>
+                      <td>${item.pricePer || 0}</td> 
+                      <td>${item.discountPercentage || 0}% / ${item.discountAmount || 0}</td> 
+                      <td>${item.basicAmount || 0}</td> 
+                      <td>${item.sgst || 0}</td>
+                      <td>${item.igst || 0}</td> 
+                      <td>${item.netAmount || 0}</td> 
+                    </tr>
+                  `;
+                }).join("")}
+                  <tr>
+                    <td colspan="7" style="text-align: right; font-weight: bold">
+                      Total:
+                    </td>
+                    <td>${items.reduce((sum: number, item: any) => sum + (item.basicAmount || 0), 0)?.toFixed(2)}</td>
+                    <td>${items.reduce((sum: number, item: any) => sum + (item.sgst || 0), 0)?.toFixed(2)}</td>
+                    <td>${items.reduce((sum: number, item: any) => sum + (item.igst || 0), 0)?.toFixed(2)}</td>
+                    <td>${items.reduce((sum: number, item: any) => sum + (item.netAmount || 0), 0)?.toFixed(2)}</td>
+                  </tr>
+              </tbody>
             </table>
-          </div>
+           <div class="summary-section">
+             <div class="left">
+               <table>
+                 <th>Class</th>
+                 <th>Taxable Amt.</th>
+                 <th>@IGST</th>
+                 <th>Total Amt.</th>
 
-          <div class="right">
-            <table>
-              <tr>
-                <td>Total Amount Before Tax:</td>
-                <td>957,903.00</td>
-              </tr>
-              <tr>
-                <td>Less: Discount Amount:</td>
-                <td>0.00</td>
-              </tr>
-              <tr>
-                <td>Add: IGST:</td>
-                <td>1,500.00</td>
-              </tr>
-              <tr>
-                <td>Total Tax Amount (GST):</td>
-                <td>1,500.00</td>
-              </tr>
-            </table>
-          </div>
-        </div>
+                 <tr>
+                   <td>0.00%</td>
+                   <td>${totalAmountBeforeTax.toFixed(2)}</td>
+                   <td>0.00</td>
+                   <td>${totalAmountBeforeTax.toFixed(2)}</td>
+                 </tr>
+                 <tr>
+                   <td>5.00%</td>
+                   <td>${totalGST.toFixed(2)}</td>
+                   <td>${totalGST.toFixed(2)}</td>
+                   <td>${(totalAmountBeforeTax + totalGST).toFixed(2)}</td>
+                 </tr>
+               </table>
+             </div>
 
-        <div class="bill-amount"><strong>Bill Amount:</strong> 959,403.00</div>
+             <div class="right">
+               <table>
+                 <tr>
+                   <td>Total Amount Before Tax:</td>
+                   <td>${totalAmountBeforeTax.toFixed(2)}</td>
+                 </tr>
+                 <tr>
+                   <td>Less: Discount Amount:</td>
+                   <td>0.00</td>
+                 </tr>
+                 <tr>
+                   <td>Add: IGST:</td>
+                   <td>${totalGST.toFixed(2)}</td>
+                 </tr>
+                 <tr>
+                   <td>Total Tax Amount (GST):</td>
+                   <td>${totalGST.toFixed(2)}</td>
+                 </tr>
+               </table>
+             </div>
+           </div>
 
-        <div class="termsANDsignatory">
-          <div class="terms-conditions">
-            <h3>Terms & Conditions:</h3>
-            <ul>
-              <li>
-                1. We are not responsible for loss and damage caused by
-                transport in transit.
-              </li>
-              <li>
-                2. Interest @ 18% will be charged if payment is not made within
-                7 days.
-              </li>
-              <li>3. Goods once sold will not be taken back.</li>
-              <li>
-                4. I am liable to pay tax on the above and authorized to sign
-                this invoice.
-              </li>
-            </ul>
-          </div>
+           <div class="bill-amount"><strong>Bill Amount:</strong> ${totalAmount.toFixed(2)}</div>
 
-          <div class="signatory">
-            <p>For M/S A.M. AGRO FOOD PRODUCTS</p>
-            <p>Authorized Signatory</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
-        `;
+           <div class="termsANDsignatory">
+             <div class="terms-conditions">
+               <h3>Terms & Conditions:</h3>
+               <ul>
+                 <li>1. We are not responsible for loss and damage caused by transport in transit.</li>
+                 <li>2. Interest @ 18% will be charged if payment is not made within 7 days.</li>
+                 <li>3. Goods once sold will not be taken back.</li>
+                 <li>4. I am liable to pay tax on the above and authorized to sign this invoice.</li>
+               </ul>
+             </div>
 
-    return (
-        <div
-        dangerouslySetInnerHTML={{
-            __html: invoiceHtml,
-        }}
-        />
-    );
+             <div class="signatory">
+               <p>For M/S A.M. AGRO FOOD PRODUCTS</p>
+               <p>Authorized Signatory</p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </body>
+   </html>
+ `;
+
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: invoiceHtml,
+      }}
+    />
+  );
 }
