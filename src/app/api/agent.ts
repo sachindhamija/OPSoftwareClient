@@ -966,6 +966,17 @@ const SalePurchase = {
       `SalePurchase/${voucherId}`, params
     );
   },
+
+  getVoucherById: async (
+    accessId: string,
+    voucherId: string
+  ) => {
+    const params = new URLSearchParams({
+      accessId: accessId,
+      voucherId: voucherId
+    });
+    return await requests.get(`SalePurchase/GetVoucherById`,params);
+  }  
 };
 const SerialNumber = {
   getAll: async (accessId: string) => {
