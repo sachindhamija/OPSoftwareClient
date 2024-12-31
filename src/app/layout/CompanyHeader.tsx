@@ -222,6 +222,18 @@ function CompanyHeader() {
             <Dropdown.Item as={Link} to={"/Voucher/JournalEntry"}>
               Journal Entry <span style={{ marginLeft: "100px" }}>F8</span>
             </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item as={Link} to={"/Voucher/CreditSaleEntry"}>
+              Credit Sale Entry <span style={{ marginLeft: "60px" }}>Alt+C</span>
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item as={Link} to={"/Voucher/StockShortageEntry"}>
+              Stock Shortage Entry
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item as={Link} to={"/Voucher/ItemStockTransfer"}>
+              Item Stock Transfer
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
         <Dropdown as="div" className="dropdown-on-hover">

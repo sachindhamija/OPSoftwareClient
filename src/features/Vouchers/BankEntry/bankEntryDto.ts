@@ -1,4 +1,5 @@
 export interface BankEntryDto {
+  billNo: string;
   voucherId?: string | null;
   voucherDate: Date | string;
   bankAccountId: string;

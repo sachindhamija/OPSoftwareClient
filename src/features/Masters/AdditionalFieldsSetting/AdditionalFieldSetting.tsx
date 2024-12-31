@@ -1,193 +1,221 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { Col, Row } from 'react-bootstrap';
-import { CustomButton, CustomInput, CommonCard, CommonTable, FormNavigator, CustomDropdown } from '../../../app/components/Components';
-import { ColumnDef } from '@tanstack/react-table';
-import agent from '../../../app/api/agent';
-import { useAppDispatch } from '../../../app/store/configureStore';
-import toast from 'react-hot-toast';
-import { setLoading } from '../../../app/layout/loadingSlice';
-import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
-import { AdditionalFieldDto } from './AdditionalFieldDto';
+import React, { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { Col, Row, Form } from "react-bootstrap";
+import {
+  CustomButton,
+  CustomInput,
+  CommonCard,
+  CommonTable,
+  FormNavigator,
+  CustomDropdown,
+} from "../../../app/components/Components";
+import { ColumnDef } from "@tanstack/react-table";
+import agent from "../../../app/api/agent";
+import { useAppDispatch } from "../../../app/store/configureStore";
+import toast from "react-hot-toast";
+import { setLoading } from "../../../app/layout/loadingSlice";
+import { getAccessIdOrRedirect } from "../Company/CompanyInformation";
 
-interface AdditionalFieldType {
-    additionalFieldTypeId: string;
-    additionalFieldTypeName: string;
+interface SerialNumberDto {
+  serialNumberID: string;
+  serialNumberName: string;
+  description: string;
 }
 
 const AdditionalFieldSetting: React.FC = () => {
-    const accessId = getAccessIdOrRedirect();
-    const dispatch = useAppDispatch();
-    const { register, handleSubmit, setValue, reset,control, formState: { errors,isSubmitting, isValid } } = useForm<AdditionalFieldDto>();
-    const [additionalFields, setAdditionalFields] = useState<AdditionalFieldDto[]>([]);
-    const [additionalFieldTypes, setAdditionalFieldTypes] = useState<AdditionalFieldType[]>([]);
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [editingAdditionalField, setEditingAdditionalField] = useState<AdditionalFieldDto | null>(null);
+  const accessId = getAccessIdOrRedirect();
+  const dispatch = useAppDispatch();
 
-    const columns: ColumnDef<AdditionalFieldDto>[] = [
-        {
-            accessorFn: (row) => row.additionalFieldName,
-            id: 'additionalFieldName',
-            header: 'Additional Field Name',
-            cell: (info) => info.getValue(),
-        },
-        {
-            accessorFn: (row) => row.additionalFieldTypeName,
-            id: 'additionalFieldTypeName',
-            header: 'Additional Field Type',
-            cell: (info) => info.getValue(),
-        },
-    ];
+  const { register, handleSubmit, setValue, reset, control } =
+    useForm<SerialNumberDto>();
 
-    useEffect(() => {
-        fetchAdditionalFields();
-        fetchAdditionalFieldTypes();
-    }, [dispatch]);
+  const [serialNumbers, setSerialNumbers] = useState<SerialNumberDto[]>([]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingSerialNumber, setEditingSerialNumber] =
+    useState<SerialNumberDto | null>(null);
+  const [numFields, setNumFields] = useState(0);
 
-    const fetchAdditionalFields = async () => {
-        dispatch(setLoading(true));
-        try {
-            const fetchedAdditionalFields = await agent.AdditionalField.getAll(accessId);
-            setAdditionalFields(fetchedAdditionalFields);
-        } catch (error) {
-            console.error('Error fetching additional fields', error);
-            toast.error('Error fetching additional fields');
-        } finally {
-            dispatch(setLoading(false));
-        }
-    };
+  const columns: ColumnDef<SerialNumberDto>[] = [
+    {
+      accessorKey: "serialNumberName",
+      header: "Serial Number Name",
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div>
+          <button onClick={() => handleEdit(row.original)}>Edit</button>
+          <button onClick={() => handleDelete(row.original)}>Delete</button>
+        </div>
+      ),
+    },
+  ];
 
-    const fetchAdditionalFieldTypes = async () => {
-        try {
-            const fetchedAdditionalFieldTypes = await agent.AdditionalFieldType.getAll(accessId);
-            setAdditionalFieldTypes(fetchedAdditionalFieldTypes);
-        } catch (error) {
-            console.error('Error fetching additional field types', error);
-            toast.error('Error fetching additional field types');
-        }
-    };
+  useEffect(() => {
+    fetchSerialNumbers();
+  }, []);
 
-    const onSubmit = async (data: AdditionalFieldDto) => {
-        dispatch(setLoading(true));
-        try {
-            if (isEditMode && editingAdditionalField) {
-                await agent.AdditionalField.update(accessId, editingAdditionalField.additionalFieldID, data);
-                toast.success('Additional field updated successfully');
-            } else {
-                await agent.AdditionalField.create(accessId, { ...data });
-                toast.success('Additional field created successfully');
-            }
-            fetchAdditionalFields();
-        } catch (error) {
-            console.error('Error saving additional field', error);
-            toast.error('Error saving additional field');
-        } finally {
-            dispatch(setLoading(false));
-            setIsEditMode(false);
-            setEditingAdditionalField(null);
-            reset();
-        }
-    };
+  const fetchSerialNumbers = async () => {
+    dispatch(setLoading(true));
+    try {
+      const fetchedSerialNumbers = await agent.SerialNumber.getAll(accessId);
+      setSerialNumbers(fetchedSerialNumbers);
+    } catch (error) {
+      console.error("Error fetching serial numbers", error);
+      // toast.error("Error fetching serial numbers");
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
-    const handleEdit = (additionalField: AdditionalFieldDto) => {
-        setEditingAdditionalField(additionalField);
-        setIsEditMode(true);
-        setValue('additionalFieldName', additionalField.additionalFieldName);
-        setValue('description', additionalField.description);
-        setValue('additionalFieldTypeId', additionalField.additionalFieldTypeId);
-    };
+  const onSubmit = async (data: SerialNumberDto) => {
+    dispatch(setLoading(true));
+    try {
+      if (isEditMode && editingSerialNumber) {
+        await agent.SerialNumber.update(
+          accessId,
+          editingSerialNumber.serialNumberID,
+          data
+        );
+        toast.success("Serial number updated successfully");
+      } else {
+        await agent.SerialNumber.create(accessId, data);
+        toast.success("Serial number created successfully");
+      }
+      fetchSerialNumbers();
+    } catch (error) {
+      console.error("Error saving serial number", error);
+      // toast.error("Error saving serial number");
+    } finally {
+      dispatch(setLoading(false));
+      resetForm();
+    }
+  };
 
-    const handleDelete = async (additionalField: AdditionalFieldDto) => {
-        if (window.confirm(`Are you sure you want to delete the additional field "${additionalField.additionalFieldName}"?`)) {
-            dispatch(setLoading(true));
-            try {
-                await agent.AdditionalField.delete(accessId, additionalField.additionalFieldID);
-                toast.success(`Additional field "${additionalField.additionalFieldName}" deleted successfully`);
-                fetchAdditionalFields();
-            } catch (error) {
-                console.error('Error deleting additional field', error);
-                toast.error('Error deleting additional field');
-            } finally {
-                dispatch(setLoading(false));
-                setIsEditMode(false);
-                setEditingAdditionalField(null);
-                reset();
-            }
-        }
-    };
+  const handleEdit = (serialNumber: SerialNumberDto) => {
+    setEditingSerialNumber(serialNumber);
+    setIsEditMode(true);
+    setValue("serialNumberName", serialNumber.serialNumberName);
+  };
 
-    return (
-        <CommonCard header="Field Settings">
-            <FormNavigator onSubmit={handleSubmit(onSubmit)}>
-                <Row>
-                    <Col xs={12} md={4}>
-                        <CustomInput
-                            label="Field Name"
-                            name="additionalFieldName"
-                            register={register}
-                            validationRules={{
-                                required: 'Field Name cannot be empty.',
-                            }}
-                        />
-                    </Col>
-                    <Col xs={12} md={4}>
-                        <CustomInput
-                            label="Description"
-                            name="description"
-                            register={register}
-                        />
-                    </Col>
-                    <Col xs={12} md={4}>
-                    <CustomDropdown
-							name="additionalFieldTypeId"
-							label="Field Type"
-							options={additionalFieldTypes.map(type => ({
-                                value: type.additionalFieldTypeId,
-                                label: type.additionalFieldTypeName,
-                            }))}
-							control={control}
-							error={errors.additionalFieldTypeId}
-							validationRules={{ required: 'Field Type cannot be empty.' }}
-						/>
-                        {/* <CustomSelect
-                            label="Field Type"
-                            name="additionalFieldTypeId"
-                            register={register}
-                            options={additionalFieldTypes.map(type => ({
-                                value: type.additionalFieldTypeId,
-                                label: type.additionalFieldTypeName,
-                            }))}
-                            validationRules={{
-                                required: 'Field Type cannot be empty.',
-                            }}
-                        /> */}
-                    </Col>
-                    <Col
-                        xs={12}
-                        md={2}
-                        className="d-flex align-items-center justify-content-end justify-content-md-start mt-md-4 mb-2"
-                    >
-                        <CustomButton
-                            text={isEditMode ? 'Update' : 'Add'}
-                            variant="primary"
-                            type="submit"
-                            isSubmitting={isSubmitting}
-                            isValid={isValid}
-                        />
-                    </Col>
-                </Row>
-            </FormNavigator>
-            {additionalFields.length > 0 && (
-                <CommonTable
-                    data={additionalFields}
-                    columns={columns}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    showSrNo
-                />
-            )}
-        </CommonCard>
-    );
+  const handleDelete = async (serialNumber: SerialNumberDto) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete the serial number "${serialNumber.serialNumberName}"?`
+      )
+    ) {
+      dispatch(setLoading(true));
+      try {
+        await agent.SerialNumber.delete(accessId, serialNumber.serialNumberID);
+        toast.success(
+          `Serial number "${serialNumber.serialNumberName}" deleted successfully`
+        );
+        fetchSerialNumbers();
+      } catch (error) {
+        console.error("Error deleting serial number", error);
+        // toast.error("Error deleting serial number");
+      } finally {
+        dispatch(setLoading(false));
+        resetForm();
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setIsEditMode(false);
+    setEditingSerialNumber(null);
+    reset();
+  };
+
+  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = parseInt(e.target.value, 10);
+    setNumFields(isNaN(value) ? 0 : value);
+  };
+
+  return (
+    <CommonCard header="Additional Field Settings">
+      <FormNavigator onSubmit={handleSubmit(onSubmit)}>
+        <Row>
+          <Col xs={12} md={4}>
+            <CustomDropdown
+              name="additionalFieldTypeId"
+              label="Form Type"
+              options={[
+                { value: "Sale", label: "Sale Voucher" },
+                { value: "Purchase", label: "Purchase Voucher" },
+                { value: "SalesReturn", label: "Sales Return" },
+                { value: "PurchaseReturn", label: "Purchase Return" },
+                { value: "DebitNote", label: "Debit Note" },
+                { value: "CreditNote", label: "Credit Note" },
+              ]}
+              control={control}
+            />
+          </Col>
+          <Col xs={12} md={10}>
+            <Form.Group controlId="formDropdown">
+              <Form.Label>Select number of fields</Form.Label>
+              <Controller
+                name="numFields"
+                control={control}
+                defaultValue=""
+                rules={{ required: "Please select a valid option." }}
+                render={({ field }) => (
+                  <Form.Control
+                    as="select"
+                    {...field}
+                    onChange={(e) => {
+                      const value = parseInt((e.target as unknown as HTMLSelectElement).value, 10);
+                      field.onChange(value);
+                      handleDropdownChange(e as unknown as React.ChangeEvent<HTMLSelectElement>);
+                    }}
+                  >
+                    <option value="">Select...</option>
+                    {[...Array(10).keys()].map((num) => (
+                      <option key={num + 1} value={num + 1}>
+                        {num + 1}
+                      </option>
+                    ))}
+                  </Form.Control>
+                )}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        {[...Array(numFields).keys()].map((num) => (
+          <Row key={num} className="mt-3">
+            <Col xs={12} md={10}>
+              <CustomInput
+                label={`Title of ${num + 1} field`}
+                name={`field${num + 1}`}
+                register={register}
+              />
+            </Col>
+          </Row>
+        ))}
+        <Row className="mt-3">
+          <Col xs={5}>
+            <CustomButton
+              text={isEditMode ? "Update" : "Save"}
+              variant="primary"
+              type="submit"
+            />
+          </Col>
+          <Col xs={5}>
+            <CustomButton
+              text="Reset"
+              variant="secondary"
+              type="button"
+              onClick={resetForm}
+            />
+          </Col>
+        </Row>
+      </FormNavigator>
+      {serialNumbers.length > 0 && (
+        <CommonTable data={serialNumbers} columns={columns} showSrNo />
+      )}
+    </CommonCard>
+  );
 };
 
 export default AdditionalFieldSetting;
