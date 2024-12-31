@@ -20,6 +20,10 @@ const useKeyboardShortcuts = () => {
       else if (event.ctrlKey && event.key.toLowerCase() === "g") {
         event.preventDefault();
         navigate("/Report/TrialBalance");
+      }
+      else if (event.altKey && event.key.toLowerCase() === "c") {
+        event.preventDefault();
+        navigate("Voucher/CreditSaleEntry");
       }else {
         switch (event.key) {
           case "F5":
