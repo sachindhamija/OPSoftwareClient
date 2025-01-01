@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Col, Row, Form, Button } from "react-bootstrap";
 import {
   CustomInput,
@@ -19,13 +19,12 @@ import { SerialNumberDto } from "./SerialNumberDto";
 const SerialNumberSetting: React.FC = () => {
   const accessId = getAccessIdOrRedirect();
   const dispatch = useAppDispatch();
-  const { register, handleSubmit, setValue, reset, control } =
+  const { register, handleSubmit, setValue, reset } =
     useForm<SerialNumberDto>();
   const [serialNumbers, setSerialNumbers] = useState<SerialNumberDto[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingSerialNumber, setEditingSerialNumber] =
     useState<SerialNumberDto | null>(null);
-  const [numFields, setNumFields] = useState<number>(0);
 
   const columns: ColumnDef<SerialNumberDto>[] = [
     {
@@ -124,9 +123,9 @@ const SerialNumberSetting: React.FC = () => {
     setEditingSerialNumber(null);
   };
 
-  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setNumFields(Number(e.target.value));
-  };
+  // const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setNumFields(Number(e.target.value));
+  // };
 
   return (
     <CommonCard header="Serial Number Settings">
@@ -137,7 +136,7 @@ const SerialNumberSetting: React.FC = () => {
               <Form.Label>
                 Serial No.'s to input in purchase and sale
               </Form.Label>
-              <Controller
+              {/* <Controller
                 name="select number"
                 control={control}
                 defaultValue=""
@@ -162,7 +161,7 @@ const SerialNumberSetting: React.FC = () => {
                     ))}
                   </Form.Control>
                 )}
-              />
+              /> */}
             </Form.Group>
           </Col>
         </Row>
@@ -174,7 +173,7 @@ const SerialNumberSetting: React.FC = () => {
                 label={`Title of serial number ${num + 1}`}
                 name={`serialNumber${num + 1}`}
                 register={register}
-                disabled={num >= numFields}
+                // disabled={num >= numFields}
               />
             </Col>
           </Row>
@@ -208,3 +207,6 @@ const SerialNumberSetting: React.FC = () => {
 };
 
 export default SerialNumberSetting;
+
+
+//Use CustomeDropdown instead of Controller to resolve this issue thanks

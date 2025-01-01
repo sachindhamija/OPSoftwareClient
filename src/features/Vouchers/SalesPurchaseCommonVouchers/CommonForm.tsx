@@ -749,15 +749,10 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     
     const printInvoice = () => {
         if (voucherId && !voucher) {
-            return null;
-            // handleSubmit(async (data) => {
-            //     const saveSuccessful = await onSubmit(data);
-            //     if (saveSuccessful) { 
-            //         navigate('/Voucher/Sale/print-invoice'); 
-            //     } else {
-            //         alert('Failed to save the invoice. Please try again.');
-            //     }
-            // })();
+            //return null;
+            handleSubmit(async (data) => {
+                onSubmit(data)
+            })();
         } else {
             navigate('/Voucher/Sale/print-invoice'); 
         }

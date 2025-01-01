@@ -7,6 +7,7 @@ export interface CompanyInformation {
   companyName?: string;
   companyGSTIN?: string;
   companyPAN?: string;
+  companyPANNo?: string;
   companyState: string;
 }
 
