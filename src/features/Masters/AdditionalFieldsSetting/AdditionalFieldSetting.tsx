@@ -148,6 +148,13 @@ const AdditionalFieldSetting: React.FC = () => {
                 { value: "PurchaseReturn", label: "Purchase Return" },
                 { value: "DebitNote", label: "Debit Note" },
                 { value: "CreditNote", label: "Credit Note" },
+                { value: "Payment", label: "Payment Voucher" },
+                { value: "Receipt", label: "Receipt Voucher" },
+                { value: "BankEntry", label: "Bank Entry" },
+                { value: "JournalEntry", label: "Journal Entry" },
+                { value: "CreditSale", label: "Credit Sale" },
+                
+
               ]}
               control={control}
             />
