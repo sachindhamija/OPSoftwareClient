@@ -20,7 +20,6 @@ import {
   import { useForm } from "react-hook-form";
   import { selectCurrentFinancialYear } from "../../Masters/FinancialYear/financialYearSlice";
   import CommonModal from "../../../app/components/CommonModal";
-  import AccountForm from "../../Masters/Account/AccountForm";
   import {
     formatDateForBackend,
     formatDateForFrontend,
@@ -33,7 +32,8 @@ import {
   import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
   import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation";
   import { OptionType } from "../../../app/models/optionType";
-  
+  import ItemForm from "../../Masters/Item/ItemForm";
+
   interface CreditSaleEntryProps {
     voucherId?: string;
     isInModal?: boolean;
@@ -50,7 +50,7 @@ import {
     const voucherType = VoucherTypeEnum.BankEntry;
     const [currentVoucherId, setCurrentVoucherId] = useState(voucherId);
     const [itemDropDownList] = useState<OptionType[]>([]);
-    const [, setShowItemModal] = useState(false);
+    const [ShowItemModal, setShowItemModal] = useState(false);
     const {
       register,
       handleSubmit,
@@ -62,7 +62,7 @@ import {
     } = useForm<ItemStockTransferDto>({
       mode: "all",
     });
-    const [showAccountModal, setShowAccountModal] = useState(false);
+ 
     const [, setBankAccountOptions] = useState<AccountDtoForDropDownList[]>([]);
     const [accountOptions, setAccountOptions] = useState<
       AccountDtoForDropDownList[]
@@ -590,20 +590,20 @@ import {
         </CommonCard>
   
         <CommonModal
-          show={showAccountModal}
-          onHide={() => setShowAccountModal(false)}
-          size="xl"
-        >
-          <Suspense fallback={<div>Loading...</div>}>
-            <AccountForm
-              isModalOpen={showAccountModal}
-              onCloseModalAfterSave={() => {
-                fetchAccounts(voucherDate);
-                setShowAccountModal(false);
-              }}
-            />
-          </Suspense>
-        </CommonModal>
+        show={ShowItemModal}
+        onHide={() => setShowItemModal(false)}
+        size="xl"
+      >
+        <Suspense fallback={<div>Loading...</div>}>
+          <ItemForm
+            isModalOpen={ShowItemModal}
+            onCloseModalAfterSave={() => {
+              fetchAccounts(voucherDate);
+              setShowItemModal(false);
+            }}
+          />
+        </Suspense>
+      </CommonModal>
       </>
     );
   }

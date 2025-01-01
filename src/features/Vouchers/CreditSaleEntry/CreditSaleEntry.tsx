@@ -34,6 +34,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation";
 import { OptionType } from "../../../app/models/optionType";
+import ItemForm from "../../Masters/Item/ItemForm";
 
 
 interface CreditSaleEntryProps {
@@ -52,7 +53,7 @@ function CreditSaleEntry({
   const voucherType = VoucherTypeEnum.BankEntry;
   const [currentVoucherId, setCurrentVoucherId] = useState(voucherId);
    const [itemDropDownList] = useState<OptionType[]>([]);
-   const [ , setShowItemModal] = useState(false);
+   const [showItemModal, setShowItemModal] = useState(false);
   const {
     register,
     handleSubmit,
@@ -427,6 +428,7 @@ function CreditSaleEntry({
     fetchEntriesAsPerDate();
   }, [voucherDate]);
 
+
   return (
     <>
       <CommonCard header="Credit Sale Entry" size="100%">
@@ -586,20 +588,33 @@ function CreditSaleEntry({
       </CommonCard>
 
       <CommonModal
-        show={showAccountModal}
-        onHide={() => setShowAccountModal(false)}
-        size="xl"
-      >
-        <Suspense fallback={<div>Loading...</div>}>
-          <AccountForm
-            isModalOpen={showAccountModal}
-            onCloseModalAfterSave={() => {
-              fetchAccounts(voucherDate);
-              setShowAccountModal(false);
-            }}
-          />
-        </Suspense>
-      </CommonModal>
+  show={showAccountModal || showItemModal}
+  onHide={() => {
+    setShowAccountModal(false);
+    setShowItemModal(false);
+  }}
+  size="xl"
+>
+  <Suspense fallback={<div>Loading...</div>}>
+    {showAccountModal && (
+      <AccountForm
+        isModalOpen={showAccountModal}
+        onCloseModalAfterSave={() => {
+          fetchAccounts(voucherDate);
+          setShowAccountModal(false);
+        }}
+      />
+    )}
+    {showItemModal && (
+      <ItemForm
+        isModalOpen={showItemModal}
+        onCloseModalAfterSave={() => {
+          setShowItemModal(false);
+        }}
+      />
+    )}
+  </Suspense>
+</CommonModal>
     </>
   );
 }

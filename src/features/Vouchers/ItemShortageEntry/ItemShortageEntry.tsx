@@ -20,7 +20,6 @@ import { Col, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { selectCurrentFinancialYear } from "../../Masters/FinancialYear/financialYearSlice";
 import CommonModal from "../../../app/components/CommonModal";
-import AccountForm from "../../Masters/Account/AccountForm";
 import {
   formatDateForBackend,
   formatDateForFrontend,
@@ -33,6 +32,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import getLastVoucherDate from "../../../app/hooks/useLastVoucherDate";
 import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation";
 import { OptionType } from "../../../app/models/optionType";
+import ItemForm from "../../Masters/Item/ItemForm";
 
 interface CreditSaleEntryProps {
   voucherId?: string;
@@ -50,7 +50,7 @@ function CreditSaleEntry({
   const voucherType = VoucherTypeEnum.BankEntry;
   const [currentVoucherId, setCurrentVoucherId] = useState(voucherId);
   const [itemDropDownList] = useState<OptionType[]>([]);
-  const [, setShowItemModal] = useState(false);
+  const [ShowItemModal, setShowItemModal] = useState(false);
   const {
     register,
     handleSubmit,
@@ -62,7 +62,7 @@ function CreditSaleEntry({
   } = useForm<ItemShortageEntryDto>({
     mode: "all",
   });
-  const [showAccountModal, setShowAccountModal] = useState(false);
+ 
   const [, setBankAccountOptions] = useState<AccountDtoForDropDownList[]>([]);
   const [accountOptions, setAccountOptions] = useState<
     AccountDtoForDropDownList[]
@@ -580,16 +580,16 @@ function CreditSaleEntry({
       </CommonCard>
 
       <CommonModal
-        show={showAccountModal}
-        onHide={() => setShowAccountModal(false)}
+        show={ShowItemModal}
+        onHide={() => setShowItemModal(false)}
         size="xl"
       >
         <Suspense fallback={<div>Loading...</div>}>
-          <AccountForm
-            isModalOpen={showAccountModal}
+          <ItemForm
+            isModalOpen={ShowItemModal}
             onCloseModalAfterSave={() => {
               fetchAccounts(voucherDate);
-              setShowAccountModal(false);
+              setShowItemModal(false);
             }}
           />
         </Suspense>
