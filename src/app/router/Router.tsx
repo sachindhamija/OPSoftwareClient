@@ -38,6 +38,9 @@ import CommissionAgentItemForm from '../../features/CommissionAgent/CommissionAg
 import InvoiceReport from '../../features/Reports/ReportViewer/InvoiceReport';
 import PasswordSetting from '../../features/Masters/Password/Password';
 import { PrintInvoicePage } from '../../features/Vouchers/SalesPurchaseCommonVouchers/PrintInvoicePage';
+import CreditSaleEntry from '../../features/Vouchers/CreditSaleEntry/CreditSaleEntry';
+import ItemShortageEntry from '../../features/Vouchers/ItemShortageEntry/ItemShortageEntry';
+import ItemStockTransfer from '../../features/Vouchers/ItemStockTransfer/ItemStockTransfer';
 
 export const router = createBrowserRouter([
 	{
@@ -149,6 +152,9 @@ export const router = createBrowserRouter([
 							/>
 						),
 					},
+					{ path: 'Voucher/CreditSaleEntry', element: <CreditSaleEntry /> },
+					{ path: 'Voucher/StockShortageEntry', element: <ItemShortageEntry /> },
+					{ path: 'Voucher/ItemStockTransfer', element: <ItemStockTransfer /> },
 					{ path: 'Report/Ledger', element: <LedgerReport /> },
 					{
 						path: 'Report/TrialBalance',
