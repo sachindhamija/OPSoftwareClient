@@ -113,7 +113,7 @@ function Login() {
 
 						{/* Register Prompt */}
 						<div className="text-center mt-2">
-							Is Not yet registered?{' '}
+							Not yet registered?{' '}
 							<Link to="/register" className="d-none d-md-inline">
 								<strong>Click here to register now</strong>
 							</Link>

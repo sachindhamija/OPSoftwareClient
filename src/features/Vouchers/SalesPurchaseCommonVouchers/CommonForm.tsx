@@ -31,8 +31,6 @@ import OtherChargesModal from "./OtherChargesModal";
 import { setLoading } from '../../../app/layout/loadingSlice';
 import SerialNumberModal from "./SerialNumberModal";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
-import { useNavigate } from "react-router-dom";
-
 
 
 const PAYMENT_MODE_OPTIONS = [
@@ -113,7 +111,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             dispatch(setLoading(false));
         }
     };
-    const navigate = useNavigate();
     
     useEffect(() => {
         fetchSerialNumbers();
@@ -754,7 +751,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 onSubmit(data)
             })();
         } else {
-            navigate('/Voucher/Sale/print-invoice'); 
+            window.open('/Voucher/Sale/print-invoice', '_blank');
         }
     };
     

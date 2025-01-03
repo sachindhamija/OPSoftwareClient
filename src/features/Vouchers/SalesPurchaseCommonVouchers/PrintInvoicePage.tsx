@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import agent from "../../../app/api/agent";
 import { getAccessIdOrRedirect } from "../../Masters/Company/CompanyInformation";
+import CustomButton from "../../../app/components/CustomButton";
 
 interface PrintInvoicePageProps { }
 
@@ -70,16 +71,16 @@ export function PrintInvoicePage({ }: PrintInvoicePageProps) {
      <head>
        <meta charset="UTF-8" />
        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-       <title>Tax Invoice</title>
        <style>
-      body {
+
+       body {
         font-family: "Arial", sans-serif;
         background-color: #f4f6f9;
         margin: 0;
         padding: 0;
       }
       .invoice-container {
-        padding: 30px;
+        padding: 20px;
         border: 2px solid black;
       }
       .main-container {
@@ -92,7 +93,7 @@ export function PrintInvoicePage({ }: PrintInvoicePageProps) {
         display: flex;
         justify-content: space-between;
         margin-bottom: 30px;
-        align-items: center;
+        align-items: start;
       }
       .header .left,
       .header .right {
@@ -268,16 +269,16 @@ export function PrintInvoicePage({ }: PrintInvoicePageProps) {
          <div class="invoice-container">
            <div class="header">
              <div class="left">
-               <p><strong>GSTIN No:</strong> ${companyInfo?.gstNo}</p>
-               <p><strong>PAN No:</strong> ${companyInfo?.panNo}</p>
+               <strong>GSTIN No:${companyInfo?.gstNo}</strong><br />
+               <strong>PAN No:${companyInfo?.panNo}</strong>
              </div>
              <div class="center">
                <h1>${companyInfo?.companyName}</h1>
                <p>${companyInfo?.address1},${companyInfo?.city},${companyInfo?.district}</p>
              </div>
              <div class="right">
-               <p><strong>Email:</strong> ${companyInfo?.email || "N/A"}</p>
-               <p><strong>Tel:</strong> ${companyInfo?.mobileNo}, ${companyInfo?.mobileNo2}</p>
+               <strong>Tel: ${companyInfo?.mobileNo}, ${companyInfo?.mobileNo2}</strong><br />
+               <strong>${companyInfo?.email}</strong>
              </div>
            </div>
 
@@ -290,7 +291,7 @@ export function PrintInvoicePage({ }: PrintInvoicePageProps) {
                  <strong>Address:</strong> ${customerAddress || "N/A"}<br />
                </div>
                <div class="strong">
-                 <strong>GSTIN:</strong> ${customerGSTNo || "N/A"}<br />
+                 <strong>GSTIN:${customerGSTNo || "N/A"}</strong><br />
                </div>
                <strong>Phone:</strong><br />
                <div class="strong">
@@ -432,11 +433,30 @@ export function PrintInvoicePage({ }: PrintInvoicePageProps) {
    </html>
  `;
 
+ const handlePrint = () => {
+  const printWindow = window.open("");
+  printWindow?.document.write(invoiceHtml);
+  printWindow?.document.close();
+  printWindow?.print();
+};
+
+
   return (
+    <div>
+      <div 
+      className="d-flex justify-content-center mb-3" >
+      <CustomButton
+        text="Print"
+        variant="success"
+        onClick={handlePrint}
+        size="lg" 
+      />
+    </div>
     <div
       dangerouslySetInnerHTML={{
         __html: invoiceHtml,
       }}
     />
+    </div>
   );
 }
