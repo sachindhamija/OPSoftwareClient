@@ -456,8 +456,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 border: 2px solid black;
                 }
                 .main-container {
-                max-width: 1050px;
-                margin: 20px auto;
+                max-width: 794px;
+                margin: auto;
                 background: white;
                 padding: 30px;
                 }
@@ -517,24 +517,32 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 padding: 15px;
                 }
                 table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
+                    width: 100%; /* Ensure the table fits within the container */
+                    table-layout: fixed; /* Fixed column widths to prevent overflow */
+                    margin: 20px 0;
                 }
-                table,
-                th,
-                td {
-                border: 1px solid #ddd;
+
+                table, th, td {
+                    border: 1px solid #ddd; /* Uniform border for table elements */
                 }
-                th,
-                td {
-                padding: 12px;
-                text-align: left;
+
+                th, td {
+                    padding: 10px; /* Slightly smaller padding for better fit */
+                    text-align: left; /* Left-align text for readability */
+                    word-wrap: break-word; /* Ensure long text wraps within the cell */
+                    overflow-wrap: break-word; /* Additional wrap support for browsers */
                 }
+
                 th {
-                background-color: #f5f5f5;
-                font-weight: bold;
-                color: #333;
+                    background-color: #f5f5f5; /* Light background for headers */
+                    font-weight: bold;
+                    color: #333;
+                    text-align: center; /* Center header text */
+                }
+
+                td {
+                    color: #555; /* Softer text color for better contrast */
+                    text-align: center; /* Center-align table content */
                 }
                 .strong {
                 margin-bottom: 10px;
@@ -691,7 +699,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                         </div>
                         </div>
                     </div>
-                    <table>
+                    <table style="zoom:75%">
                         <thead>
                         <tr>
                             <th>S.N</th>
@@ -795,7 +803,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                         </div>
         
                         <div class="signatory">
-                        <p>For M/S A.M. AGRO FOOD PRODUCTS</p>
+                        <p>For ${companyInfo?.companyName}</p>
                         <p>Authorized Signatory</p>
                         </div>
                     </div>
@@ -824,8 +832,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 border: 2px solid black;
                 }
                 .main-container {
-                max-width: 1050px;
-                margin: 20px auto;
+                max-width: 794px;
+                margin: auto;
                 background: white;
                 padding: 30px;
                 }
@@ -885,24 +893,32 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 padding: 15px;
                 }
                 table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
+                    width: 100%; /* Ensure the table fits within the container */
+                    table-layout: fixed; /* Fixed column widths to prevent overflow */
+                    margin: 20px 0;
                 }
-                table,
-                th,
-                td {
-                border: 1px solid #ddd;
+
+                table, th, td {
+                    border: 1px solid #ddd; /* Uniform border for table elements */
                 }
-                th,
-                td {
-                padding: 12px;
-                text-align: left;
+
+                th, td {
+                    padding: 10px; /* Slightly smaller padding for better fit */
+                    text-align: left; /* Left-align text for readability */
+                    word-wrap: break-word; /* Ensure long text wraps within the cell */
+                    overflow-wrap: break-word; /* Additional wrap support for browsers */
                 }
+
                 th {
-                background-color: #f5f5f5;
-                font-weight: bold;
-                color: #333;
+                    background-color: #f5f5f5; /* Light background for headers */
+                    font-weight: bold;
+                    color: #333;
+                    text-align: center; /* Center header text */
+                }
+
+                td {
+                    color: #555; /* Softer text color for better contrast */
+                    text-align: center; /* Center-align table content */
                 }
                 .strong {
                 margin-bottom: 10px;
@@ -1059,7 +1075,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                         </div>
                         </div>
                     </div>
-                    <table>
+                    <table style="zoom:75%">
                         <thead>
                         <tr>
                             <th>S.N</th>
@@ -1163,7 +1179,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                         </div>
         
                         <div class="signatory">
-                        <p>For M/S A.M. AGRO FOOD PRODUCTS</p>
+                        <p>For ${companyInfo?.companyName}</p>
                         <p>Authorized Signatory</p>
                         </div>
                     </div>
@@ -1582,22 +1598,46 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         }
     };
 
-    const generateAndPrintInvoice = async (copyType: string, invoiceHtml :string) => {
+    const generateAndPrintInvoice = async (copyType : string, invoiceHtml: string) => {
         const container = document.createElement("div");
+        container.style.width = "794px"; // A4 width in pixels at 96 DPI
+        container.style.margin = "auto"; // Center the content
         container.innerHTML = invoiceHtml.replace('{COPYTYPE}', copyType);
         document.body.appendChild(container);
-        const canvas = await html2canvas(container, { scale: 2 });
+    
+        const canvas = await html2canvas(container, { scale: 2 }); // Increase resolution
         document.body.removeChild(container);
     
-        const pdf = new jsPDF("p", "mm", "a4");
+        const pdf = new jsPDF("p", "mm", "a4"); // A4 dimensions
         const imgData = canvas.toDataURL("image/png");
-        const imgWidth = 220;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * pageWidth) / canvas.width;
+    
+        // Ensure content fits within the A4 page height
+        if (imgHeight > pageHeight) {
+            let y = 0;
+            while (y < canvas.height) {
+                const sliceHeight = canvas.width * (pageHeight / pageWidth);
+                const sliceCanvas = document.createElement("canvas");
+                sliceCanvas.width = canvas.width;
+                sliceCanvas.height = sliceHeight;
+                const ctx = sliceCanvas.getContext("2d");
+                ctx?.drawImage(canvas, 0, y, canvas.width, sliceHeight, 0, 0, sliceCanvas.width, sliceCanvas.height);
+                const sliceImgData = sliceCanvas.toDataURL("image/png");
+                pdf.addImage(sliceImgData, "PNG", 0, 0, pageWidth, pageHeight);
+                y += sliceHeight;
+                if (y < canvas.height) pdf.addPage();
+            }
+        } else {
+            pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        }
+    
         pdf.setProperties({
             title: copyType,
         });
-        //pdf.save(`${copyType.replace(/ /g, '_')}.pdf`); i you want to download directly
+    
         const pdfBlob = pdf.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, "_blank");
