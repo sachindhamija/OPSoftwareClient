@@ -31,7 +31,10 @@ import OtherChargesModal from "./OtherChargesModal";
 import { setLoading } from '../../../app/layout/loadingSlice';
 import SerialNumberModal from "./SerialNumberModal";
 import { SerialNumberDto } from "../../Masters/SerialNumberSetting/SerialNumberDto";
-
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { ControlOptionDto } from "../VoucherCommon/controlOptionDto";
+import ControlPanelForm from "../VoucherCommon/ControlPanelForm";
 
 const PAYMENT_MODE_OPTIONS = [
     { label: "Cash", value: "CASH" },
@@ -84,6 +87,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             items: [defaultItems]
         }
     });
+    const [invoiceHtml, setInvoiceHtml] = useState<any>(null);
+    const [showControlPanelModal, setShowControlPanelModal] = useState(false);
+	const [invoiceAfterSave, setInvoiceAfterSave] = useState(true);
+	const [originalCopyInvoice, setOriginalCopyInvoice] = useState(true);
+	const [officeCopyInvoice, setOfficeCopyInvoice] = useState(true);
+	const [customerCopyInvoice, setCustomerCopyInvoice] = useState(true);
+	const [duplicateCopyInvoice, setDuplicateCopyInvoice] = useState(true);
+
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'items',
@@ -366,7 +377,813 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
     sessionStorage.setItem(
         'voucherId',JSON.stringify(voucherId)
-     );
+    );
+
+	const fetchControlOptions = async () => {
+		try {
+			if (voucherType != undefined) {
+				const options: ControlOptionDto[] =
+					await agent.ControlOptions.list(accessId, voucherType);
+				options.forEach((option) => {
+					switch (option.controlOption) {
+						case 'Do you want to print invoice after Save?':
+							setInvoiceAfterSave(option.controlValue === 'Y');
+							break;
+						case 'Do you want to print Original Copy of Invoice?':
+							setOriginalCopyInvoice(option.controlValue === 'Y');
+							break;
+						case 'Do you want to print Office Copy of Invoice?':
+							setOfficeCopyInvoice(option.controlValue === 'Y');
+							break;
+						case 'Do you want to print Customer Copy of Invoice?':
+							setCustomerCopyInvoice(option.controlValue === 'Y');
+							break;
+						case 'Do you want to print Duplicate Copy of Invoice?':
+							setDuplicateCopyInvoice(option.controlValue === 'Y');
+							break;
+						default:
+							break;
+					}
+				});
+			}
+		} catch (error) {
+			toast.error('Failed to load control options.');
+		}
+	};
+	useEffect(() => {
+		fetchControlOptions();
+	}, [accessId]);
+
+    useEffect(() => {
+        invoiceHtmlData(false);
+    }, [voucherId, invoiceHtml]);
+
+    const invoiceHtmlData = async (isNewSave: Boolean) =>{
+        const fetchVoucher = async () => {
+          try {
+            const voucherdata = await agent.SalePurchase.getVoucherById(accessId, voucherId ?? "");
+            const customerName = voucherdata.customerDetailDto?.customerName || "";
+            const customerAddress = voucherdata.customerDetailDto?.customerAddress || "";
+            const customerGSTNo = voucherdata.customerDetailDto?.customerGSTNo || "";
+            const customerPAN = voucherdata.customerDetailDto?.customerPAN || "";
+            //const customerAadhar = voucherdata.customerDetailDto?.customerAadhar || "";
+            
+            const transportDetailsInvoice = voucherdata.transportDetailDto || {};
+            
+            const formattedVoucherDate = new Date(voucherdata.voucherDate).toLocaleDateString();
+            
+            const totalAmountBeforeTax = voucherdata.items?.reduce((sum: number, item: any) => sum + item.basicAmount, 0) || 0;
+            const totalGST = voucherdata.items?.reduce((sum: number, item: any) => sum + item.sgst + item.cgst + item.igst, 0) || 0;
+            const totalAmount = totalAmountBeforeTax + totalGST;
+
+            const companyInfo = await agent.Company.getCompanyDetail(accessId);
+            setInvoiceHtml(`
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <style>
+        
+                body {
+                font-family: "Arial", sans-serif;
+                background-color: #f4f6f9;
+                margin: 0;
+                padding: 0;
+                }
+                .invoice-container {
+                padding: 20px;
+                border: 2px solid black;
+                }
+                .main-container {
+                max-width: 1050px;
+                margin: 20px auto;
+                background: white;
+                padding: 30px;
+                }
+                .header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 30px;
+                align-items: start;
+                }
+                .header .left,
+                .header .right {
+                width: 48%;
+                }
+                .header .center {
+                width: 48%;
+                text-align: center;
+                }
+                .header .center h1 {
+                font-size: 30px;
+                color: #333;
+                margin: 0;
+                font-weight: bold;
+                }
+                .header .center p {
+                font-size: 16px;
+                color: #555;
+                margin: 5px 0;
+                }
+                .header .left {
+                font-size: 14px;
+                text-align: left;
+                }
+                .header .right {
+                font-size: 14px;
+                text-align: right;
+                }
+                .party-details {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 40px;
+                font-size: 14px;
+                border: 1px solid black;
+                }
+                .party-details .left-column,
+                .party-details .right-column {
+                width: 48%;
+                padding: 15px;
+                }
+                .right-column {
+                padding-left: 25px;
+                display: flex;
+                border-left: #333 solid 1px;
+                justify-content: space-between;
+                }
+                .right-column .box {
+                width: 48%;
+                padding: 15px;
+                }
+                table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                }
+                table,
+                th,
+                td {
+                border: 1px solid #ddd;
+                }
+                th,
+                td {
+                padding: 12px;
+                text-align: left;
+                }
+                th {
+                background-color: #f5f5f5;
+                font-weight: bold;
+                color: #333;
+                }
+                .strong {
+                margin-bottom: 10px;
+                }
+                td {
+                color: #555;
+                }
+                .totals td {
+                font-size: 16px;
+                font-weight: bold;
+                padding-top: 10px;
+                }
+                .summary-section {
+                margin-top: 30px;
+                display: flex;
+                justify-content: space-between;
+                }
+                .summary-section .left,
+                .summary-section .right {
+                width: 48%;
+                }
+                .summary-section table {
+                width: 100%;
+                margin-top: 10px;
+                }
+                .summary-section td {
+                padding: 8px;
+                text-align: left;
+                }
+                .bill-amount {
+                margin-top: 30px;
+                font-size: 22px;
+                font-weight: bold;
+                text-align: right;
+                color: #333;
+                }
+                .terms-conditions {
+                font-size: 14px;
+                line-height: 1.6;
+                }
+                .terms-conditions h3 {
+                font-size: 16px;
+                color: #333;
+                margin-bottom: 10px;
+                }
+                .terms-conditions ul {
+                list-style-type: none;
+                padding-left: 0;
+                }
+                .terms-conditions li {
+                margin-bottom: 8px;
+                color: #555;
+                }
+        
+                .termsANDsignatory {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 40px;
+                padding-top: 20px;
+                border-top: 2px solid #ddd;
+                }
+        
+                .terms-conditions {
+                width: 48%;
+                }
+        
+                .signatory {
+                width: 48%;
+                text-align: right;
+                font-size: 14px;
+                font-weight: bold;
+                color: #333;
+                }
+        
+                .TaxInvoiceContainer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                }
+        
+                .TaxInvoice {
+                text-align: center;
+                font-size: 24px;
+                margin-left: 80px;
+                font-weight: bold;
+                flex: 1;
+                color: #333;
+                }
+        
+                .original-copy {
+                text-align: right;
+                    font-weight: bold;
+                color: #333;
+                }
+            </style>
+                </head>
+                <body>
+                <div class="main-container">
+                    <div class="TaxInvoiceContainer">
+                    <p class="TaxInvoice">Tax Invoice</p>
+                    <p class="original-copy">{COPYTYPE}</p>
+                    </div>
+        
+                    <div class="invoice-container">
+                    <div class="header">
+                        <div class="left">
+                        <strong>GSTIN No:${companyInfo?.gstNo}</strong><br />
+                        <strong>PAN No:${companyInfo?.panNo}</strong>
+                        </div>
+                        <div class="center">
+                        <h1>${companyInfo?.companyName}</h1>
+                        <p>${companyInfo?.address1},${companyInfo?.city},${companyInfo?.district}</p>
+                        </div>
+                        <div class="right">
+                        <strong>Tel: ${companyInfo?.mobileNo}, ${companyInfo?.mobileNo2}</strong><br />
+                        <strong>${companyInfo?.email}</strong>
+                        </div>
+                    </div>
+        
+                    <div class="party-details">
+                        <div class="left-column">
+                        <div class="strong">
+                            <strong>Party Name:</strong> ${customerName || "N/A"}<br />
+                        </div>
+                        <div class="strong">
+                            <strong>Address:</strong> ${customerAddress || "N/A"}<br />
+                        </div>
+                        <div class="strong">
+                            <strong>GSTIN:${customerGSTNo || "N/A"}</strong><br />
+                        </div>
+                        <strong>Phone:</strong><br />
+                        <div class="strong">
+                            <strong>GST NO:</strong> ${customerPAN || "N/A"}<br />
+                        </div>
+                        <div class="strong">
+                            <strong>Delivery At:</strong> ${transportDetailsInvoice.deliveryAddress || "N/A"}<br />
+                        </div>
+                        </div>
+                        <div class="right-column">
+                        <div class="box">
+                            <div class="strong"><strong>INVOICE NO:</strong> ${voucherdata.voucherNo}<br /></div>
+                            <div class="strong"><strong>GR No.:</strong> ${transportDetailsInvoice.grNo || "N/A"}<br /></div>
+                            <div class="strong"><strong>GR Date:</strong> ${transportDetailsInvoice.grDate || "N/A"}<br /></div>
+                            <div class="strong">
+                            <strong>Vehicle No.:</strong> ${transportDetailsInvoice.vehicleNumber || "N/A"}<br />
+                            </div>
+                            <div class="strong"><strong>Transport:</strong> ${transportDetailsInvoice.transporterName || "N/A"}<br /></div>
+                        </div>
+                        <div class="box">
+                            <div class="strong"><strong>Date:</strong> ${formattedVoucherDate}<br /></div>
+                            <div class="strong"><strong>EWay No.:</strong> ${transportDetailsInvoice.ewayBillNo || "N/A"}<br /></div>
+                            <div class="strong"><strong>EWay Date:</strong> ${transportDetailsInvoice.ewayDate || "N/A"}<br /></div>
+                            <div class="strong"><strong>State:</strong> ${transportDetailsInvoice.state || "N/A"}<br /></div>
+                        </div>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>S.N</th>
+                            <th>Item Description</th>
+                            <th>HSN</th>
+                            <th>QTY</th>
+                            <th>UOM</th>
+                            <th>Rate</th>
+                            <th>Discount (%) & Amt</th>
+                            <th>Taxable Amt</th>
+                            <th>Tax</th>
+                            <th>IGST</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        ${voucherdata.items?.map((item: any, index: number) => {
+                            return `
+                            <tr key="${item.itemId}">
+                                <td>${index + 1}</td>  
+                                <td>${item.itemDescription || "N/A"}</td>
+                                <td>${item.hsnCode || "N/A"}</td>
+                                <td>${item.mainQty || 0}</td> 
+                                <td>${item.uom || "N/A"}</td>
+                                <td>${item.pricePer || 0}</td> 
+                                <td>${item.discountPercentage || 0}% / ${item.discountAmount || 0}</td> 
+                                <td>${item.basicAmount || 0}</td> 
+                                <td>${item.sgst || 0}</td>
+                                <td>${item.igst || 0}</td> 
+                                <td>${item.netAmount || 0}</td> 
+                            </tr>
+                            `;
+                        }).join("")}
+                            <tr>
+                            <td colspan="7" style="text-align: right; font-weight: bold">
+                                Total:
+                            </td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.basicAmount || 0), 0)?.toFixed(2)}</td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.sgst || 0), 0)?.toFixed(2)}</td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.igst || 0), 0)?.toFixed(2)}</td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.netAmount || 0), 0)?.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="summary-section">
+                        <div class="left">
+                        <table>
+                            <th>Class</th>
+                            <th>Taxable Amt.</th>
+                            <th>@IGST</th>
+                            <th>Total Amt.</th>
+        
+                            <tr>
+                            <td>0.00%</td>
+                            <td>${totalAmountBeforeTax?.toFixed(2)}</td>
+                            <td>0.00</td>
+                            <td>${totalAmountBeforeTax?.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                            <td>5.00%</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            <td>${(totalAmountBeforeTax + totalGST)?.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                        </div>
+        
+                        <div class="right">
+                        <table>
+                            <tr>
+                            <td>Total Amount Before Tax:</td>
+                            <td>${totalAmountBeforeTax?.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                            <td>Less: Discount Amount:</td>
+                            <td>0.00</td>
+                            </tr>
+                            <tr>
+                            <td>Add: IGST:</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                            <td>Total Tax Amount (GST):</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                        </div>
+                    </div>
+        
+                    <div class="bill-amount"><strong>Bill Amount:</strong> ${totalAmount?.toFixed(2)}</div>
+        
+                    <div class="termsANDsignatory">
+                        <div class="terms-conditions">
+                        <h3>Terms & Conditions:</h3>
+                        <ul>
+                            <li>1. We are not responsible for loss and damage caused by transport in transit.</li>
+                            <li>2. Interest @ 18% will be charged if payment is not made within 7 days.</li>
+                            <li>3. Goods once sold will not be taken back.</li>
+                            <li>4. I am liable to pay tax on the above and authorized to sign this invoice.</li>
+                        </ul>
+                        </div>
+        
+                        <div class="signatory">
+                        <p>For M/S A.M. AGRO FOOD PRODUCTS</p>
+                        <p>Authorized Signatory</p>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </body>
+            </html>
+            `)
+            if (isNewSave) {
+                await printInvoice(true, `
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <style>
+        
+                body {
+                font-family: "Arial", sans-serif;
+                background-color: #f4f6f9;
+                margin: 0;
+                padding: 0;
+                }
+                .invoice-container {
+                padding: 20px;
+                border: 2px solid black;
+                }
+                .main-container {
+                max-width: 1050px;
+                margin: 20px auto;
+                background: white;
+                padding: 30px;
+                }
+                .header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 30px;
+                align-items: start;
+                }
+                .header .left,
+                .header .right {
+                width: 48%;
+                }
+                .header .center {
+                width: 48%;
+                text-align: center;
+                }
+                .header .center h1 {
+                font-size: 30px;
+                color: #333;
+                margin: 0;
+                font-weight: bold;
+                }
+                .header .center p {
+                font-size: 16px;
+                color: #555;
+                margin: 5px 0;
+                }
+                .header .left {
+                font-size: 14px;
+                text-align: left;
+                }
+                .header .right {
+                font-size: 14px;
+                text-align: right;
+                }
+                .party-details {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 40px;
+                font-size: 14px;
+                border: 1px solid black;
+                }
+                .party-details .left-column,
+                .party-details .right-column {
+                width: 48%;
+                padding: 15px;
+                }
+                .right-column {
+                padding-left: 25px;
+                display: flex;
+                border-left: #333 solid 1px;
+                justify-content: space-between;
+                }
+                .right-column .box {
+                width: 48%;
+                padding: 15px;
+                }
+                table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                }
+                table,
+                th,
+                td {
+                border: 1px solid #ddd;
+                }
+                th,
+                td {
+                padding: 12px;
+                text-align: left;
+                }
+                th {
+                background-color: #f5f5f5;
+                font-weight: bold;
+                color: #333;
+                }
+                .strong {
+                margin-bottom: 10px;
+                }
+                td {
+                color: #555;
+                }
+                .totals td {
+                font-size: 16px;
+                font-weight: bold;
+                padding-top: 10px;
+                }
+                .summary-section {
+                margin-top: 30px;
+                display: flex;
+                justify-content: space-between;
+                }
+                .summary-section .left,
+                .summary-section .right {
+                width: 48%;
+                }
+                .summary-section table {
+                width: 100%;
+                margin-top: 10px;
+                }
+                .summary-section td {
+                padding: 8px;
+                text-align: left;
+                }
+                .bill-amount {
+                margin-top: 30px;
+                font-size: 22px;
+                font-weight: bold;
+                text-align: right;
+                color: #333;
+                }
+                .terms-conditions {
+                font-size: 14px;
+                line-height: 1.6;
+                }
+                .terms-conditions h3 {
+                font-size: 16px;
+                color: #333;
+                margin-bottom: 10px;
+                }
+                .terms-conditions ul {
+                list-style-type: none;
+                padding-left: 0;
+                }
+                .terms-conditions li {
+                margin-bottom: 8px;
+                color: #555;
+                }
+        
+                .termsANDsignatory {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 40px;
+                padding-top: 20px;
+                border-top: 2px solid #ddd;
+                }
+        
+                .terms-conditions {
+                width: 48%;
+                }
+        
+                .signatory {
+                width: 48%;
+                text-align: right;
+                font-size: 14px;
+                font-weight: bold;
+                color: #333;
+                }
+        
+                .TaxInvoiceContainer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                }
+        
+                .TaxInvoice {
+                text-align: center;
+                font-size: 24px;
+                margin-left: 80px;
+                font-weight: bold;
+                flex: 1;
+                color: #333;
+                }
+        
+                .original-copy {
+                text-align: right;
+                    font-weight: bold;
+                color: #333;
+                }
+            </style>
+                </head>
+                <body>
+                <div class="main-container">
+                    <div class="TaxInvoiceContainer">
+                    <p class="TaxInvoice">Tax Invoice</p>
+                    <p class="original-copy">{COPYTYPE}</p>
+                    </div>
+        
+                    <div class="invoice-container">
+                    <div class="header">
+                        <div class="left">
+                        <strong>GSTIN No:${companyInfo?.gstNo}</strong><br />
+                        <strong>PAN No:${companyInfo?.panNo}</strong>
+                        </div>
+                        <div class="center">
+                        <h1>${companyInfo?.companyName}</h1>
+                        <p>${companyInfo?.address1},${companyInfo?.city},${companyInfo?.district}</p>
+                        </div>
+                        <div class="right">
+                        <strong>Tel: ${companyInfo?.mobileNo}, ${companyInfo?.mobileNo2}</strong><br />
+                        <strong>${companyInfo?.email}</strong>
+                        </div>
+                    </div>
+        
+                    <div class="party-details">
+                        <div class="left-column">
+                        <div class="strong">
+                            <strong>Party Name:</strong> ${customerName || "N/A"}<br />
+                        </div>
+                        <div class="strong">
+                            <strong>Address:</strong> ${customerAddress || "N/A"}<br />
+                        </div>
+                        <div class="strong">
+                            <strong>GSTIN:${customerGSTNo || "N/A"}</strong><br />
+                        </div>
+                        <strong>Phone:</strong><br />
+                        <div class="strong">
+                            <strong>GST NO:</strong> ${customerPAN || "N/A"}<br />
+                        </div>
+                        <div class="strong">
+                            <strong>Delivery At:</strong> ${transportDetailsInvoice.deliveryAddress || "N/A"}<br />
+                        </div>
+                        </div>
+                        <div class="right-column">
+                        <div class="box">
+                            <div class="strong"><strong>INVOICE NO:</strong> ${voucherdata.voucherNo}<br /></div>
+                            <div class="strong"><strong>GR No.:</strong> ${transportDetailsInvoice.grNo || "N/A"}<br /></div>
+                            <div class="strong"><strong>GR Date:</strong> ${transportDetailsInvoice.grDate || "N/A"}<br /></div>
+                            <div class="strong">
+                            <strong>Vehicle No.:</strong> ${transportDetailsInvoice.vehicleNumber || "N/A"}<br />
+                            </div>
+                            <div class="strong"><strong>Transport:</strong> ${transportDetailsInvoice.transporterName || "N/A"}<br /></div>
+                        </div>
+                        <div class="box">
+                            <div class="strong"><strong>Date:</strong> ${formattedVoucherDate}<br /></div>
+                            <div class="strong"><strong>EWay No.:</strong> ${transportDetailsInvoice.ewayBillNo || "N/A"}<br /></div>
+                            <div class="strong"><strong>EWay Date:</strong> ${transportDetailsInvoice.ewayDate || "N/A"}<br /></div>
+                            <div class="strong"><strong>State:</strong> ${transportDetailsInvoice.state || "N/A"}<br /></div>
+                        </div>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>S.N</th>
+                            <th>Item Description</th>
+                            <th>HSN</th>
+                            <th>QTY</th>
+                            <th>UOM</th>
+                            <th>Rate</th>
+                            <th>Discount (%) & Amt</th>
+                            <th>Taxable Amt</th>
+                            <th>Tax</th>
+                            <th>IGST</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        ${voucherdata.items?.map((item: any, index: number) => {
+                            return `
+                            <tr key="${item.itemId}">
+                                <td>${index + 1}</td>  
+                                <td>${item.itemDescription || "N/A"}</td>
+                                <td>${item.hsnCode || "N/A"}</td>
+                                <td>${item.mainQty || 0}</td> 
+                                <td>${item.uom || "N/A"}</td>
+                                <td>${item.pricePer || 0}</td> 
+                                <td>${item.discountPercentage || 0}% / ${item.discountAmount || 0}</td> 
+                                <td>${item.basicAmount || 0}</td> 
+                                <td>${item.sgst || 0}</td>
+                                <td>${item.igst || 0}</td> 
+                                <td>${item.netAmount || 0}</td> 
+                            </tr>
+                            `;
+                        }).join("")}
+                            <tr>
+                            <td colspan="7" style="text-align: right; font-weight: bold">
+                                Total:
+                            </td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.basicAmount || 0), 0)?.toFixed(2)}</td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.sgst || 0), 0)?.toFixed(2)}</td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.igst || 0), 0)?.toFixed(2)}</td>
+                            <td>${voucherdata.items.reduce((sum: number, item: any) => sum + (item.netAmount || 0), 0)?.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="summary-section">
+                        <div class="left">
+                        <table>
+                            <th>Class</th>
+                            <th>Taxable Amt.</th>
+                            <th>@IGST</th>
+                            <th>Total Amt.</th>
+        
+                            <tr>
+                            <td>0.00%</td>
+                            <td>${totalAmountBeforeTax?.toFixed(2)}</td>
+                            <td>0.00</td>
+                            <td>${totalAmountBeforeTax?.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                            <td>5.00%</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            <td>${(totalAmountBeforeTax + totalGST)?.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                        </div>
+        
+                        <div class="right">
+                        <table>
+                            <tr>
+                            <td>Total Amount Before Tax:</td>
+                            <td>${totalAmountBeforeTax?.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                            <td>Less: Discount Amount:</td>
+                            <td>0.00</td>
+                            </tr>
+                            <tr>
+                            <td>Add: IGST:</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                            <td>Total Tax Amount (GST):</td>
+                            <td>${totalGST?.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                        </div>
+                    </div>
+        
+                    <div class="bill-amount"><strong>Bill Amount:</strong> ${totalAmount?.toFixed(2)}</div>
+        
+                    <div class="termsANDsignatory">
+                        <div class="terms-conditions">
+                        <h3>Terms & Conditions:</h3>
+                        <ul>
+                            <li>1. We are not responsible for loss and damage caused by transport in transit.</li>
+                            <li>2. Interest @ 18% will be charged if payment is not made within 7 days.</li>
+                            <li>3. Goods once sold will not be taken back.</li>
+                            <li>4. I am liable to pay tax on the above and authorized to sign this invoice.</li>
+                        </ul>
+                        </div>
+        
+                        <div class="signatory">
+                        <p>For M/S A.M. AGRO FOOD PRODUCTS</p>
+                        <p>Authorized Signatory</p>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </body>
+            </html>
+            `);
+            }            
+        } catch (error) {
+            console.error("Error fetching voucher:", error);
+          }
+        };
+        if(voucherId !== null && voucherId !== undefined){
+            fetchVoucher();
+        }
+   
+    }
+
+
     useEffect(() => {
         let filteredAccounts: AccountDtoForDropDownList[] = [];
         if (paymentMode.toLowerCase().includes("cash")) {
@@ -602,7 +1419,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 return;
             }
             const finalData = convertFieldValuesToDto(data);
-            
             if (voucherType == VoucherTypeEnum.ItemSale) {
                 if (voucherId || voucher) {
                     // update the invoice   
@@ -611,14 +1427,17 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 }
                 else {
                     var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
-                    sessionStorage.setItem(
-                        'voucherId',JSON.stringify(newVoucherId)
-                     );
+                    voucherId = newVoucherId;
+                    sessionStorage.setItem('voucherId',JSON.stringify(newVoucherId));
                     toast.success('Voucher created successfully');
-                    reset();
-                    setTransportDetails(defaultTransportDetails);
-                    setCustomerDetail(defaultCustomerDetails);
-                    setBillSummary(defaultBillSummary);
+                    if (invoiceAfterSave && window.confirm("Do you want to print the invoice?")) {                        
+                        await invoiceHtmlData(true)
+                    }else{
+                        reset();
+                        setTransportDetails(defaultTransportDetails);
+                        setCustomerDetail(defaultCustomerDetails);
+                        setBillSummary(defaultBillSummary);
+                    }
                 }
                 if (isInModal && onSuccessfulSubmit) {
                     onSuccessfulSubmit();
@@ -742,24 +1561,59 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
         return processedItems;
     };
-
     
-    const printInvoice = () => {
-        if (voucherId && !voucher) {
-            //return null;
+    const printInvoice = async (isNewSave : boolean, html: string) => {
+        if (!voucherId) {
             handleSubmit(async (data) => {
                 onSubmit(data)
             })();
-        } else {
-            window.open('/Voucher/Sale/print-invoice', '_blank');
+        }
+        else if(isNewSave){
+            if (originalCopyInvoice) await generateAndPrintInvoice('Original Copy', html);
+            if (officeCopyInvoice) await generateAndPrintInvoice('Office Copy', html);
+            if (customerCopyInvoice) await generateAndPrintInvoice('Customer Copy', html);
+            if (duplicateCopyInvoice) await generateAndPrintInvoice('Duplicate Copy', html);
+        }
+        else {
+            if (originalCopyInvoice) await generateAndPrintInvoice('Original Copy', invoiceHtml);
+            if (officeCopyInvoice) await generateAndPrintInvoice('Office Copy', invoiceHtml);
+            if (customerCopyInvoice) await generateAndPrintInvoice('Customer Copy', invoiceHtml);
+            if (duplicateCopyInvoice) await generateAndPrintInvoice('Duplicate Copy', invoiceHtml);
         }
     };
+
+    const generateAndPrintInvoice = async (copyType: string, invoiceHtml :string) => {
+        const container = document.createElement("div");
+        container.innerHTML = invoiceHtml.replace('{COPYTYPE}', copyType);
+        document.body.appendChild(container);
+        const canvas = await html2canvas(container, { scale: 2 });
+        document.body.removeChild(container);
     
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = 220;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.setProperties({
+            title: copyType,
+        });
+        //pdf.save(`${copyType.replace(/ /g, '_')}.pdf`); i you want to download directly
+        const pdfBlob = pdf.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, "_blank");
+    };
+    
+
 
     if (voucherId && !voucher) return null;
     return (
         <>
-            <CommonCard header={voucherType == undefined ? "" : getVoucherTypeString(voucherType)} size="100%" showControlPanelButton >
+            <CommonCard header={voucherType == undefined ? "" : getVoucherTypeString(voucherType)}
+                        size="100%"
+                        onControlPanelClick={() => {
+						setShowControlPanelModal(true);
+					}}
+                    showControlPanelButton >
                 <FormNavigator onSubmit={handleSubmit(onSubmit)} isModalOpen={isInModal}>
                     <Row className="gx-2">
                         <Col xs={12} md={3} className="custom-col-billBook">
@@ -1098,7 +1952,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 }} /></Col>
                                 <Col><CustomButton size="sm" variant="success" type="submit" text="Save Invoice (Ctrl+S)" className="w-100" /></Col>
                                 <Col><CustomButton size="sm" onClick={() => {
-                                    printInvoice() 
+                                    printInvoice(false, "")
                                     }} variant="success" text="Print Invoice (Ctrl+P)" className="w-100" /></Col>
                                 <Col>{voucher && voucherId && <CustomButton size="sm" variant="outline-danger" text="Final Delete (Ctrl+D)" className="w-100" onClick={() => deleteVoucher()} />}</Col>
 
@@ -1187,6 +2041,26 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     />
                 </Suspense>
             </CommonModal>
+
+            <CommonModal
+				show={showControlPanelModal}
+				onHide={() => {
+                    fetchControlOptions();
+					setShowControlPanelModal(false);
+				}}
+				size="sm"
+			>
+				<Suspense fallback={<div>Loading...</div>}>
+					<ControlPanelForm
+						voucherType={voucherType}
+						onSaveSuccess={() => {
+							fetchControlOptions();
+							setShowControlPanelModal(false);
+						}}
+						isModalOpen={showControlPanelModal}
+					/>
+				</Suspense>
+			</CommonModal>
 
             {showTransportModal &&
                 <TransportAndShippingDetailModal

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Col, Row, Form } from "react-bootstrap";
 import {
   CustomButton,
-  CustomInput,
+  // CustomInput,
   CommonCard,
   CommonTable,
   FormNavigator,
@@ -26,14 +26,14 @@ const AdditionalFieldSetting: React.FC = () => {
   const accessId = getAccessIdOrRedirect();
   const dispatch = useAppDispatch();
 
-  const { register, handleSubmit, setValue, reset, control } =
+  const { handleSubmit, setValue, reset, control } =
     useForm<SerialNumberDto>();
 
   const [serialNumbers, setSerialNumbers] = useState<SerialNumberDto[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingSerialNumber, setEditingSerialNumber] =
     useState<SerialNumberDto | null>(null);
-  const [numFields, setNumFields] = useState(0);
+  // const [numFields, setNumFields] = useState(0);
 
   const columns: ColumnDef<SerialNumberDto>[] = [
     {
@@ -128,10 +128,10 @@ const AdditionalFieldSetting: React.FC = () => {
     reset();
   };
 
-  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = parseInt(e.target.value, 10);
-    setNumFields(isNaN(value) ? 0 : value);
-  };
+  // const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const value = parseInt(e.target.value, 10);
+  //   setNumFields(isNaN(value) ? 0 : value);
+  // };
 
   return (
     <CommonCard header="Additional Field Settings">
@@ -162,7 +162,11 @@ const AdditionalFieldSetting: React.FC = () => {
           <Col xs={12} md={10}>
             <Form.Group controlId="formDropdown">
               <Form.Label>Select number of fields</Form.Label>
-              <Controller
+
+              {/* please fix this issue by using customdropdown */}
+
+
+              {/* <Controller
                 name="numFields"
                 control={control}
                 defaultValue=""
@@ -185,11 +189,15 @@ const AdditionalFieldSetting: React.FC = () => {
                     ))}
                   </Form.Control>
                 )}
-              />
+              /> */}
             </Form.Group>
           </Col>
         </Row>
-        {[...Array(numFields).keys()].map((num) => (
+
+
+          {/* please fix this issue by using customdropdown */}
+
+        {/* {[...Array(numFields).keys()].map((num) => (
           <Row key={num} className="mt-3">
             <Col xs={12} md={10}>
               <CustomInput
@@ -199,7 +207,7 @@ const AdditionalFieldSetting: React.FC = () => {
               />
             </Col>
           </Row>
-        ))}
+        ))} */}
         <Row className="mt-3">
           <Col xs={5}>
             <CustomButton
