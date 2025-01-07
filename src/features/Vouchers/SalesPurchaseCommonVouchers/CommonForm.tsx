@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import FormNavigator from "../../../app/components/FormNavigator";
 import handleApiErrors from "../../../app/errors/handleApiErrors";
 import CommonCard from "../../../app/components/CommonCard";
-import { Col, Row, Table } from "react-bootstrap";
+import { Button, Col, Row, Table } from "react-bootstrap";
 import agent from "../../../app/api/agent";
 import { OptionType } from "../../../app/models/optionType";
 import { CustomDropdown, CustomDateInputBox, CommonModal, CustomInput, CustomButton } from "../../../app/components/Components";
@@ -35,6 +35,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ControlOptionDto } from "../VoucherCommon/controlOptionDto";
 import ControlPanelForm from "../VoucherCommon/ControlPanelForm";
+import JSZip from "jszip";
 
 const PAYMENT_MODE_OPTIONS = [
     { label: "Cash", value: "CASH" },
@@ -94,6 +95,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 	const [officeCopyInvoice, setOfficeCopyInvoice] = useState(true);
 	const [customerCopyInvoice, setCustomerCopyInvoice] = useState(true);
 	const [duplicateCopyInvoice, setDuplicateCopyInvoice] = useState(true);
+    const [showPrintModal, setShowPrintModal] = useState(false);
 
     const { fields, append, remove } = useFieldArray({
         control,
@@ -156,11 +158,18 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     }, [focusRemarks]);
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
+        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
             if ((event.ctrlKey) && event.key === 't') {
                 event.preventDefault();
                 setShowTransportModal(true);
             }
+            if ((isMac && event.metaKey && event.key === 'p') ||
+                (!isMac && event.ctrlKey && event.key === 'p')) {
+                event.preventDefault(); 
+                setShowPrintModal(true);
+            }
         };
+
 
         // Add the event listener to the window object
         window.addEventListener('keydown', handleKeyPress);
@@ -1187,7 +1196,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 </div>
                 </body>
             </html>
-            `);
+            `,false,false);
             }            
         } catch (error) {
             console.error("Error fetching voucher:", error);
@@ -1578,44 +1587,97 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         return processedItems;
     };
     
-    const printInvoice = async (isNewSave : boolean, html: string) => {
+    const printInvoice = async (isNewSave : boolean, html: string,
+     isPrintPDF : boolean,isPrintDesktopPDF : boolean) => {
         if (!voucherId) {
             handleSubmit(async (data) => {
-                onSubmit(data)
+                onSubmit(data);
             })();
-        }
-        else if(isNewSave){
-            if (originalCopyInvoice) await generateAndPrintInvoice('Original Copy', html);
-            if (officeCopyInvoice) await generateAndPrintInvoice('Office Copy', html);
-            if (customerCopyInvoice) await generateAndPrintInvoice('Customer Copy', html);
-            if (duplicateCopyInvoice) await generateAndPrintInvoice('Duplicate Copy', html);
-        }
-        else {
-            if (originalCopyInvoice) await generateAndPrintInvoice('Original Copy', invoiceHtml);
-            if (officeCopyInvoice) await generateAndPrintInvoice('Office Copy', invoiceHtml);
-            if (customerCopyInvoice) await generateAndPrintInvoice('Customer Copy', invoiceHtml);
-            if (duplicateCopyInvoice) await generateAndPrintInvoice('Duplicate Copy', invoiceHtml);
+        } else if (isNewSave) {
+            if (isPrintPDF || isPrintDesktopPDF) {
+                const zip = new JSZip();
+                const folderName = `Invoice-${voucherId}`;
+                const folder = zip.folder(folderName);
+    
+                if (originalCopyInvoice) await addInvoiceToZip(folder, "Original Copy", html);
+                if (officeCopyInvoice) await addInvoiceToZip(folder, "Office Copy", html);
+                if (customerCopyInvoice) await addInvoiceToZip(folder, "Customer Copy", html);
+                if (duplicateCopyInvoice) await addInvoiceToZip(folder, "Duplicate Copy", html);
+    
+                const zipBlob = await zip.generateAsync({ type: "blob" });
+                const zipUrl = URL.createObjectURL(zipBlob);
+    
+                if (isPrintDesktopPDF) {
+                    const link = document.createElement("a");
+                    link.href = zipUrl;
+                    link.download = `${folderName}.zip`;
+                    link.click();
+                } else {
+                    const link = document.createElement("a");
+                    link.href = zipUrl;
+                    link.download = `${folderName}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            } else {
+                if (originalCopyInvoice) await generateAndPrintInvoice("Original Copy", html);
+                if (officeCopyInvoice) await generateAndPrintInvoice("Office Copy", html);
+                if (customerCopyInvoice) await generateAndPrintInvoice("Customer Copy", html);
+                if (duplicateCopyInvoice) await generateAndPrintInvoice("Duplicate Copy", html);
+            }
+        } else if (isPrintPDF) {
+            const zip = new JSZip();
+            const folderName = `Invoice-${voucherId}`;
+            const folder = zip.folder(folderName);
+    
+            if (originalCopyInvoice) await addInvoiceToZip(folder, "Original Copy", invoiceHtml);
+            if (officeCopyInvoice) await addInvoiceToZip(folder, "Office Copy", invoiceHtml);
+            if (customerCopyInvoice) await addInvoiceToZip(folder, "Customer Copy", invoiceHtml);
+            if (duplicateCopyInvoice) await addInvoiceToZip(folder, "Duplicate Copy", invoiceHtml);
+    
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            const zipUrl = URL.createObjectURL(zipBlob);
+    
+            console.log("isPrintDesktopPDF")
+            console.log(isPrintDesktopPDF)
+            if (isPrintDesktopPDF) {
+                const link = document.createElement("a");
+                link.href = zipUrl;
+                link.download = `${folderName}.zip`;
+                link.click();
+            } else {
+                const link = document.createElement("a");
+                link.href = zipUrl;
+                link.download = `${folderName}.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } else {
+            if (originalCopyInvoice) await generateAndPrintInvoice("Original Copy", invoiceHtml);
+            if (officeCopyInvoice) await generateAndPrintInvoice("Office Copy", invoiceHtml);
+            if (customerCopyInvoice) await generateAndPrintInvoice("Customer Copy", invoiceHtml);
+            if (duplicateCopyInvoice) await generateAndPrintInvoice("Duplicate Copy", invoiceHtml);
         }
     };
-
-    const generateAndPrintInvoice = async (copyType : string, invoiceHtml: string) => {
+    
+    const addInvoiceToZip = async (folder:any, copyType:string, invoiceHtml:string) => {
         const container = document.createElement("div");
-        container.style.width = "794px"; // A4 width in pixels at 96 DPI
-        container.style.margin = "auto"; // Center the content
-        container.innerHTML = invoiceHtml.replace('{COPYTYPE}', copyType);
+        container.style.width = "794px";
+        container.style.margin = "auto";
+        container.innerHTML = invoiceHtml.replace("{COPYTYPE}", copyType);
         document.body.appendChild(container);
     
-        const canvas = await html2canvas(container, { scale: 2 }); // Increase resolution
+        const canvas = await html2canvas(container, { scale: 2 });
         document.body.removeChild(container);
     
-        const pdf = new jsPDF("p", "mm", "a4"); // A4 dimensions
+        const pdf = new jsPDF("p", "mm", "a4");
         const imgData = canvas.toDataURL("image/png");
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = pageWidth;
         const imgHeight = (canvas.height * pageWidth) / canvas.width;
     
-        // Ensure content fits within the A4 page height
         if (imgHeight > pageHeight) {
             let y = 0;
             while (y < canvas.height) {
@@ -1631,8 +1693,33 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 if (y < canvas.height) pdf.addPage();
             }
         } else {
-            pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+            pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
         }
+    
+        pdf.setProperties({
+            title: copyType,
+        });
+    
+        const pdfBlob = pdf.output("blob");
+        folder.file(`${voucherId}-${copyType}.pdf`, pdfBlob);
+    };
+    
+    const generateAndPrintInvoice = async (copyType: string, invoiceHtml:string) => {
+        const container = document.createElement("div");
+        container.style.width = "794px";
+        container.style.margin = "auto";
+        container.innerHTML = invoiceHtml.replace("{COPYTYPE}", copyType);
+        document.body.appendChild(container);
+    
+        const canvas = await html2canvas(container, { scale: 2 });
+        document.body.removeChild(container);
+    
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgData = canvas.toDataURL("image/png");
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const imgHeight = (canvas.height * pageWidth) / canvas.width;
+    
+        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
     
         pdf.setProperties({
             title: copyType,
@@ -1642,6 +1729,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, "_blank");
     };
+
+
+
     
 
 
@@ -1992,7 +2082,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 }} /></Col>
                                 <Col><CustomButton size="sm" variant="success" type="submit" text="Save Invoice (Ctrl+S)" className="w-100" /></Col>
                                 <Col><CustomButton size="sm" onClick={() => {
-                                    printInvoice(false, "")
+                                    printInvoice(false, "", false, false)
                                     }} variant="success" text="Print Invoice (Ctrl+P)" className="w-100" /></Col>
                                 <Col>{voucher && voucherId && <CustomButton size="sm" variant="outline-danger" text="Final Delete (Ctrl+D)" className="w-100" onClick={() => deleteVoucher()} />}</Col>
 
@@ -2101,6 +2191,77 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 					/>
 				</Suspense>
 			</CommonModal>
+
+            <CommonModal
+                show={showPrintModal}
+                onHide={() => {
+                    fetchControlOptions();
+                    setShowPrintModal(false);
+                }}
+                size="sm"
+            >
+                <div className="p-3" style={{ backgroundColor: "#D5F5E3", borderRadius: "8px" }}>
+                    <h5 className="text-center text-danger mb-4">
+                        Bill of Supply Default Printer:
+                    </h5>
+                    <div className="container">
+                        <div className="row justify-content-center mb-3">
+                            <div className="col-auto">
+                                <Button
+                                    variant="outline-primary"
+                                    className="btn-sm"
+                                    onClick={() => printInvoice(false, "", false, false)}
+                                >
+                                    Preview
+                                </Button>
+                            </div>
+                            <div className="col-auto">
+                                <Button
+                                    variant="outline-secondary"
+                                    className="btn-sm"
+                                    onClick={() => {
+                                        printInvoice(false, "", true, true);
+                                    }}
+                                >
+                                    PDF Desktop
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="row justify-content-center mb-3">
+                            <div className="col-auto">
+                                <Button
+                                    variant="outline-success"
+                                    className="btn-sm"
+                                    onClick={() => {
+                                        printInvoice(false, "",true,false);
+                                    }}
+                                >
+                                    PDF
+                                </Button>
+                            </div>
+                            <div className="col-auto">
+                                <Button
+                                    variant="outline-secondary"
+                                    className="btn-sm"
+                                    onClick={() => console.log("Email Desktop Clicked")}
+                                >
+                                    Email
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="d-flex justify-content-end mt-3">
+                            <Button
+                                variant="outline-danger"
+                                className="btn-sm"
+                                onClick={() => setShowPrintModal(false)}
+                            >
+                                Exit
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </CommonModal>
+
 
             {showTransportModal &&
                 <TransportAndShippingDetailModal
