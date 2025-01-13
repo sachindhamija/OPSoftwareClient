@@ -1096,6 +1096,67 @@ const Mandi = {
   },
 };
 
+const Email = {
+  // sendEmails: async (accessId: string) => {
+  //   const params = new URLSearchParams({ accessId });
+  //   return await requests.post("email/SendEmails", params);
+  // },
+  sendEmails: async (accessId: string, files: File[]) => {
+    console.log("API call initiated");
+    const formData = new FormData();
+    formData.append("accessId", accessId);
+
+    files.forEach((file) => {
+        formData.append("attachments", file); 
+    });
+
+    return await axios
+        .post("email/SendEmails", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
+        .then(responseBody);
+},
+
+  getAllEmails: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("email/GetAllEmails", params);
+  },
+  getEmailById: async (accessId: string, emailID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`email/${emailID}`, params);
+  },
+  createEmail: async (
+    accessId: string,
+    email: EmailDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "email/CreateEmail",
+      email,
+      params
+    );
+  },
+  updateEmail: async (
+    accessId: string,
+    emailID: number,
+    email: EmailDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `email/${emailID}`,
+      email,
+      params
+    );
+  },
+  deleteEmail: async (accessId: string, emailID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`email/${emailID}`, params);
+  },
+};
+
 const agent = {
   UserAccount,
   Company,
@@ -1123,6 +1184,7 @@ const agent = {
   AdditionalFieldType,
   CommissionAgentItem,
   Mandi,
+  Email,
 };
 
 export default agent;
