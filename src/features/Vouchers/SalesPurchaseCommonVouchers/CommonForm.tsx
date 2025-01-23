@@ -20,7 +20,7 @@ import { AccountDtoForDropDownList } from "../../Masters/Account/accountDto";
 import { transformAccountToOption } from "../../../app/utils/accountUtils";
 import AccountForm from "../../Masters/Account/AccountForm";
 import ItemForm from "../../Masters/Item/ItemForm";
-import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
+import { fetchVoucherItemListForDropdown } from "../../../app/utils/voucherItemUtils";
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
 import './Common.scss'
 import { formatNumberIST } from "../../../app/utils/numberUtils";
@@ -58,7 +58,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [lastVoucherDate, setLastVoucherDate] = useState<Date | null>(null);
     const [billBookList, setBillBookList] = useState<OptionType[]>([]);
     const [showBillBookModal, setShowBillBookModal] = useState(false);
-    const [selectedTaxType, setSelectedTaxType] = useState<string>('');
+    const [selectedTaxType, setSelectedTaxType] = useState<string>('Inclusive');
     const [allAccounts, setAllAccounts] = useState<AccountDtoForDropDownList[]>([]);
     const [showAccountModal, setShowAccountModal] = useState(false);
     const [showItemModal, setShowItemModal] = useState(false);
@@ -95,13 +95,28 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 	const [officeCopyInvoice, setOfficeCopyInvoice] = useState(true);
 	const [customerCopyInvoice, setCustomerCopyInvoice] = useState(true);
 	const [duplicateCopyInvoice, setDuplicateCopyInvoice] = useState(true);
+	const [isSundayAllowed, setIsSundayAllowed] = useState(false);
+	const [hideBank, setHideBank] = useState(false);
+	const [isCashDefault, setIsCashDefault] = useState(false);
+	const [isCreditDefault, setIsCreditDefault] = useState(false);
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [showEmailModal, setShowEmailModal] = useState(false);
+    const [isMainQty, setIsMainQty] = useState(true);
+    const [isRateSale, setIsRateSale] = useState(true);
+    const [isDiscount, setIsDiscount] = useState(true);
+    const [isDiscountPercentage, setIsDiscountPercentage] = useState(true);
+    const [isBillNumberExists, setIsBillNumberExists] = useState(false);
 
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'items',
     });
+
+
+    useEffect(() => {
+		fetchControlOptions();
+	}, [accessId]);
+
     const watchedItems = watch('items');    
     const items: ItemsInVoucherDto[] = watchedItems;
     const handleSaveSerialNumbers = (values: ItemsInVoucherDto[]) => {
@@ -160,17 +175,22 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            if ((event.ctrlKey) && event.key === 't') {
-                event.preventDefault();
-                setShowTransportModal(true);
-            }
-            console.log("cntrl + p")
+            // if ((event.ctrlKey) && event.key === 't') {
+            //     event.preventDefault();
+            //     setShowTransportModal(true);
+            // }
             if ((isMac && event.metaKey && event.key === 'p') ||
                 (!isMac && event.ctrlKey && event.key === 'p')) {
-                    console.log("Print shortcut pressed");
+                 console.log("Print shortcut pressed");
                 event.preventDefault(); 
                 setShowPrintModal(true);
             }
+            if ((isMac && event.metaKey && event.key === 't') ||
+            (!isMac && event.ctrlKey && event.key === 't')) {
+             console.log("transport shortcut pressed");
+            event.preventDefault(); 
+            setShowTransportModal(true);
+        }
         };
         window.addEventListener('keydown', handleKeyPress);
         return () => {
@@ -306,21 +326,28 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 setSelectedTaxType("Inclusive");
             }
             setValue("billBookId", selectedOption.value);
-            const voucherNo = watch("voucherNo");
-            if (voucherNo) return;
+            //const voucherNo = watch("voucherNo");
+            //if (voucherNo) return;
             try {
                 const lastVoucherInfo = await agent.SalePurchase.getLastVoucherInfoBySaleBillBookId(accessId, selectedOption.value);
-                const { LastVoucherPrefix } = lastVoucherInfo;
-                let { LastVoucherNumber } = lastVoucherInfo;
-                LastVoucherNumber = String(parseInt(LastVoucherNumber) || 0);
-                const nextVoucherNumber = parseInt(LastVoucherNumber) + 1;
-                const fullVoucherNumber = `${LastVoucherPrefix || ''}${nextVoucherNumber}`;
+                //const { LastVoucherPrefix } = lastVoucherInfo.lastVoucherPrefix || 0 ;
+                //let { LastVoucherNumber } = lastVoucherInfo.lastVoucherNumber;
+                //LastVoucherNumber = String(parseInt(lastVoucherInfo.lastVoucherNumberr) || 0);
+                const nextVoucherNumber = parseInt(lastVoucherInfo.lastVoucherNumber || '0') + 1;
+                const fullVoucherNumber = `${lastVoucherInfo.lastVoucherPrefix || ''}${nextVoucherNumber}`;
                 setValue("voucherNo", fullVoucherNumber);
             } catch (error) {
                 console.error("Error fetching last voucher info:", error);
                 const fullVoucherNumber = `1`;
                 setValue("voucherNo", fullVoucherNumber);
             }
+
+            if (isCashDefault) {
+                setValue("paymentMode", "CASH");
+            } else if (isCreditDefault) {
+                setValue("paymentMode", "CREDIT");
+            }
+            
         }
     };
     const handleAccountChange = async (selectedOption: OptionType | null) => {
@@ -356,7 +383,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const fetchData = async () => {
         if (voucherDate && validateDate(voucherDate) && financialYear?.financialYearFrom) {
             fetchAccounts(voucherDate);
-            const options = await fetchItemListForDropdown(accessId, financialYear.financialYearFrom, voucherDate);
+            const options = await fetchVoucherItemListForDropdown(accessId,selectedTaxType, financialYear.financialYearFrom, voucherDate);
             setItemDropDownList(options);
         }
     };
@@ -380,7 +407,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             }
         });
 
-    }, [accessId, voucherDate, financialYear, voucherType]);
+    }, [accessId, voucherDate, financialYear, voucherType, selectedTaxType]);
 
     sessionStorage.setItem(
         'voucherId',JSON.stringify(voucherId)
@@ -408,6 +435,33 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 						case 'Do you want to print Duplicate Copy of Invoice?':
 							setDuplicateCopyInvoice(option.controlValue === 'Y');
 							break;
+                        case 'Allow Entries on Sunday for Sales':
+                            setIsSundayAllowed(option.controlValue === 'Y');
+                            break;
+                        case 'Hide Bank form payment mode':
+                            setHideBank(option.controlValue === 'Y');
+                            break;
+                        case 'Set Cash Default for payment mode':
+                            setIsCashDefault(option.controlValue === 'Y');
+                            break;
+                        case 'Set Credit Default for payment mode':
+                            setIsCreditDefault(option.controlValue === 'Y');
+                            break;
+ 						case 'Use Main Quantity in Sales':
+							setIsMainQty(option.controlValue === 'Y');
+							break;
+						case 'Use Main Quantity in Sales':
+							setIsMainQty(option.controlValue === 'Y');
+							break;
+						case 'Apply Rate in Sales':
+							setIsRateSale(option.controlValue === 'Y');
+							break;
+						case 'Apply Discount in Sales':
+							setIsDiscount(option.controlValue === 'Y');
+							break;
+						case 'Apply Discount Percentage in Sales':
+							setIsDiscountPercentage(option.controlValue === 'Y');
+							break;
 						default:
 							break;
 					}
@@ -417,9 +471,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 			toast.error('Failed to load control options.');
 		}
 	};
-	useEffect(() => {
-		fetchControlOptions();
-	}, [accessId]);
 
     useEffect(() => {
         invoiceHtmlData(false);
@@ -1228,11 +1279,12 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 filteredAccounts = otherAccounts;
             }
         } else if (paymentMode.toLowerCase().includes("credit")) {
-            filteredAccounts = allAccounts.filter(account => account.accountGroupName !== 'BANK ACCOUNTS' && account.accountGroupName !== 'CASH-IN-HAND');
+            filteredAccounts = allAccounts.filter(account => account.accountGroupName === 'CUSTOMER' || account.accountGroupName === 'SUNDRY CREDITORS' || account.accountGroupName === 'SUNDRY DEBTORS');
         } else if (paymentMode.toLowerCase().includes("upi") || paymentMode.toLowerCase().includes("bank")) {
-            filteredAccounts = allAccounts.filter(account => account.accountGroupName === 'BANK ACCOUNTS');
+            filteredAccounts = allAccounts.filter(account => account.accountGroupName === 'BANK ACCOUNTS' || account.accountGroupName === 'SECURED LOANS');
         }
         setDisplayedAccounts(filteredAccounts);
+    //}, [paymentMode, setValue]);
     }, [paymentMode, allAccounts, setValue]);
 
 
@@ -1441,12 +1493,38 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 toast.error("Invalid Voucher Type. Data cannot be saved.");
                 return;
             }
+            if (isBillNumberExists) {
+                toast.error('Bill Number already exists.');
+                return;
+            }
             const finalData = convertFieldValuesToDto(data);
+            const today = new Date();
+            if (!isSundayAllowed) {
+                const isSunday = today.getDay() === 0;
+                if (isSunday) {
+                    toast.error("Voucher cannot be saved on Sundays.");
+                    return;
+                }
+            }
+
+            today.setHours(0, 0, 0, 0);
+            if (data.voucherDate) {
+                const [day, month, year] = data.voucherDate.split("-").map(Number);
+                const parsedVoucherDate = new Date(year, month - 1, day);
+                if (parsedVoucherDate > today) {
+                    toast.error('The voucher date cannot be in the future.');
+                    return;
+                }
+            }
             if (voucherType == VoucherTypeEnum.ItemSale) {
                 if (voucherId || voucher) {
                     // update the invoice   
                     await agent.SalePurchase.updateVoucher(accessId, finalData);
                     toast.success('Voucher updated successfully');
+                    reset();
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
                 }
                 else {
                     var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
@@ -1672,6 +1750,23 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         window.open(pdfUrl, "_blank");
     };    
 
+    const checkIfBillNumberExists = async (value:string)=>{
+        const billBookId = watch("billBookId");
+        if (!billBookId) {
+            console.error("Bill Book ID is required to check if the bill number exists.");
+            return;
+        }
+
+        var billNumberExists = await agent.SalePurchase.checkIfBillNumberExists(accessId, billBookId, value);
+        if(billNumberExists){
+            setIsBillNumberExists(true);
+            toast.error('Bill Number already exists.');
+        }else{
+            setIsBillNumberExists(false);
+        }
+    }
+
+
 
     if (voucherId && !voucher) return null;
     return (
@@ -1717,11 +1812,12 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                             <CustomDropdown
                                 name="paymentMode"
                                 label="Payment Mode"
-                                options={PAYMENT_MODE_OPTIONS}
+                                options={hideBank ? PAYMENT_MODE_OPTIONS.filter(option => option.value !== "BANK") : PAYMENT_MODE_OPTIONS}
                                 control={control}
                                 hideDropdownIcon
                                 hideClearIcon
-                            // defaultValue={voucher?.voucherMasterExtended?.paymentMode}
+                                disabled={isBillNumberExists}
+                                //defaultValue={ isCashDefault ? PAYMENT_MODE_OPTIONS.find(option => option.value === "CASH"): isCreditDefault ? PAYMENT_MODE_OPTIONS.find(option => option.value === "CREDIT") : undefined}
                             />
                         </Col>
                         <Col xs={12} sm={6} md={5}>
@@ -1739,7 +1835,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 badgeText={partyGST}
                                 hideDropdownIcon
                                 hideClearIcon
-                                disabled={askForCustomerDetailWhenCash && paymentMode.toLowerCase().includes("cash")}
+                                disabled={(askForCustomerDetailWhenCash && paymentMode.toLowerCase().includes("cash")) || isBillNumberExists}
                             // defaultValue={voucher?.voucherDetails?.accountId}
                             />
                         </Col>
@@ -1751,7 +1847,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 maxLength={12}
                                 isTextCenter
                                 autoFocus={focusBillNo}
-                            // defaultValue={voucher?.voucherNumber}
+                                onChange={(e) => checkIfBillNumberExists(e.target.value)}
+                                // defaultValue={voucher?.voucherNumber}
                             />
                         </Col>
                     </Row>
@@ -1797,24 +1894,24 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                     <tr key={field.id}>
                                         <td style={{ textAlign: 'center' }}>{index + 1}</td>
                                         <td>
-                                            <CustomDropdown
-                                                name={`items[${index}].itemId`}
-                                                options={itemDropDownList}
-                                                control={control}
-                                                isCreatable
-                                                onCreateButtonClick={() => { setShowItemModal(true); }}
-                                                dropDownWidth="800px"
-                                                onChangeCallback={(selectedOption: OptionType | null) => {
-                                                    if (selectedOption) {
-                                                        setTimeout(() => fetchItemDetails(selectedOption.value, index), 0);
-                                                    }
-                                                }}
-                                                hideDropdownIcon
-                                                hideClearIcon
-                                                isInTable
-                                                onFocus={index === fields.length - 1 ? scrollToBottom : undefined}
-
-                                            />
+                                        <CustomDropdown
+                                                    name={`items[${index}].itemId`}
+                                                    options={itemDropDownList}
+                                                    control={control}
+                                                    isCreatable
+                                                    onCreateButtonClick={() => { setShowItemModal(true); }}
+                                                    dropDownWidth="800px"
+                                                    onChangeCallback={(selectedOption: OptionType | null) => {
+                                                        if (selectedOption) {
+                                                            setTimeout(() => fetchItemDetails(selectedOption.value, index), 0);
+                                                        }
+                                                    }}
+                                                    hideDropdownIcon
+                                                    hideClearIcon
+                                                    isInTable
+                                                    onFocus={index === fields.length - 1 ? scrollToBottom : undefined}
+                                                    disabled={isBillNumberExists}
+                                                />
                                         </td>
 
                                         <td>
@@ -1823,8 +1920,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 register={register}
                                                 allowedChars="numericDecimal"
                                                 onChange={(e) => calculateItemRow(index, 'mainQty', e.target.value)}
-
-                                            />
+                                                disabled={!isMainQty || isBillNumberExists}                                            />
                                         </td>
                                         {/* Alternate Qty */}
                                         {useAltQty && (
@@ -1834,6 +1930,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     register={register}
                                                     allowedChars="numericDecimal"
                                                     onChange={(e) => calculateItemRow(index, 'altQty', e.target.value)}
+                                                    disabled={isBillNumberExists}
                                                 />
                                             </td>
                                         )}
@@ -1844,6 +1941,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     name={`items[${index}].free`}
                                                     register={register}
                                                     allowedChars="numericDecimal"
+                                                    disabled={isBillNumberExists}
                                                 />
                                             </td>
                                         )}
@@ -1866,6 +1964,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         setFocusInclusiveRateInput(`items[${index}].inclusiveRate`);
                                                     }
                                                 }}
+                                                disabled={!isRateSale || isBillNumberExists}
+
                                             />
                                             {showInclusiveRateInput === index && (
                                                 <CustomInput
@@ -1887,6 +1987,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         setFocusInclusiveRateInput(null);
                                                     }}
                                                     autoFocus={focusInclusiveRateInput === `items[${index}].inclusiveRate`}
+                                                    disabled={isBillNumberExists}
                                                 />
                                             )}
 
@@ -1907,6 +2008,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         }}
                                                         dropDownWidth="100px"
                                                         isInTable
+                                                        disabled={isBillNumberExists}
                                                     />
                                                 </div>
                                             </td>
@@ -1917,6 +2019,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 register={register}
                                                 allowedChars="numericDecimal"
                                                 disabled={getValues(`items[${index}].isRateZero`)}
+                                                
                                             />
                                         </td>
                                         <td>
@@ -1924,7 +2027,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].discountPercentage`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                disabled={getValues(`items[${index}].isRateZero`)}
+                                                disabled={getValues(`items[${index}].isRateZero`) || !isDiscountPercentage}                                               
                                                 onChange={(e) => calculateItemRow(index, 'discountPercentage', e.target.value)}
                                                 maxLength={2}
                                             />
@@ -1934,7 +2037,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].discountAmount`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                disabled={getValues(`items[${index}].isRateZero`)}
+                                                disabled={getValues(`items[${index}].isRateZero`) || !isDiscount}
                                                 onChange={(e) => calculateItemRow(index, 'discountAmount', e.target.value)}
                                             />
                                         </td>
@@ -2083,7 +2186,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     <SaleBillBookForm onSaveSuccess={() => { loadBillBookOptions(); setShowBillBookModal(false); }} isModalOpen={showBillBookModal} />
                 </Suspense>
             </CommonModal>
-            <CommonModal show={showAccountModal} onHide={() => { setShowAccountModal(false); }} size='xl'>
+            <CommonModal 
+                    show={showAccountModal} 
+                    onHide={() => {
+                        fetchAccounts(voucherDate);                         
+                        setShowAccountModal(false);
+                        }
+                    }
+                    size='xl'>
                 <Suspense fallback={<div>Loading...</div>}>
                     <AccountForm
                         isModalOpen={showAccountModal}
@@ -2101,7 +2211,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                         isModalOpen={showItemModal}
                         onCloseModalAfterSave={async () => {
                             if (financialYear?.financialYearFrom) {
-                                const options = await fetchItemListForDropdown(accessId, financialYear?.financialYearFrom, voucherDate);
+                                const options = await fetchVoucherItemListForDropdown(accessId,selectedTaxType, financialYear?.financialYearFrom, voucherDate);
                                 setItemDropDownList(options);
                             }
                             setShowItemModal(false);
@@ -2268,7 +2378,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 onSave={handleSaveSerialNumbers}
                 currentItemID={null}
                 items={items}
-            />}
+            />}            
 
         </>
     )

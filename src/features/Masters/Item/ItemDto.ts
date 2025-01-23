@@ -56,6 +56,7 @@ export interface ItemDropDownListDto {
   netPurQty?: number;
   netSaleQty?: number;
   balance?: number;
+  gstSlabName?: string;
 }
 export interface ItemDetailDto {
   itemId: number;

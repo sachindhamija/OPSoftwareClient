@@ -553,6 +553,20 @@ const Item = {
     });
     return await requests.get(`items/LoadItemsForDropDownList`, params);
   },
+  getVoucherItemsForDropDownList: async (
+    accessId: string,
+    selectedTaxType: string,
+    financialYearFrom: string,
+    tillDate: string
+  ): Promise<ItemDropDownListDto[]> => {
+    const params = new URLSearchParams({
+      accessId,
+      selectedTaxType,
+      financialYearFrom,
+      tillDate,
+    });
+    return await requests.get(`items/LoadVoucherItemsForDropDownList`, params);
+  },
   getAllItems: async (
     accessId: string,
     {
@@ -942,7 +956,9 @@ const SalePurchase = {
   ) => {
     const params = new URLSearchParams({ accessId, existingVoucherId });
     return await requests.post("SalePurchase/SaveVoucher", dto, params);
-  }, updateVoucher: async (
+  },
+
+  updateVoucher: async (
     accessId: string,
     dto: ItemSalePurchaseVoucherDto
   ) => {
@@ -976,6 +992,19 @@ const SalePurchase = {
       voucherId: voucherId
     });
     return await requests.get(`SalePurchase/GetVoucherById`,params);
+  }, 
+
+  checkIfBillNumberExists: async (
+    accessId: string,
+    billBookId: string,
+    voucherNo: string
+  ) => {
+    const params = new URLSearchParams({
+      accessId: accessId,
+      billBookId: billBookId,
+      voucherNo: voucherNo
+    });
+    return await requests.get(`SalePurchase/CheckIfBillNumberExists`,params);
   }  
 };
 const SerialNumber = {
