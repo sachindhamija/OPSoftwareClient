@@ -63,7 +63,7 @@ function ItemForm({
 	const [itemGodown, setItemGodown] = useState<OptionType[]>([]);
 	const [hsnCodeInput, setHsnCodeInput] = useState('');
 	const [hsnCodes, setHsnCodes] = useState<OptionType[]>([]);
-	const debouncedHSNCodeInput = useDebounce(hsnCodeInput, 700);
+	const debouncedHSNCodeInput = useDebounce(hsnCodeInput, 400);
 	const [dataLoaded, setDataLoaded] = useState(false);
 	const [gstSlabModalShow, setGSTSlabModalShow] = useState(false);
 	const [categoryModalShow, setCategoryModalShow] = useState(false);
@@ -150,7 +150,7 @@ function ItemForm({
 
 	useEffect(() => {
 		const fetchHSNCodes = async () => {
-			if (debouncedHSNCodeInput && debouncedHSNCodeInput.length >= 3) {
+			if (debouncedHSNCodeInput && debouncedHSNCodeInput.length >= 2) {
 				try {
 					const codes = await useHSNCodesOrSAC(
 						accessId,
@@ -402,7 +402,7 @@ function ItemForm({
 							label="HSN/SAC Code"
 							name="hsnCode"
 							control={control}
-							placeholder="Enter First 3 digits of HSN Code"
+							placeholder="Enter First 2 digits of HSN Code"
 							options={hsnCodes}
 							onInputChange={(newValue) =>
 								setHsnCodeInput(newValue)

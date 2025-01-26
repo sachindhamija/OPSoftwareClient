@@ -9,7 +9,7 @@ export const useHSNCodesOrSAC = async (
   accessId: string,
   inputValue: string
 ): Promise<OptionType[]> => {
-  if (!inputValue || inputValue.length < 3) {
+  if (!inputValue || inputValue.length < 2) {
     return [];
   }
   try {

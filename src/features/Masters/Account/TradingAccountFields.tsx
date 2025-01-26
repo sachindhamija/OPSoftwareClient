@@ -36,7 +36,7 @@ const TradingAccountFields = ({
 
 	useEffect(() => {
 		const fetchHSNCodes = async () => {
-			if (debouncedHSNCodeInput && debouncedHSNCodeInput.length >= 3) {
+			if (debouncedHSNCodeInput && debouncedHSNCodeInput.length >= 2) {
 				try {
 					const codes = await useHSNCodesOrSAC(
 						accessId,
@@ -74,7 +74,7 @@ const TradingAccountFields = ({
 						label="HSN/SAC Code"
 						name="hsnCode"
 						control={control}
-						placeholder="Enter First 3 digits of HSN Code"
+						placeholder="Enter First 2 digits of HSN Code"
 						options={hsnCodes}
 						onInputChange={(newValue) => setHsnCodeInput(newValue)}
 					/>

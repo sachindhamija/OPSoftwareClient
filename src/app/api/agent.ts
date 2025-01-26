@@ -773,7 +773,8 @@ const Vouchers = {
     });
     // return await requests.get(`voucher/${voucherId}`, params);
     const response = await requests.get(`voucher/${voucherId}`, params);
-
+    console.log("response")
+    console.log(response);
     // Assuming response.data contains the voucher data
     if (response) {
       const voucherData = response;

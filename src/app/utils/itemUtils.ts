@@ -11,6 +11,7 @@ const transformItemToOption = (item: ItemDropDownListDto): OptionType => {
     item.netPurQty ? `Purchases: ${item.netPurQty}` : "",
     item.netSaleQty ? `Sales: ${item.netSaleQty}` : "",
     item.balance ? `Balance: ${item.balance}` : "",
+    item.gstSlabName ? `GSTSlab: ${item.gstSlabName}` : "",
   ].filter((part) => part !== ""); // Remove empty parts
 
   return {

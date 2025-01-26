@@ -25,22 +25,8 @@ export interface ItemSalePurchaseVoucherDto {
   voucherOtherCharges?: OtherChargesDto[];
   
 }
+ 
 
-export interface TransportDetailDto {
-  
-  deliveryAddress?: string;
-  deliveryFirmName?: string;
-  deliveryFirmGSTNo?: string;
-  deliveryFirmContactPersonName?: string;
-  deliveryFirmPersonMobileNumber?: string;
-
-  transporterName?: string;
-  vehicleNumber?: string;
-  driverName?: string;
-  grNo?: string;
-  grDate?: string;
-  brokerName?: string;
-}
 
 export interface CustomerDetailDto {
   customerName?: string;
@@ -164,20 +150,58 @@ export const defaultItems: ItemsInVoucherDto = {
   itemDetail: defaultItemDetail,
   serialNumberValues:[],
 };
+export interface TransportDetailDto {
+  eInvoiceNumber?: string;
+  eInvoiceDate?: string | Date | null;
+  eWayBillNo?: string;
+  eWayBillDate?: string | Date | null;
+  firmName?: string;
+  gstNo?: string;
+  contactPersonName?: string;
+  contactPersonMobileNo?: string;
+  deliveryAddress?: string;
+  placeOfSupply?: string;
+  mode?: string;
+  vehicleType?: string;
+  chargesPaidOrToPaid?: string;
+
+  transporterName?: string;
+  vehicleNumber?: string;
+  driverName?: string;
+  grNo?: string;
+  grDate?: string | Date;
+  brokerName?: string;
+  deliveryFirmName?: string;
+  deliveryFirmGSTNo?: string;
+  deliveryFirmContactPersonName?: string;
+  deliveryFirmPersonMobileNumber?: string;
+}
+
 export const defaultTransportDetails: TransportDetailDto = {
+  eInvoiceNumber: "",
+  eInvoiceDate: null,
+  eWayBillNo: "",
+  eWayBillDate: null,
+  firmName: "",
+  gstNo: "",
+  contactPersonName: "",
+  contactPersonMobileNo: "",
+  deliveryAddress: "",
+  placeOfSupply: "",
+  mode: "",
+  vehicleType: "",
+  chargesPaidOrToPaid: "",
   transporterName: "",
   vehicleNumber: "",
   driverName: "",
   grNo: "",
   grDate: "",
-  deliveryAddress: "",
+  brokerName: "",
   deliveryFirmName: "",
   deliveryFirmGSTNo: "",
   deliveryFirmContactPersonName: "",
   deliveryFirmPersonMobileNumber: "",
-  brokerName: "",
 };
-
 // Define default values for the customer details form
 export const defaultCustomerDetails: CustomerDetailDto = {
   customerName: "",

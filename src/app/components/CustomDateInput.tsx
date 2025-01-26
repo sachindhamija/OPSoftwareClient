@@ -23,6 +23,7 @@ interface CustomDateInputBoxProps {
     WarningForAdvanceEntry?: boolean;
     inputRef?: React.RefObject<HTMLInputElement>;
     style?: React.CSSProperties; // Add this line
+    onValueChange?: (value: string) => void; // Add this prop
 
 }
 
@@ -42,6 +43,7 @@ const CustomDateInputBox: React.FC<CustomDateInputBoxProps> = ({
     WarningForAdvanceEntry = false,
     inputRef,
     style,
+    onValueChange, // Destructure it here
     ...rest
 }) => {
 
@@ -135,6 +137,9 @@ const CustomDateInputBox: React.FC<CustomDateInputBoxProps> = ({
             setValue(name, formattedValue, { shouldValidate: true })
             updateDayName(formattedValue);
             setLocalError('');
+            if (onValueChange) {
+                onValueChange(formattedValue);
+            }
         }
         else {
             ('Out of financial year.');

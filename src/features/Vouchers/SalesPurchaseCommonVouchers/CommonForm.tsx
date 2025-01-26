@@ -20,7 +20,6 @@ import { AccountDtoForDropDownList } from "../../Masters/Account/accountDto";
 import { transformAccountToOption } from "../../../app/utils/accountUtils";
 import AccountForm from "../../Masters/Account/AccountForm";
 import ItemForm from "../../Masters/Item/ItemForm";
-import { fetchVoucherItemListForDropdown } from "../../../app/utils/voucherItemUtils";
 import { ItemDetailDto } from "../../Masters/Item/ItemDto";
 import './Common.scss'
 import { formatNumberIST } from "../../../app/utils/numberUtils";
@@ -36,6 +35,7 @@ import html2canvas from 'html2canvas';
 import { ControlOptionDto } from "../VoucherCommon/controlOptionDto";
 import ControlPanelForm from "../VoucherCommon/ControlPanelForm";
 import EmailForm from "./EmailForm";
+import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
 
 const PAYMENT_MODE_OPTIONS = [
     { label: "Cash", value: "CASH" },
@@ -58,7 +58,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [lastVoucherDate, setLastVoucherDate] = useState<Date | null>(null);
     const [billBookList, setBillBookList] = useState<OptionType[]>([]);
     const [showBillBookModal, setShowBillBookModal] = useState(false);
-    const [selectedTaxType, setSelectedTaxType] = useState<string>('Inclusive');
+    const [selectedTaxType, setSelectedTaxType] = useState<string>('');
     const [allAccounts, setAllAccounts] = useState<AccountDtoForDropDownList[]>([]);
     const [showAccountModal, setShowAccountModal] = useState(false);
     const [showItemModal, setShowItemModal] = useState(false);
@@ -85,6 +85,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const { register, handleSubmit, setValue, getValues, watch, control, reset, formState: { errors } } = useForm<FieldValues>({
         mode: "all",
         defaultValues: {
+            billBookId: null,
+            voucherDate: null, 
+            paymentMode: null,
             items: [defaultItems]
         }
     });
@@ -111,7 +114,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         control,
         name: 'items',
     });
-
+    
 
     useEffect(() => {
 		fetchControlOptions();
@@ -254,6 +257,20 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 deliveryFirmGSTNo: voucher?.voucherMasterExtended?.deliveryFirmGSTNo,
                 deliveryFirmContactPersonName: voucher?.voucherMasterExtended?.deliveryFirmContactPersonName,
                 deliveryFirmPersonMobileNumber: voucher?.voucherMasterExtended?.deliveryFirmPersonMobileNumber,
+
+                eInvoiceNumber: voucher?.voucherMasterExtended?.eInvoiceNumber,
+                eInvoiceDate: voucher?.voucherMasterExtended?.eInvoiceDate,
+                eWayBillNo: voucher?.voucherMasterExtended?.eWayBillNo,
+                eWayBillDate: voucher?.voucherMasterExtended?.eWayBillDate,
+                firmName: voucher?.voucherMasterExtended?.firmName,
+                gstNo: voucher?.voucherMasterExtended?.gstNo,
+                contactPersonName: voucher?.voucherMasterExtended?.contactPersonName,
+                contactPersonMobileNo: voucher?.voucherMasterExtended?.contactPersonMobileNo,
+                placeOfSupply: voucher?.voucherMasterExtended?.placeOfSupply,
+                mode: voucher?.voucherMasterExtended?.mode,
+                vehicleType: voucher?.voucherMasterExtended?.vehicleType,
+                chargesPaidOrToPaid: voucher?.voucherMasterExtended?.chargesPaidOrToPaid,
+
             });
 
             // Update the customerDetail state
@@ -383,7 +400,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const fetchData = async () => {
         if (voucherDate && validateDate(voucherDate) && financialYear?.financialYearFrom) {
             fetchAccounts(voucherDate);
-            const options = await fetchVoucherItemListForDropdown(accessId,selectedTaxType, financialYear.financialYearFrom, voucherDate);
+            const options = await fetchItemListForDropdown(accessId, financialYear.financialYearFrom, voucherDate);
             setItemDropDownList(options);
         }
     };
@@ -1260,7 +1277,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
     useEffect(() => {
         let filteredAccounts: AccountDtoForDropDownList[] = [];
-        if (paymentMode.toLowerCase().includes("cash")) {
+        if (paymentMode?.toLowerCase().includes("cash")) {
             const cashAccount = allAccounts.find(acc => acc.accountName === "CASH");
             const otherAccounts = allAccounts.filter(acc => acc.accountName !== "CASH");
             if (cashAccount) {
@@ -1278,9 +1295,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             } else {
                 filteredAccounts = otherAccounts;
             }
-        } else if (paymentMode.toLowerCase().includes("credit")) {
+        } else if (paymentMode?.toLowerCase().includes("credit")) {
             filteredAccounts = allAccounts.filter(account => account.accountGroupName === 'CUSTOMER' || account.accountGroupName === 'SUNDRY CREDITORS' || account.accountGroupName === 'SUNDRY DEBTORS');
-        } else if (paymentMode.toLowerCase().includes("upi") || paymentMode.toLowerCase().includes("bank")) {
+        } else if (paymentMode?.toLowerCase().includes("upi") || paymentMode?.toLowerCase().includes("bank")) {
             filteredAccounts = allAccounts.filter(account => account.accountGroupName === 'BANK ACCOUNTS' || account.accountGroupName === 'SECURED LOANS');
         }
         setDisplayedAccounts(filteredAccounts);
@@ -1288,8 +1305,43 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     }, [paymentMode, allAccounts, setValue]);
 
 
-    const fetchItemDetails = async (itemId: number, index: number) => {
+    const fetchItemDetails = async (itemId: number, index: number, selectedOption: string) => {
 
+    
+        const gstSlabMatch = selectedOption.match(/GSTSlab:\s*([\d.]+%)/);
+        const gstSlabValue = gstSlabMatch ? parseFloat(gstSlabMatch[1]) : null; // Convert "3%" to 3
+    
+        const billBookId = watch("billBookId");
+        if (!billBookId) {
+            toast.error("Select bill book first.");
+            setValue(`items[${index}].itemId`, null); 
+            remove(index);
+            if (fields.length === 1) {
+                append(defaultItems); 
+            }
+            return;        }
+        console.log("gstSlabValue");
+        console.log(typeof(gstSlabValue));
+        console.log(gstSlabValue);
+        if (selectedTaxType === "Inclusive" && (!gstSlabValue || gstSlabValue <= 0)) {
+            toast.error("Inclusive type doesn't include items without tax.");
+            setValue(`items[${index}].itemId`, null);
+            remove(index);
+            if (fields.length === 1) {
+                append(defaultItems); 
+            }
+            return;        }
+    
+        if (selectedTaxType === "Exclusive" && gstSlabValue && gstSlabValue > 0) {
+            toast.error("Exclusive type doesn't include items with tax.");
+            setValue(`items[${index}].itemId`, null); 
+            remove(index);
+            if (fields.length === 1) {
+                append(defaultItems); 
+            }
+            return;
+        }
+        
         setValue(`items[${index}]`, {
             mainQty: "",
             altQty: "",
@@ -1433,7 +1485,50 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             calculateBillSummary();
         }, 0);
     };
+    const [showBillNumberExistsPopup, setShowBillNumberExistsPopup] = useState(false);
+    const [existingVoucher, setExistingVoucher] = useState();
 
+    const checkIfBillNumberExists = async (value: string) => {
+        const billBookId = watch("billBookId");
+        if (!billBookId) {
+            toast.error("Bill Book ID is required to check if the bill number exists.");
+            return;
+        }
+    
+        var voucherExists = await agent.SalePurchase.checkIfBillNumberExists(accessId, billBookId, value);
+        if (voucherExists) {
+            setExistingVoucher(voucherExists)
+            setIsBillNumberExists(true);
+            setShowBillNumberExistsPopup(true);
+        } else {
+            setIsBillNumberExists(false);
+        }
+    }
+    
+    
+    const BillNumberExistsPopup = ({ existingVoucher,show, onHide }: { existingVoucher: ItemSalePurchaseVoucherDto ,show: boolean, onHide: () => void }) => {
+        return (
+            <CommonModal show={show} onHide={onHide} size="sm">
+                <div className="p-4">
+                    <h5 className="text-center text-danger mb-4" style={{ fontWeight: "600" }}>
+                        Bill Number Already Exists
+                    </h5>
+                    <p className="text-center">The bill number you entered already exists. Please enter a different bill number.</p>
+                    <p className="text-center">Account: {existingVoucher.accountName}.</p>
+                    <p className="text-center">Total: {existingVoucher.totalRoundOff}.</p>
+                    <div className="d-flex justify-content-end mt-4">
+                        <Button
+                            variant="outline-danger"
+                            className="btn-sm px-4"
+                            onClick={onHide}
+                        >
+                            Close
+                        </Button>
+                    </div>
+                </div>
+            </CommonModal>
+        );
+    };
     const calculateBillSummary = () => {
         
 
@@ -1508,26 +1603,30 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             }
 
             today.setHours(0, 0, 0, 0);
-            if (data.voucherDate) {
-                const [day, month, year] = data.voucherDate.split("-").map(Number);
-                const parsedVoucherDate = new Date(year, month - 1, day);
-                if (parsedVoucherDate > today) {
-                    toast.error('The voucher date cannot be in the future.');
-                    return;
-                }
-            }
+            // if (data.voucherDate) {
+            //     const [day, month, year] = data.voucherDate.split("-").map(Number);
+            //     const parsedVoucherDate = new Date(year, month - 1, day);
+            //     if (parsedVoucherDate > today) {
+            //         toast.error('The voucher date cannot be in the future.');
+            //         return;
+            //     }
+            // }
             if (voucherType == VoucherTypeEnum.ItemSale) {
                 if (voucherId || voucher) {
                     // update the invoice   
                     await agent.SalePurchase.updateVoucher(accessId, finalData);
                     toast.success('Voucher updated successfully');
-                    reset();
+                    reset()
                     setTransportDetails(defaultTransportDetails);
                     setCustomerDetail(defaultCustomerDetails);
                     setBillSummary(defaultBillSummary);
                 }
                 else {
                     var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    reset()
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
                     voucherId = newVoucherId;
                     sessionStorage.setItem('voucherId',JSON.stringify(newVoucherId));
                     toast.success('Voucher created successfully');
@@ -1750,23 +1849,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         window.open(pdfUrl, "_blank");
     };    
 
-    const checkIfBillNumberExists = async (value:string)=>{
-        const billBookId = watch("billBookId");
-        if (!billBookId) {
-            console.error("Bill Book ID is required to check if the bill number exists.");
-            return;
-        }
-
-        var billNumberExists = await agent.SalePurchase.checkIfBillNumberExists(accessId, billBookId, value);
-        if(billNumberExists){
-            setIsBillNumberExists(true);
-            toast.error('Bill Number already exists.');
-        }else{
-            setIsBillNumberExists(false);
-        }
-    }
-
-
 
     if (voucherId && !voucher) return null;
     return (
@@ -1835,7 +1917,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 badgeText={partyGST}
                                 hideDropdownIcon
                                 hideClearIcon
-                                disabled={(askForCustomerDetailWhenCash && paymentMode.toLowerCase().includes("cash")) || isBillNumberExists}
+                                disabled={(askForCustomerDetailWhenCash && paymentMode?.toLowerCase().includes("cash")) || isBillNumberExists}
                             // defaultValue={voucher?.voucherDetails?.accountId}
                             />
                         </Col>
@@ -1903,7 +1985,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     dropDownWidth="800px"
                                                     onChangeCallback={(selectedOption: OptionType | null) => {
                                                         if (selectedOption) {
-                                                            setTimeout(() => fetchItemDetails(selectedOption.value, index), 0);
+                                                            setTimeout(() => fetchItemDetails(selectedOption.value, index, selectedOption.label), 0);
                                                         }
                                                     }}
                                                     hideDropdownIcon
@@ -2211,7 +2293,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                         isModalOpen={showItemModal}
                         onCloseModalAfterSave={async () => {
                             if (financialYear?.financialYearFrom) {
-                                const options = await fetchVoucherItemListForDropdown(accessId,selectedTaxType, financialYear?.financialYearFrom, voucherDate);
+                                const options = await fetchItemListForDropdown(accessId, financialYear?.financialYearFrom, voucherDate);
                                 setItemDropDownList(options);
                             }
                             setShowItemModal(false);
@@ -2328,6 +2410,13 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 					</Suspense>
 			</CommonModal>
 
+            {existingVoucher && (
+                <BillNumberExistsPopup
+                    existingVoucher={existingVoucher}
+                    show={showBillNumberExistsPopup}
+                    onHide={() => setShowBillNumberExistsPopup(false)}
+                />
+            )}
 
 
             {showTransportModal &&
@@ -2342,6 +2431,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     }}
                     onSave={updateParentStateOfTransportDetails}
                     initialData={transportDetails}
+                    
                 />
             }
             {showCustomerDetailModal &&
