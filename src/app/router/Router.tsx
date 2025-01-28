@@ -41,7 +41,7 @@ import { PrintInvoicePage } from '../../features/Vouchers/SalesPurchaseCommonVou
 import CreditSaleEntry from '../../features/Vouchers/CreditSaleEntry/CreditSaleEntry';
 import ItemShortageEntry from '../../features/Vouchers/ItemShortageEntry/ItemShortageEntry';
 import ItemStockTransfer from '../../features/Vouchers/ItemStockTransfer/ItemStockTransfer';
-
+import StudentAdmission from '../../features/Masters/StudentAdmission/StudentAdmission';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -175,6 +175,8 @@ export const router = createBrowserRouter([
 							/>
 						),
 					},
+					{ path: 'student-admission', element: <StudentAdmission /> },
+
 				],
 			},
 			{ path: '*', element: <Navigate replace to="/not-found" /> },

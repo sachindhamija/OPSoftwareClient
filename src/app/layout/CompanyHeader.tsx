@@ -224,7 +224,8 @@ function CompanyHeader() {
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/CreditSaleEntry"}>
-              Credit Sale Entry <span style={{ marginLeft: "60px" }}>Alt+C</span>
+              Credit Sale Entry{" "}
+              <span style={{ marginLeft: "60px" }}>Alt+C</span>
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Voucher/StockShortageEntry"}>
@@ -367,6 +368,28 @@ function CompanyHeader() {
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Password-Delete-Update"}>
               Password for Delete/Update
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown as="div" className="dropdown-on-hover">
+          <Dropdown.Toggle
+            as={Nav.Link}
+            id="dropdown-autoclose-true"
+            className="dropdown-toggle"
+            onMouseEnter={() => setShowReportsDropdown(true)} 
+            onMouseLeave={() => setShowReportsDropdown(false)}
+          >
+            School
+          </Dropdown.Toggle>
+          <Dropdown.Menu
+            className={`custom-dropdown-menu ${
+              showReportsDropdown ? "" : "hidden"
+            }`}
+            onMouseEnter={() => setShowReportsDropdown(true)}  
+            onMouseLeave={() => setShowReportsDropdown(false)}
+          >
+            <Dropdown.Item as={Link} to={"/student-admission"}>
+              Student Admission
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>

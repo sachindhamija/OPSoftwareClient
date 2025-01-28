@@ -33,6 +33,7 @@ import { SerialNumberDto } from "../../features/Masters/SerialNumberSetting/Seri
 import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetting/AdditionalFieldDto";
 import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
 import { CommissionAgentItemDto } from "../../features/CommissionAgent/CommissionAgentItem/commissionAgentItem";
+import { StudentAdmissionDto } from "../../features/Masters/StudentAdmission/StudentAdmissionDto";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -763,31 +764,30 @@ const Vouchers = {
     });
     return await requests.delete(`voucher/${voucherId}`, params);
   },
-  getVoucherById: async (
-    accessId: string,
-    voucherId: string
-  ) => {
+  getVoucherById: async (accessId: string, voucherId: string) => {
     const params = new URLSearchParams({
       accessId: accessId,
-      voucherId: voucherId
+      voucherId: voucherId,
     });
     // return await requests.get(`voucher/${voucherId}`, params);
     const response = await requests.get(`voucher/${voucherId}`, params);
-    console.log("response")
+    console.log("response");
     console.log(response);
     // Assuming response.data contains the voucher data
     if (response) {
       const voucherData = response;
-      if (voucherData.voucherItemDetails && voucherData.voucherItemDetails.length > 0) {
+      if (
+        voucherData.voucherItemDetails &&
+        voucherData.voucherItemDetails.length > 0
+      ) {
         try {
           voucherData.voucherItemDetails.map((item: any) => {
             if (item.serialNumberValues) {
               item.serialNumberValues = JSON.parse(item.serialNumberValues);
             }
-          })
-          
+          });
         } catch (error) {
-          console.error('Error parsing SerialNumberValues:', error);
+          console.error("Error parsing SerialNumberValues:", error);
         }
       }
     }
@@ -895,6 +895,8 @@ const Reports = {
     return await requests.get(`reports/TrialBalanceReport`, params);
   },
 };
+
+
 const BillBook = {
   getAllBillBooks: async (
     accessId: string,
@@ -959,41 +961,26 @@ const SalePurchase = {
     return await requests.post("SalePurchase/SaveVoucher", dto, params);
   },
 
-  updateVoucher: async (
-    accessId: string,
-    dto: ItemSalePurchaseVoucherDto
-  ) => {
+  updateVoucher: async (accessId: string, dto: ItemSalePurchaseVoucherDto) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.put(
-      `SalePurchase/UpdateVoucher`,
-      dto,
-      params
-    );
+    return await requests.put(`SalePurchase/UpdateVoucher`, dto, params);
   },
 
-  deleteVoucher: async (
-    accessId: string,
-    voucherId: string
-  ) => {
+  deleteVoucher: async (accessId: string, voucherId: string) => {
     const params = new URLSearchParams({
       accessId: accessId,
-      voucherId: voucherId
+      voucherId: voucherId,
     });
-    return await requests.delete(
-      `SalePurchase/${voucherId}`, params
-    );
+    return await requests.delete(`SalePurchase/${voucherId}`, params);
   },
 
-  getVoucherById: async (
-    accessId: string,
-    voucherId: string
-  ) => {
+  getVoucherById: async (accessId: string, voucherId: string) => {
     const params = new URLSearchParams({
       accessId: accessId,
-      voucherId: voucherId
+      voucherId: voucherId,
     });
-    return await requests.get(`SalePurchase/GetVoucherById`,params);
-  }, 
+    return await requests.get(`SalePurchase/GetVoucherById`, params);
+  },
 
   checkIfBillNumberExists: async (
     accessId: string,
@@ -1003,10 +990,10 @@ const SalePurchase = {
     const params = new URLSearchParams({
       accessId: accessId,
       billBookId: billBookId,
-      voucherNo: voucherNo
+      voucherNo: voucherNo,
     });
-    return await requests.get(`SalePurchase/CheckIfBillNumberExists`,params);
-  }  
+    return await requests.get(`SalePurchase/CheckIfBillNumberExists`, params);
+  },
 };
 const SerialNumber = {
   getAll: async (accessId: string) => {
@@ -1033,30 +1020,30 @@ const SerialNumber = {
 const AdditionalField = {
   getAll: async (accessId: string) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.get("AdditionalField",params );
+    return await requests.get("AdditionalField", params);
   },
   getById: async (accessId: string, id: string) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.get(`AdditionalField/${id}`,params );
+    return await requests.get(`AdditionalField/${id}`, params);
   },
   create: async (accessId: string, data: AdditionalFieldDto) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.post("AdditionalField", data,params );
+    return await requests.post("AdditionalField", data, params);
   },
   update: async (accessId: string, id: string, data: AdditionalFieldDto) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.put(`AdditionalField/${id}`, data,params );
+    return await requests.put(`AdditionalField/${id}`, data, params);
   },
   delete: async (accessId: string, id: string) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.delete(`AdditionalField/${id}`,params );
+    return await requests.delete(`AdditionalField/${id}`, params);
   },
 };
 const AdditionalFieldType = {
-    getAll: async (accessId: string) => {
-        const params = new URLSearchParams({ accessId });
-        return await requests.get("AdditionalFieldType", params);
-    },
+  getAll: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("AdditionalFieldType", params);
+  },
 };
 const CommissionAgentItem = {
   getAllCommissionAgentItems: async (
@@ -1137,17 +1124,17 @@ const Email = {
     formData.append("accessId", accessId);
 
     files.forEach((file) => {
-        formData.append("attachments", file); 
+      formData.append("attachments", file);
     });
 
     return await axios
-        .post("email/SendEmails", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        })
-        .then(responseBody);
-},
+      .post("email/SendEmails", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(responseBody);
+  },
 
   getAllEmails: async (accessId: string) => {
     const params = new URLSearchParams({ accessId });
@@ -1157,29 +1144,14 @@ const Email = {
     const params = new URLSearchParams({ accessId });
     return await requests.get(`email/${emailID}`, params);
   },
-  createEmail: async (
-    accessId: string,
-    email: EmailDto
-  ) => {
+  createEmail: async (accessId: string, email: EmailDto) => {
     const params = new URLSearchParams({ accessId });
 
-    return await requests.post(
-      "email/CreateEmail",
-      email,
-      params
-    );
+    return await requests.post("email/CreateEmail", email, params);
   },
-  updateEmail: async (
-    accessId: string,
-    emailID: number,
-    email: EmailDto
-  ) => {
+  updateEmail: async (accessId: string, emailID: number, email: EmailDto) => {
     const params = new URLSearchParams({ accessId });
-    return await requests.put(
-      `email/${emailID}`,
-      email,
-      params
-    );
+    return await requests.put(`email/${emailID}`, email, params);
   },
   deleteEmail: async (accessId: string, emailID: number) => {
     const params = new URLSearchParams({ accessId });
@@ -1267,6 +1239,13 @@ const Vehicle = {
   },
 };
 
+const Student = {
+  create: async (student: StudentAdmissionDto) => {
+    const params = new URLSearchParams();
+    return await requests.post("student/create", student, params);
+  },
+};
+
 const agent = {
   UserAccount,
   Company,
@@ -1297,6 +1276,7 @@ const agent = {
   Email,
   Transporter,
   Vehicle,
+  Student, // Add  here
 };
 
 export default agent;
