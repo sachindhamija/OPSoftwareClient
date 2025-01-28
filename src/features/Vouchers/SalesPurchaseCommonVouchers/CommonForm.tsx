@@ -247,7 +247,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         if (voucher) {
             setTransportDetails({
                 transporterName: voucher?.voucherMasterExtended?.transporterName,
+                transporterId: voucher?.voucherMasterExtended?.transporterId,
                 vehicleNumber: voucher?.voucherMasterExtended?.vehicleNumber,
+                vehicleId: voucher?.voucherMasterExtended?.vehicleId,
                 driverName: voucher?.voucherMasterExtended?.driverName,
                 grNo: voucher?.voucherMasterExtended?.grNo,
                 grDate: voucher?.voucherMasterExtended?.grDate,
@@ -1277,6 +1279,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
     useEffect(() => {
         let filteredAccounts: AccountDtoForDropDownList[] = [];
+        setValue('accountId', '');
+        setPartyGST('');
         if (paymentMode?.toLowerCase().includes("cash")) {
             const cashAccount = allAccounts.find(acc => acc.accountName === "CASH");
             const otherAccounts = allAccounts.filter(acc => acc.accountName !== "CASH");
@@ -1301,8 +1305,12 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             filteredAccounts = allAccounts.filter(account => account.accountGroupName === 'BANK ACCOUNTS' || account.accountGroupName === 'SECURED LOANS');
         }
         setDisplayedAccounts(filteredAccounts);
-    //}, [paymentMode, setValue]);
+        const dropdownElement = document.querySelector('[name="accountId"]');
+        if (dropdownElement) {
+            dropdownElement.dispatchEvent(new Event('change', { bubbles: true }));
+        }
     }, [paymentMode, allAccounts, setValue]);
+    //}, [paymentMode, setValue]);
 
 
     const fetchItemDetails = async (itemId: number, index: number, selectedOption: string) => {
@@ -1319,10 +1327,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             if (fields.length === 1) {
                 append(defaultItems); 
             }
-            return;        }
-        console.log("gstSlabValue");
-        console.log(typeof(gstSlabValue));
-        console.log(gstSlabValue);
+            return;
+        }
+
         if (selectedTaxType === "Inclusive" && (!gstSlabValue || gstSlabValue <= 0)) {
             toast.error("Inclusive type doesn't include items without tax.");
             setValue(`items[${index}].itemId`, null);
@@ -1496,7 +1503,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         }
     
         var voucherExists = await agent.SalePurchase.checkIfBillNumberExists(accessId, billBookId, value);
-        if (voucherExists) {
+        if (voucherExists.totalRoundOff > 0) {
             setExistingVoucher(voucherExists)
             setIsBillNumberExists(true);
             setShowBillNumberExistsPopup(true);
@@ -1603,14 +1610,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             }
 
             today.setHours(0, 0, 0, 0);
-            // if (data.voucherDate) {
-            //     const [day, month, year] = data.voucherDate.split("-").map(Number);
-            //     const parsedVoucherDate = new Date(year, month - 1, day);
-            //     if (parsedVoucherDate > today) {
-            //         toast.error('The voucher date cannot be in the future.');
-            //         return;
-            //     }
-            // }
+            if (data.voucherDate) {
+                const [day, month, year] = data.voucherDate.split("-").map(Number);
+                const parsedVoucherDate = new Date(year, month - 1, day);
+                if (parsedVoucherDate > today) {
+                    toast.error('The voucher date cannot be in the future.');
+                    return;
+                }
+            }
             if (voucherType == VoucherTypeEnum.ItemSale) {
                 if (voucherId || voucher) {
                     // update the invoice   
@@ -1623,7 +1630,13 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 }
                 else {
                     var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
-                    reset()
+                    debugger;
+                    reset({
+                        billBookId: "",
+                        voucherDate: "",
+                        paymentMode: "",
+                        items: [defaultItems],
+                    });
                     setTransportDetails(defaultTransportDetails);
                     setCustomerDetail(defaultCustomerDetails);
                     setBillSummary(defaultBillSummary);
@@ -1633,7 +1646,12 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     if (invoiceAfterSave && window.confirm("Do you want to print the invoice?")) {                        
                         await invoiceHtmlData(true)
                     }else{
-                        reset();
+                        reset({
+                            billBookId: "",
+                            voucherDate: "",
+                            paymentMode: "",
+                            items: [defaultItems],
+                        });
                         setTransportDetails(defaultTransportDetails);
                         setCustomerDetail(defaultCustomerDetails);
                         setBillSummary(defaultBillSummary);
@@ -1897,6 +1915,10 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 options={hideBank ? PAYMENT_MODE_OPTIONS.filter(option => option.value !== "BANK") : PAYMENT_MODE_OPTIONS}
                                 control={control}
                                 hideDropdownIcon
+                                onChangeCallback={()=>{
+                                    setValue('accountId', '');
+                                    setPartyGST(''); 
+                                }}
                                 hideClearIcon
                                 disabled={isBillNumberExists}
                                 //defaultValue={ isCashDefault ? PAYMENT_MODE_OPTIONS.find(option => option.value === "CASH"): isCreditDefault ? PAYMENT_MODE_OPTIONS.find(option => option.value === "CREDIT") : undefined}
@@ -1917,6 +1939,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 badgeText={partyGST}
                                 hideDropdownIcon
                                 hideClearIcon
+                                key={paymentMode}
                                 disabled={(askForCustomerDetailWhenCash && paymentMode?.toLowerCase().includes("cash")) || isBillNumberExists}
                             // defaultValue={voucher?.voucherDetails?.accountId}
                             />
@@ -1972,28 +1995,35 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 </tr>
                             </thead>
                             <tbody>
-                                {fields.map((field, index) => (
+                            {fields.map((field, index) => {
+                                const mainQty = watch(`items[${index}].mainQty`); // Watch mainQty
+                                const rate = watch(`items[${index}].rate`); // Watch rate
+
+                                const disableFieldsAfterMainQty = !mainQty || parseFloat(mainQty) === 0;
+                                const disableFieldsAfterRate = !rate || parseFloat(rate) === 0;
+
+                                return (
                                     <tr key={field.id}>
                                         <td style={{ textAlign: 'center' }}>{index + 1}</td>
                                         <td>
-                                        <CustomDropdown
-                                                    name={`items[${index}].itemId`}
-                                                    options={itemDropDownList}
-                                                    control={control}
-                                                    isCreatable
-                                                    onCreateButtonClick={() => { setShowItemModal(true); }}
-                                                    dropDownWidth="800px"
-                                                    onChangeCallback={(selectedOption: OptionType | null) => {
-                                                        if (selectedOption) {
-                                                            setTimeout(() => fetchItemDetails(selectedOption.value, index, selectedOption.label), 0);
-                                                        }
-                                                    }}
-                                                    hideDropdownIcon
-                                                    hideClearIcon
-                                                    isInTable
-                                                    onFocus={index === fields.length - 1 ? scrollToBottom : undefined}
-                                                    disabled={isBillNumberExists}
-                                                />
+                                            <CustomDropdown
+                                                name={`items[${index}].itemId`}
+                                                options={itemDropDownList}
+                                                control={control}
+                                                isCreatable
+                                                onCreateButtonClick={() => { setShowItemModal(true); }}
+                                                dropDownWidth="800px"
+                                                onChangeCallback={(selectedOption: OptionType | null) => {
+                                                    if (selectedOption) {
+                                                        setTimeout(() => fetchItemDetails(selectedOption.value, index, selectedOption.label), 0);
+                                                    }
+                                                }}
+                                                hideDropdownIcon
+                                                hideClearIcon
+                                                isInTable
+                                                onFocus={index === fields.length - 1 ? scrollToBottom : undefined}
+                                                disabled={isBillNumberExists}
+                                            />
                                         </td>
 
                                         <td>
@@ -2002,7 +2032,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 register={register}
                                                 allowedChars="numericDecimal"
                                                 onChange={(e) => calculateItemRow(index, 'mainQty', e.target.value)}
-                                                disabled={!isMainQty || isBillNumberExists}                                            />
+                                                disabled={!isMainQty || isBillNumberExists}
+                                            />
                                         </td>
                                         {/* Alternate Qty */}
                                         {useAltQty && (
@@ -2012,7 +2043,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     register={register}
                                                     allowedChars="numericDecimal"
                                                     onChange={(e) => calculateItemRow(index, 'altQty', e.target.value)}
-                                                    disabled={isBillNumberExists}
+                                                    disabled={disableFieldsAfterMainQty || isBillNumberExists}
                                                 />
                                             </td>
                                         )}
@@ -2023,7 +2054,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     name={`items[${index}].free`}
                                                     register={register}
                                                     allowedChars="numericDecimal"
-                                                    disabled={isBillNumberExists}
+                                                    disabled={disableFieldsAfterMainQty || isBillNumberExists}
                                                 />
                                             </td>
                                         )}
@@ -2046,10 +2077,9 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         setFocusInclusiveRateInput(`items[${index}].inclusiveRate`);
                                                     }
                                                 }}
-                                                disabled={!isRateSale || isBillNumberExists}
-
+                                                disabled={disableFieldsAfterMainQty || !isRateSale || isBillNumberExists}
                                             />
-                                            {showInclusiveRateInput === index && (
+                                             {showInclusiveRateInput === index && (
                                                 <CustomInput
                                                     className="mt-2"
                                                     name={`items[${index}].inclusiveRate`}
@@ -2100,27 +2130,28 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].basicAmount`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                disabled={getValues(`items[${index}].isRateZero`)}
-                                                
+                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || getValues(`items[${index}].isRateZero`)}
                                             />
                                         </td>
+
                                         <td>
                                             <CustomInput
                                                 name={`items[${index}].discountPercentage`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                disabled={getValues(`items[${index}].isRateZero`) || !isDiscountPercentage}                                               
                                                 onChange={(e) => calculateItemRow(index, 'discountPercentage', e.target.value)}
                                                 maxLength={2}
+                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || !isDiscountPercentage || getValues(`items[${index}].isRateZero`) }
                                             />
                                         </td>
+
                                         <td>
                                             <CustomInput
                                                 name={`items[${index}].discountAmount`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                disabled={getValues(`items[${index}].isRateZero`) || !isDiscount}
                                                 onChange={(e) => calculateItemRow(index, 'discountAmount', e.target.value)}
+                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || !isDiscount || getValues(`items[${index}].isRateZero`)}
                                             />
                                         </td>
 
@@ -2130,7 +2161,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     name={`items[${index}].iGST`}
                                                     register={register}
                                                     allowedChars="numericDecimal"
-                                                    disabled
+                                                    disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                                 />
                                             </td>
                                         ) : (
@@ -2140,7 +2171,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         name={`items[${index}].sGST`}
                                                         register={register}
                                                         allowedChars="numericDecimal"
-                                                        disabled
+                                                        disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                                     />
                                                 </td>
                                                 <td>
@@ -2148,7 +2179,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         name={`items[${index}].cGST`}
                                                         register={register}
                                                         allowedChars="numericDecimal"
-                                                        disabled
+                                                        disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                                     />
                                                 </td>
                                             </>
@@ -2159,7 +2190,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].netAmount`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                disabled
+                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                             />
                                         </td>
                                         <td>
@@ -2171,7 +2202,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                );
+                            })}
                             </tbody>
                         </Table>
                     </div>

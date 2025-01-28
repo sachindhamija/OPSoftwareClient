@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Table, Button, Form, FormControl, Modal } from 'react-bootstrap';
-import { OtherChargesDto } from './SalesPurchaseCommonVoucherDto';
+import { defaultOtherCharges, OtherChargesDto } from './SalesPurchaseCommonVoucherDto';
 import { useForm } from 'react-hook-form';
 import { useGstSlabs } from '../../../app/hooks/useGSTSlabsOptions';
 import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation';
@@ -17,6 +17,8 @@ import { selectCurrentFinancialYear } from '../../Masters/FinancialYear/financia
 import { formatDateForBackend } from '../../../app/utils/dateUtils';
 // import { AccountDtoForDropDownList } from '../../Masters/Account/accountDto';
 import { transformAccountToOption } from '../../../app/utils/accountUtils';
+import CustomInput from '../../../app/components/CustomInput';
+import FormNavigator from '../../../app/components/FormNavigator';
 
 interface OtherChargesModalProps {
   show: boolean;
@@ -32,7 +34,7 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
   const financialYear = useAppSelector(selectCurrentFinancialYear);
   const gstSlabs = useGstSlabs(accessId);
   // const [isFormValid, setIsFormValid] = useState(false)
-  const [charges, setCharges] = useState<OtherChargesDto[]>(initialData);
+  const [charges, setCharges] = useState<OtherChargesDto[]>(defaultOtherCharges);
   const [modalShow, setModalShow] = useState(false);
   const { control, formState: { errors }, reset } = useForm<OtherChargesDto[]>({ mode: 'all' });
   const [allAccounts, setAllAccounts] = useState<OptionType[]>([]);
@@ -84,22 +86,49 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
     reset(initialData);
   }, [initialData, reset]);
 
- const validateOtherCharges = ():boolean => {
-    const formIsValid = charges.every((item: OtherChargesDto) => {
-        return ((item.grossAmount > 0 || item.chargesPercentage > 0) && (item.addedOrSubtracted && item.accountId));
-    });
+  const isDefaultCharge = (item: OtherChargesDto): boolean => {
+    return (
+      item.otherChargesId === null &&
+      item.voucherId === '' &&
+      item.accountId === '' &&
+      item.onValue === 0 &&
+      item.chargesPercentage === 0 &&
+      item.addedOrSubtracted === '' &&
+      item.tax === 'no' &&
+      item.taxSlab === '' &&
+      item.grossAmount === 0 &&
+      item.sGST === 0 &&
+      item.cGST === 0 &&
+      item.iGST === 0 &&
+      item.netCharges === 0
+    );
+  };
 
-    return formIsValid;
-};
+  const validateOtherCharges = ():boolean => {
+    const filteredCharges = charges.filter((item) => !isDefaultCharge(item));
+      const formIsValid = filteredCharges.every((item: OtherChargesDto) => {
+          return ((item.grossAmount > 0 || item.chargesPercentage > 0) && (item.addedOrSubtracted && item.accountId));
+      });
+
+      return formIsValid;
+  };
 
   const handleSaveAndClose = () => {
-    onSave([...charges]);
-    if (validateOtherCharges())
+    const filteredCharges = charges.filter((item) => !isDefaultCharge(item));
+    charges.forEach((item) => {
+      if (isDefaultCharge(item)) 
+      {
+        handleDeleteRow(item.key);
+      }
+    });
+    if (validateOtherCharges()) {
+      onSave([...filteredCharges]);
       onHide();
-    else {
-      toast.error('Please verify that you have filled all the mendatory firlds.')
+    } else {
+      toast.error('Please verify that you have filled all the mandatory fields.');
     }
   };
+
 
   const handleDeleteRow = (key: number) => {
     const updatedCharges = charges.filter(x => x.key !== key);
@@ -155,8 +184,16 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
     });
     setCharges(updatedCharges);
     onSave(updatedCharges);
+    // console.log("key")
+    // console.log(key)
+    // console.log("updatedCharges")
+    // console.log(updatedCharges)
+    // if ((key === updatedCharges.length - 1) && validateOtherCharges()) {
+    //   console.log("vlaid")
+    //   handleAddRow()  
+    // }
   };
-
+ 
   const getAccountGroupId = (id: string): OptionType => {
     const val = allAccounts.find(x => x.value === id) as OptionType;
     return val;
@@ -169,6 +206,7 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
           <Modal.Title>Customer Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <FormNavigator>
           <div>
             {allAccounts.length && gstSlabs.length && (
               <Table style={{ width: 2000 }} striped bordered hover responsive>
@@ -207,10 +245,11 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
                         />
                       </td>
                       <td>
-                        <FormControl
-                          type="number"
-                          min={0}
-                          value={charge.onValue}
+                        <CustomInput                          
+                          name="charge.onValue"
+                          //type="number"
+                          //min={0}
+                          //value={charge.onValue}
                           onChange={(e) => handleFieldChange(charge.key, 'onValue', parseFloat(e.target.value))}
                           onBlur={(e) => handleFieldChange(charge.key, 'onValue', parseFloat(e.target.value))}
                         />
@@ -316,6 +355,7 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
             )}
             <Button onClick={handleAddRow}>Add Row</Button>
           </div>
+          </FormNavigator>
         </Modal.Body>
       </Modal>
       <CommonModal show={modalShow} onHide={() => setModalShow(false)}>

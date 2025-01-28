@@ -15,7 +15,7 @@ interface CustomDropdownProps {
     control?: any;
     validationRules?: Record<string, any>;
     error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined;
-    defaultValue?: OptionType;
+    defaultValue?: OptionType | null;
     onChangeCallback?: (value: OptionType | null) => void;
     isCreatable?: boolean;
     onCreateOption?: (inputValue: string) => void;

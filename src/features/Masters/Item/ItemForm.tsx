@@ -63,7 +63,7 @@ function ItemForm({
 	const [itemGodown, setItemGodown] = useState<OptionType[]>([]);
 	const [hsnCodeInput, setHsnCodeInput] = useState('');
 	const [hsnCodes, setHsnCodes] = useState<OptionType[]>([]);
-	const debouncedHSNCodeInput = useDebounce(hsnCodeInput, 400);
+	const debouncedHSNCodeInput = useDebounce(hsnCodeInput, 100);
 	const [dataLoaded, setDataLoaded] = useState(false);
 	const [gstSlabModalShow, setGSTSlabModalShow] = useState(false);
 	const [categoryModalShow, setCategoryModalShow] = useState(false);

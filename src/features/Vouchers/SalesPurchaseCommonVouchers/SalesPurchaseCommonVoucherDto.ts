@@ -166,7 +166,9 @@ export interface TransportDetailDto {
   chargesPaidOrToPaid?: string;
 
   transporterName?: string;
+  transporterId?: number;
   vehicleNumber?: string;
+  vehicleId?: number;
   driverName?: string;
   grNo?: string;
   grDate?: string | Date;
@@ -192,7 +194,9 @@ export const defaultTransportDetails: TransportDetailDto = {
   vehicleType: "",
   chargesPaidOrToPaid: "",
   transporterName: "",
+  transporterId: 0,
   vehicleNumber: "",
+  vehicleId: 0,
   driverName: "",
   grNo: "",
   grDate: "",

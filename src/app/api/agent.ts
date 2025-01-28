@@ -1187,6 +1187,86 @@ const Email = {
   },
 };
 
+
+const Transporter = {
+  getAllTransporters: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("transporter/GetAllTransporters", params);
+  },
+  getTransporterById: async (accessId: string, transporterId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`transporter/${transporterId}`, params);
+  },
+  createTransporter: async (
+    accessId: string,
+    transporter: TransporterDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "transporter/CreateTransporter",
+      transporter,
+      params
+    );
+  },
+  updateTransporter: async (
+    accessId: string,
+    transporterId: number,
+    transporter: TransporterDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `transporter/${transporterId}`,
+      transporter,
+      params
+    );
+  },
+  deleteTransporter: async (accessId: string, transporterId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`transporter/${transporterId}`, params);
+  },
+};
+
+
+const Vehicle = {
+  getAllVehicles: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("vehicle/GetAllVehicles", params);
+  },
+  getVehicleById: async (accessId: string, vehicleId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`vehicle/${vehicleId}`, params);
+  },
+  createVehicle: async (
+    accessId: string,
+    vehicle: VehicleDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "vehicle/CreateVehicle",
+      vehicle,
+      params
+    );
+  },
+  updateVehicle: async (
+    accessId: string,
+    vehicleId: number,
+    vehicle: VehicleDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `vehicle/${vehicleId}`,
+      vehicle,
+      params
+    );
+  },
+  deleteVehicle: async (accessId: string, vehicleId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`vehicle/${vehicleId}`, params);
+  },
+};
+
 const agent = {
   UserAccount,
   Company,
@@ -1215,6 +1295,8 @@ const agent = {
   CommissionAgentItem,
   Mandi,
   Email,
+  Transporter,
+  Vehicle,
 };
 
 export default agent;
