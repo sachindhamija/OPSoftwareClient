@@ -16,7 +16,7 @@ import { setLoading } from "../../../app/layout/loadingSlice";
 import { useStates } from "../../../app/hooks/useStatesOptions";
 import { StudentAdmissionDto } from "./StudentAdmissionDto";
 import studentImage from "../../../assets/images/student-image.jpg";
-import CommonModal from "../../../app/components/CommonModal";  
+import CommonModal from "../../../app/components/CommonModal";
 
 const stateOptions = useStates();
 
@@ -39,17 +39,24 @@ const StudentAdmission: React.FC = () => {
 
   const openModal = (
     type: "admissionClass" | "section" | "category" | "city"
-  ) => setShowModal({ type, isOpen: true });
+  ) => {
+    setModalInput("");
+    setShowModal({ type, isOpen: true });
+  };
 
   const handleModalSave = () => {
     const currentType = showModal.type;
-    setModalItems((prev) => ({
-      ...prev,
-      [currentType]: [...prev[currentType], modalInput],
-    }));
-    setValue(currentType, modalInput);
-    setModalInput("");
-    setShowModal({ ...showModal, isOpen: false });
+    if (modalInput.trim() !== "") {
+      setModalItems((prev) => ({
+        ...prev,
+        [currentType]: [...prev[currentType], modalInput],
+      }));
+      setValue(currentType, modalInput);
+      setModalInput("");
+      setShowModal({ ...showModal, isOpen: false });
+    } else {
+      toast.error("Please enter a valid value.");
+    }
   };
 
   const onSubmit = async (data: StudentAdmissionDto) => {
@@ -65,12 +72,14 @@ const StudentAdmission: React.FC = () => {
       dispatch(setLoading(false));
     }
   };
+
   const modalLabels = {
     admissionClass: "Enter Class Name",
     section: "Enter Section",
     category: "Enter Category",
     city: "Enter City Name",
   };
+
   return (
     <CommonCard size="75%" header="Student Admission">
       <img
@@ -111,100 +120,85 @@ const StudentAdmission: React.FC = () => {
               />
             </Col>
           </Row>
-          {/* Popup Modal */}
-          <CommonModal
-        show={showModal.isOpen}
-        onHide={() => setShowModal({ ...showModal, isOpen: false })}
-        title={
-          showModal.type === "admissionClass"
-            ? "Admission Class"
-            : showModal.type === "section"
-            ? "Section"
-            : showModal.type === "category"
-            ? "Category"
-            : "City"
-        }
-        size="sm"
-      >
-        <CommonCard size="100%" header={`Add New ${showModal.type}`}>
-          <CustomInput
-            label={modalLabels[showModal.type]}  // Updated dynamic label
-            name="modalInput"
-            value={modalInput}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setModalInput(e.target.value)
-            }
-          />
-          <ListGroup className="mt-3">
-            {modalItems[showModal.type]?.map((item, index) => (
-              <ListGroup.Item key={index}>{item}</ListGroup.Item>
-            ))}
-          </ListGroup>
-          <Modal.Footer>
-            <Button variant="primary" onClick={handleModalSave}>
-              Save
-            </Button>
-          </Modal.Footer>
-        </CommonCard>
-      </CommonModal>
 
+          <CommonModal
+            show={showModal.isOpen}
+            onHide={() => setShowModal({ ...showModal, isOpen: false })}
+            title={modalLabels[showModal.type]}
+            size="sm"
+          >
+            <CommonCard size="100%" header={`Add New ${showModal.type}`}>
+              <CustomInput
+                label={modalLabels[showModal.type]}
+                name="modalInput"
+                value={modalInput}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setModalInput(e.target.value)
+                }
+              />
+              <ListGroup className="mt-3">
+                {modalItems[showModal.type]?.map((item, index) => (
+                  <ListGroup.Item key={index}>{item}</ListGroup.Item>
+                ))}
+              </ListGroup>
+              <Modal.Footer>
+                <Button variant="primary" onClick={handleModalSave}>
+                  Save
+                </Button>
+              </Modal.Footer>
+            </CommonCard>
+          </CommonModal>
 
           <Row className="mt-3">
             <Col xs={4}>
-              <CustomInput
-                label={
-                  <span>
-                    Admission Class{" "}
-                    <span style={{ color: "red" }}>[F3-NEW]</span>
-                  </span>
-                }
+              <CustomDropdown
+                label="Admission"
                 name="admissionClass"
-                register={register}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === "F3") {
-                    e.preventDefault();
-                    openModal("admissionClass");
-                  }
+                control={control}
+                isCreatable={true}
+                options={modalItems.admissionClass.map((item) => ({
+                  label: item,
+                  value: item,
+                }))}
+                onCreateButtonClick={() => {
+                  openModal("admissionClass");
                 }}
               />
             </Col>
             <Col xs={4}>
-              <CustomInput
-                label={
-                  <span>
-                    Section <span style={{ color: "red" }}>[F3-NEW]</span>
-                  </span>
-                }
+              <CustomDropdown
+                label="Section"
                 name="section"
-                register={register}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === "F3") {
-                    e.preventDefault();
-                    openModal("section");
-                  }
+                control={control}
+                isCreatable={true}
+                options={modalItems.section.map((item) => ({
+                  label: item,
+                  value: item,
+                }))}
+                onCreateButtonClick={() => {
+                  openModal("section");
                 }}
               />
             </Col>
           </Row>
+
           <Row className="mt-3">
             <Col xs={4}>
               <CustomInput label="Roll No." name="rollNo" register={register} />
             </Col>
 
             <Col xs={4}>
-              <CustomInput
-                label={
-                  <span>
-                    Category <span style={{ color: "red" }}>[F3-NEW]</span>
-                  </span>
-                }
+              <CustomDropdown
+                label="Category"
                 name="category"
-                register={register}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === "F3") {
-                    e.preventDefault();
-                    openModal("category");
-                  }
+                control={control}
+                isCreatable={true}
+                options={modalItems.category.map((item) => ({
+                  label: item,
+                  value: item,
+                }))}
+                onCreateButtonClick={() => {
+                  openModal("category");
                 }}
               />
             </Col>
@@ -232,24 +226,24 @@ const StudentAdmission: React.FC = () => {
               />
             </Col>
           </Row>
+
           <Row className="mt-3">
             <Col xs={4}>
-              <CustomInput
-                label={
-                  <span>
-                    City <span style={{ color: "red" }}>[F3-NEW]</span>
-                  </span>
-                }
+              <CustomDropdown
+                label="City "
                 name="city"
-                register={register}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === "F3") {
-                    e.preventDefault();
-                    openModal("city");
-                  }
+                control={control}
+                isCreatable={true}
+                options={modalItems.city.map((item) => ({
+                  label: item,
+                  value: item,
+                }))}
+                onCreateButtonClick={() => {
+                  openModal("city");
                 }}
               />
             </Col>
+
             <Col md={4} sm={12}>
               <CustomDropdown
                 name="state"
@@ -260,6 +254,7 @@ const StudentAdmission: React.FC = () => {
             </Col>
           </Row>
 
+          {/* Additional fields */}
           <Row className="mt-3">
             <Col xs={4}>
               <CustomInput
@@ -276,6 +271,7 @@ const StudentAdmission: React.FC = () => {
               />
             </Col>
           </Row>
+
           <Row className="mt-3">
             <Col xs={4}>
               <CustomInput
@@ -292,6 +288,7 @@ const StudentAdmission: React.FC = () => {
               />
             </Col>
           </Row>
+
           <Row className="mt-3">
             <Col xs={4}>
               <CustomInput
