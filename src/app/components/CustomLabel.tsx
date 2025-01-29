@@ -4,7 +4,7 @@ import Badge from 'react-bootstrap/Badge';
 
 interface LabelProps {
     htmlFor?: string;
-    label: string;
+    label: React.ReactNode;  
     required?: boolean;
     className?: string;
     badgeText?: string;

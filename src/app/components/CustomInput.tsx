@@ -10,7 +10,7 @@ import {
 import CustomLabel from './CustomLabel';
 
 interface CustomInputProps {
-	label?: string;
+	label?: React.ReactNode; 
 	name: string;
 	register?: UseFormRegister<any>;
     validationRules?: Record<string, any>;
