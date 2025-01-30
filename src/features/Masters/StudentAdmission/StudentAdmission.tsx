@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Col, Row, Modal, Button, ListGroup } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import {
   CustomInput,
   CommonCard,
@@ -17,6 +17,11 @@ import { useStates } from "../../../app/hooks/useStatesOptions";
 import { StudentAdmissionDto } from "./StudentAdmissionDto";
 import studentImage from "../../../assets/images/student-image.jpg";
 import CommonModal from "../../../app/components/CommonModal";
+import SectionForm from "../SectionForm/SectionForm";
+import CategoryForm from "../CategoryForm/CategoryForm";
+import CityForm from "../CityForm/CityForm";
+import AdmissionClassForm from "../AdmissionClassForm/AdmissionClassForm";
+import { OptionType } from "../../../app/models/optionType";
 
 const stateOptions = useStates();
 
@@ -25,38 +30,38 @@ const StudentAdmission: React.FC = () => {
   const methods = useForm<StudentAdmissionDto>();
   const { handleSubmit, control, register, setValue } = methods;
 
-  const [showModal, setShowModal] = useState<{
-    type: "admissionClass" | "section" | "category" | "city";
-    isOpen: boolean;
-  }>({ type: "admissionClass", isOpen: false });
-  const [modalInput, setModalInput] = useState("");
-  const [modalItems, setModalItems] = useState<{ [key: string]: string[] }>({
-    admissionClass: [],
-    section: [],
-    category: [],
-    city: [],
-  });
+  const [showAdmissionModal, setShowAdmissionModal] = useState(false);
+  const [showSectionModal, setShowSectionModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showCityModal, setShowCityModal] = useState(false);
 
-  const openModal = (
-    type: "admissionClass" | "section" | "category" | "city"
+  const [admissionOptions, setAdmissionOptions] = useState<OptionType[]>([]);
+  const [sectionOptions, setSectionOptions] = useState<OptionType[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<OptionType[]>([]);
+  const [cityOptions, setCityOptions] = useState<OptionType[]>([]);
+
+  const handleNewOptionAdded = (
+    type: "admissionClass" | "section" | "category" | "city",
+    newOption: string
   ) => {
-    setModalInput("");
-    setShowModal({ type, isOpen: true });
-  };
+    const newOptionObj: OptionType = { label: newOption, value: newOption };
 
-  const handleModalSave = () => {
-    const currentType = showModal.type;
-    if (modalInput.trim() !== "") {
-      setModalItems((prev) => ({
-        ...prev,
-        [currentType]: [...prev[currentType], modalInput],
-      }));
-      setValue(currentType, modalInput);
-      setModalInput("");
-      setShowModal({ ...showModal, isOpen: false });
-    } else {
-      toast.error("Please enter a valid value.");
+    switch (type) {
+      case "admissionClass":
+        setAdmissionOptions((prev) => [...prev, newOptionObj]);
+        break;
+      case "section":
+        setSectionOptions((prev) => [...prev, newOptionObj]);
+        break;
+      case "category":
+        setCategoryOptions((prev) => [...prev, newOptionObj]);
+        break;
+      case "city":
+        setCityOptions((prev) => [...prev, newOptionObj]);
+        break;
     }
+
+    setValue(type, newOption);
   };
 
   const onSubmit = async (data: StudentAdmissionDto) => {
@@ -71,13 +76,6 @@ const StudentAdmission: React.FC = () => {
     } finally {
       dispatch(setLoading(false));
     }
-  };
-
-  const modalLabels = {
-    admissionClass: "Enter Class Name",
-    section: "Enter Section",
-    category: "Enter Category",
-    city: "Enter City Name",
   };
 
   return (
@@ -121,48 +119,15 @@ const StudentAdmission: React.FC = () => {
             </Col>
           </Row>
 
-          <CommonModal
-            show={showModal.isOpen}
-            onHide={() => setShowModal({ ...showModal, isOpen: false })}
-            title={modalLabels[showModal.type]}
-            size="sm"
-          >
-            <CommonCard size="100%" header={`Add New ${showModal.type}`}>
-              <CustomInput
-                label={modalLabels[showModal.type]}
-                name="modalInput"
-                value={modalInput}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setModalInput(e.target.value)
-                }
-              />
-              <ListGroup className="mt-3">
-                {modalItems[showModal.type]?.map((item, index) => (
-                  <ListGroup.Item key={index}>{item}</ListGroup.Item>
-                ))}
-              </ListGroup>
-              <Modal.Footer>
-                <Button variant="primary" onClick={handleModalSave}>
-                  Save
-                </Button>
-              </Modal.Footer>
-            </CommonCard>
-          </CommonModal>
-
           <Row className="mt-3">
             <Col xs={4}>
               <CustomDropdown
                 label="Admission"
                 name="admissionClass"
                 control={control}
+                options={admissionOptions}
                 isCreatable={true}
-                options={modalItems.admissionClass.map((item) => ({
-                  label: item,
-                  value: item,
-                }))}
-                onCreateButtonClick={() => {
-                  openModal("admissionClass");
-                }}
+                onCreateButtonClick={() => setShowAdmissionModal(true)}
               />
             </Col>
             <Col xs={4}>
@@ -171,13 +136,8 @@ const StudentAdmission: React.FC = () => {
                 name="section"
                 control={control}
                 isCreatable={true}
-                options={modalItems.section.map((item) => ({
-                  label: item,
-                  value: item,
-                }))}
-                onCreateButtonClick={() => {
-                  openModal("section");
-                }}
+                options={sectionOptions}
+                onCreateButtonClick={() => setShowSectionModal(true)}
               />
             </Col>
           </Row>
@@ -193,13 +153,8 @@ const StudentAdmission: React.FC = () => {
                 name="category"
                 control={control}
                 isCreatable={true}
-                options={modalItems.category.map((item) => ({
-                  label: item,
-                  value: item,
-                }))}
-                onCreateButtonClick={() => {
-                  openModal("category");
-                }}
+                options={categoryOptions}
+                onCreateButtonClick={() => setShowCategoryModal(true)}
               />
             </Col>
           </Row>
@@ -234,13 +189,8 @@ const StudentAdmission: React.FC = () => {
                 name="city"
                 control={control}
                 isCreatable={true}
-                options={modalItems.city.map((item) => ({
-                  label: item,
-                  value: item,
-                }))}
-                onCreateButtonClick={() => {
-                  openModal("city");
-                }}
+                options={cityOptions}
+                onCreateButtonClick={() => setShowCityModal(true)}
               />
             </Col>
 
@@ -337,6 +287,64 @@ const StudentAdmission: React.FC = () => {
           </Row>
         </FormNavigator>
       </FormProvider>
+      <CommonModal
+        show={showSectionModal}
+        onHide={() => setShowSectionModal(false)}
+        title="Add New Section"
+      >
+        <Suspense fallback={<div>Loading form...</div>}>
+          <SectionForm
+            onSuccess={(newSection) => {
+              handleNewOptionAdded("section", newSection);
+              setShowSectionModal(false);
+            }}
+          />
+        </Suspense>
+      </CommonModal>
+      <CommonModal
+        show={showCategoryModal}
+        onHide={() => setShowCategoryModal(false)}
+        title="Add New Category"
+      >
+        <Suspense fallback={<div>Loading form...</div>}>
+          <CategoryForm
+            onSuccess={(newCategory) => {
+              handleNewOptionAdded("category", newCategory);
+              setShowCategoryModal(false);
+            }}
+          />
+        </Suspense>
+      </CommonModal>
+
+      <CommonModal
+        show={showCityModal}
+        onHide={() => setShowCityModal(false)}
+        title="Add New City"
+      >
+        <Suspense fallback={<div>Loading form...</div>}>
+          <CityForm
+            onSuccess={(newCity) => {
+              handleNewOptionAdded("city", newCity);
+              setShowCityModal(false);
+            }}
+          />
+        </Suspense>
+      </CommonModal>
+
+      <CommonModal
+        show={showAdmissionModal}
+        onHide={() => setShowAdmissionModal(false)}
+        title="Add New Class"
+      >
+        <Suspense fallback={<div>Loading form...</div>}>
+          <AdmissionClassForm
+            onSuccess={(newClass) => {
+              handleNewOptionAdded("admissionClass", newClass);
+              setShowAdmissionModal(false);
+            }}
+          />
+        </Suspense>
+      </CommonModal>
     </CommonCard>
   );
 };

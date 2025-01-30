@@ -376,7 +376,7 @@ function CompanyHeader() {
             as={Nav.Link}
             id="dropdown-autoclose-true"
             className="dropdown-toggle"
-            onMouseEnter={() => setShowReportsDropdown(true)} 
+            onMouseEnter={() => setShowReportsDropdown(true)}
             onMouseLeave={() => setShowReportsDropdown(false)}
           >
             School
@@ -385,11 +385,17 @@ function CompanyHeader() {
             className={`custom-dropdown-menu ${
               showReportsDropdown ? "" : "hidden"
             }`}
-            onMouseEnter={() => setShowReportsDropdown(true)}  
+            onMouseEnter={() => setShowReportsDropdown(true)}
             onMouseLeave={() => setShowReportsDropdown(false)}
           >
             <Dropdown.Item as={Link} to={"/student-admission"}>
               Student Admission
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/student-list"}>
+              Student List
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/fee-plan"}>
+              Fee Plan{" "}
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>

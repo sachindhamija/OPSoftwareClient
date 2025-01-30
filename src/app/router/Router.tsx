@@ -42,6 +42,8 @@ import CreditSaleEntry from '../../features/Vouchers/CreditSaleEntry/CreditSaleE
 import ItemShortageEntry from '../../features/Vouchers/ItemShortageEntry/ItemShortageEntry';
 import ItemStockTransfer from '../../features/Vouchers/ItemStockTransfer/ItemStockTransfer';
 import StudentAdmission from '../../features/Masters/StudentAdmission/StudentAdmission';
+import StudentList from '../../features/Masters/StudentList/StudentList';
+import FeePlan from '../../features/Masters/FeePlan/FeePlan';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -176,6 +178,8 @@ export const router = createBrowserRouter([
 						),
 					},
 					{ path: 'student-admission', element: <StudentAdmission /> },
+					{ path: 'student-list', element: <StudentList /> },
+					{ path: 'fee-plan', element: <FeePlan /> },
 
 				],
 			},

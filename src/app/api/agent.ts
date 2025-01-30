@@ -1239,11 +1239,14 @@ const Vehicle = {
   },
 };
 
-const Student = {
+ const Student = {
   create: async (student: StudentAdmissionDto) => {
     const params = new URLSearchParams();
     return await requests.post("student/create", student, params);
   },
+  list: async () => {
+    return await requests.get("student/list");
+  }
 };
 
 const agent = {
