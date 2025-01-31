@@ -44,6 +44,10 @@ import ItemStockTransfer from '../../features/Vouchers/ItemStockTransfer/ItemSto
 import StudentAdmission from '../../features/Masters/StudentAdmission/StudentAdmission';
 import StudentList from '../../features/Masters/StudentList/StudentList';
 import FeePlan from '../../features/Masters/FeePlan/FeePlan';
+import ClassName from '../../features/Masters/AdmissionClassForm/AdmissionClassForm';
+import SectionForm from '../../features/Masters/SectionForm/SectionForm';
+import CategoryForm from '../../features/Masters/CategoryForm/CategoryForm';
+import FeeHeadingForm from '../../features/Masters/FeeHeadingForm/FeeHeadingForm';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -180,6 +184,10 @@ export const router = createBrowserRouter([
 					{ path: 'student-admission', element: <StudentAdmission /> },
 					{ path: 'student-list', element: <StudentList /> },
 					{ path: 'fee-plan', element: <FeePlan /> },
+					{ path: 'class-name', element: <ClassName onSuccess={() => { }} /> },
+					{ path: 'section-name', element: <SectionForm onSuccess={() => { }} /> },
+					{ path: 'category-name', element: <CategoryForm onSuccess={() => { }} /> },
+					{ path: 'fees-head', element: <FeeHeadingForm onSuccess={() => { }} /> },
 
 				],
 			},

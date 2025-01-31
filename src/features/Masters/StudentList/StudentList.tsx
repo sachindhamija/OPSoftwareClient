@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Col, Row, Table } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import { CustomInput, CommonCard } from "../../../app/components/Components";
 import agent from "../../../app/api/agent";
 import { useAppDispatch } from "../../../app/store/configureStore";
 import toast from "react-hot-toast";
 import { setLoading } from "../../../app/layout/loadingSlice";
+import CommonTable from "../../../app/components/CommonTable";
 
 interface Student {
   admissionNo: string;
@@ -54,6 +55,13 @@ const StudentList: React.FC = () => {
     setFilteredStudents(filtered);
   }, [admissionNoSearch, studentNameSearch, fatherNameSearch, students]);
 
+   const columns = [
+     { header: "Student Name", accessorKey: "studentName", id: "studentName" },
+    { header: "Father Name", accessorKey: "fatherName", id: "fatherName" },
+    { header: "Class Name", accessorKey: "className", id: "className" },
+    { header: "Section Name", accessorKey: "sectionName", id: "sectionName" },
+  ];
+
   return (
     <CommonCard size="100%" header="Student Records">
       <Row className="mb-4">
@@ -83,28 +91,12 @@ const StudentList: React.FC = () => {
         </Col>
       </Row>
 
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>S.No</th>
-            <th>Student Name</th>
-            <th>Father Name</th>
-            <th>Class Name</th>
-            <th>Section Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredStudents.map((student, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{student.studentName}</td>
-              <td>{student.fatherName}</td>
-              <td>{student.className}</td>
-              <td>{student.sectionName}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <CommonTable
+        data={filteredStudents}
+        columns={columns}
+        showSrNo={true}
+        usePagination={false}
+      />
     </CommonCard>
   );
 };

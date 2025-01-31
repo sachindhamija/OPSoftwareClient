@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from "react";
-import { Col, Row, Table } from "react-bootstrap";
-import { CustomDropdown, CommonCard, } from "../../../app/components/Components";
+import { Col, Row } from "react-bootstrap";
+import { CustomDropdown, CommonCard } from "../../../app/components/Components";
 import agent from "../../../app/api/agent";
 import { useAppDispatch } from "../../../app/store/configureStore";
 import toast from "react-hot-toast";
@@ -11,6 +11,7 @@ import FeeHeadingForm from "../FeeHeadingForm/FeeHeadingForm";
 import CommonModal from "../../../app/components/CommonModal";
 import { OptionType } from "../../../app/models/optionType";
 import { useForm } from "react-hook-form";
+import CommonTable from '../../../app/components/CommonTable';
 
 interface Student {
   admissionNo: string;
@@ -46,6 +47,30 @@ const FeePlan: React.FC = () => {
     };
     fetchStudents();
   }, [dispatch]);
+
+  // Updated columns with correct structure
+  const columns = [
+    {
+      header: 'Fees Heading', 
+      accessorKey: 'feeHeading',
+      id: 'feeHeading',
+    },
+    {
+      header: 'Fee Amount', 
+      accessorKey: 'feeAmount',
+      id: 'feeAmount',
+    },
+    {
+      header: 'Class Name',
+      accessorKey: 'className',
+      id: 'className',
+    },
+    {
+      header: 'Category Name',
+      accessorKey: 'categoryName',
+      id: 'categoryName',
+    },
+  ];
 
   return (
     <CommonCard size="100%" header="Fee Plan">
@@ -83,30 +108,13 @@ const FeePlan: React.FC = () => {
           />
         </Col>
       </Row>
-
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Fees Heading</th>
-            <th>Fees Value</th>
-            <th>Class Name</th>
-            <th>Category Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{student.studentName}</td>
-              <td>{student.fatherName}</td>
-              <td>{student.className}</td>
-              <td>{student.sectionName}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
+      <CommonTable
+        data={students}
+        columns={columns}
+        showSrNo={true}
+        usePagination={false}
+          
+      />
       {/* Admission Class Modal */}
       <CommonModal
         show={showAdmissionModal}
