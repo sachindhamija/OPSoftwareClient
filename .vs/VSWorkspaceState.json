@@ -1,11 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\src",
-    "\\src\\features",
-    "\\src\\features\\Vouchers",
-    "\\src\\features\\Vouchers\\SalesPurchaseCommonVouchers"
+    "\\src"
   ],
-  "SelectedNode": "\\src\\features",
+  "SelectedNode": "\\src\\app\\components\\CustomDropdown.tsx",
   "PreviewInSolutionExplorer": false
 }

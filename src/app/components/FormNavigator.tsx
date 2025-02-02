@@ -1,5 +1,6 @@
-import React, { useRef, useEffect, ReactNode } from 'react';
+import React, { useRef, useEffect, ReactNode, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 type FormNavigatorProps = {
@@ -16,8 +17,38 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 	isModalOpen = false,
 }) => {
 	const formRef = useRef<HTMLDivElement>(null);
-	const { handleSubmit } = useForm();
+	const { handleSubmit, trigger, getValues } = useForm();
 	const navigate = useNavigate();
+	const [currentField, setCurrentField] = useState<string | null>(null);
+
+	// useEffect(() => {
+	// 	const handleFocusIn = (event: FocusEvent) => {
+	// 	  const target = event.target as HTMLElement;
+	// 	  const fieldElement = target.closest('[data-fieldname]');
+	// 	  if (fieldElement) {
+	// 		const fieldName = fieldElement.getAttribute('data-fieldname');
+	// 		setCurrentField(fieldName);
+	// 	  } else {
+	// 		setCurrentField(null);
+	// 	  }
+	// 	};
+	// 	formRef.current?.addEventListener('focusin', handleFocusIn);
+	// 	return () => {
+	// 	  formRef.current?.removeEventListener('focusin', handleFocusIn);
+	// 	};
+	// }, []);
+
+	useEffect(() => {
+		const handleFocusIn = (event: FocusEvent) => {
+		  const target = event.target as HTMLElement;
+		  const fieldElement = target.closest('[data-fieldname]');
+		  setCurrentField(fieldElement?.getAttribute('data-fieldname') || null);
+		};
+		formRef.current?.addEventListener('focusin', handleFocusIn);
+		return () => {
+		  formRef.current?.removeEventListener('focusin', handleFocusIn);
+		};
+	  }, []);
 
 	useEffect(() => {
 		focusFirstInput();
@@ -62,7 +93,7 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 		}
 	};
 
-	const handleKeyDown = (event: React.KeyboardEvent) => {
+	const handleKeyDown = async (event: React.KeyboardEvent) => {
 		if (
 			event.key === 'Enter' &&
 			event.target instanceof HTMLButtonElement
@@ -76,7 +107,76 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 			event.key === 'Enter' ||
 			(event.key === 'Tab' && !event.shiftKey)
 		) {
-			event.preventDefault();
+			console.log('currentField')
+			console.log(currentField)
+
+			// if (currentField) {
+			// 	const isValid = getValues(currentField);
+			// 	console.log('isValid')
+			// 	console.log(isValid)
+			// 	if (!isValid) {
+			// 		toast.error('This Field is required.');
+			// 		event.preventDefault();
+			// 		return;
+			// 	}
+			// }
+
+			if (currentField) {
+				// Trigger validation for the current field
+				const isValid = await trigger(currentField, { shouldFocus: true });
+				if (!isValid) {
+					toast.error('This Field is required.');
+					event.preventDefault();
+					return;
+				}
+	
+				// Get the updated value after validation
+				const value = getValues(currentField);
+				console.log('value', value);
+	
+				// Check if the value is empty or invalid
+				if (!value) {
+					toast.error('This Field is required.');
+					event.preventDefault();
+					return;
+				}
+			}
+
+			// if (currentField) {
+			// 	const isValid = await trigger(currentField, { shouldFocus: true });
+			// 	if (!isValid) {
+			// 		toast.error('This Field is required.');
+			// 		event.preventDefault();
+			// 		return;
+			// 	}
+			// 	const value = getValues(currentField);
+			// 	console.log('value', value);
+			// 	if (!value) {
+			// 		toast.error('This Field is required.');
+			// 		event.preventDefault();
+			// 		return;
+			// 	}
+			// }
+
+			// if (currentField) {
+			// 	const isValid = await trigger(currentField, { shouldFocus: true });
+			// 	console.log('isValid')
+			// 	console.log(isValid)
+	
+			// 	if (!isValid) {
+			// 		console.log('Please fix validation errors')
+			// 		toast.error('Please fix validation errors');
+			// 	  event.preventDefault();
+			// 	  return;
+			// 	}
+			// }
+			//event.preventDefault();
+			// if (currentField) {
+			// 	const isValid = await trigger(currentField as any);
+			// 	if (!isValid) {
+			// 	  return;
+			// 	}
+			// }
 			setTimeout(() => {
 				moveToNextElement();
 			}, 2);

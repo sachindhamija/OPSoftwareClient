@@ -155,7 +155,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   };
 
   return (
-    <Form.Group as={Col} className={className} style={style}>
+      <Form.Group as={Col} className={className} style={style} data-fieldname={name} >
       {label && (
         <CustomLabel
           htmlFor={name}
