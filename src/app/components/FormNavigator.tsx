@@ -103,83 +103,30 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 			setTimeout(() => {
 				focusFirstInput();
 			}, 2);
-		} else if (
-			event.key === 'Enter' ||
-			(event.key === 'Tab' && !event.shiftKey)
-		) {
-			console.log('currentField')
-			console.log(currentField)
-
-			// if (currentField) {
-			// 	const isValid = getValues(currentField);
-			// 	console.log('isValid')
-			// 	console.log(isValid)
-			// 	if (!isValid) {
-			// 		toast.error('This Field is required.');
-			// 		event.preventDefault();
-			// 		return;
-			// 	}
-			// }
-
-			if (currentField) {
-				// Trigger validation for the current field
-				const isValid = await trigger(currentField, { shouldFocus: true });
-				if (!isValid) {
-					toast.error('This Field is required.');
-					event.preventDefault();
-					return;
+		} else if (event.key === 'Enter' || (event.key === 'Tab' && !event.shiftKey)) {
+			const target = event.target as HTMLElement;
+			const fieldElement = (target.closest(`input[name="${currentField}"]`) || 
+								  document.querySelector(`input[name="${currentField}"]`)) as HTMLInputElement | null;
+	
+			console.log("fieldElement", fieldElement);	
+			requestAnimationFrame(() => {
+				let CurrentFieldValue = fieldElement ? fieldElement.value || fieldElement.getAttribute('value') : null;
+				CurrentFieldValue = CurrentFieldValue?.trim() || null;
+	
+				console.log("CurrentFieldValue", CurrentFieldValue);
+	
+				if (currentField) {
+					if (!CurrentFieldValue) {
+						toast.error('This field is required.');
+						event.preventDefault();
+						return;
+					}
 				}
 	
-				// Get the updated value after validation
-				const value = getValues(currentField);
-				console.log('value', value);
-	
-				// Check if the value is empty or invalid
-				if (!value) {
-					toast.error('This Field is required.');
-					event.preventDefault();
-					return;
-				}
-			}
-
-			// if (currentField) {
-			// 	const isValid = await trigger(currentField, { shouldFocus: true });
-			// 	if (!isValid) {
-			// 		toast.error('This Field is required.');
-			// 		event.preventDefault();
-			// 		return;
-			// 	}
-			// 	const value = getValues(currentField);
-			// 	console.log('value', value);
-			// 	if (!value) {
-			// 		toast.error('This Field is required.');
-			// 		event.preventDefault();
-			// 		return;
-			// 	}
-			// }
-
-			// if (currentField) {
-			// 	const isValid = await trigger(currentField, { shouldFocus: true });
-			// 	console.log('isValid')
-			// 	console.log(isValid)
-	
-			// 	if (!isValid) {
-			// 		console.log('Please fix validation errors')
-			// 		toast.error('Please fix validation errors');
-			// 	  event.preventDefault();
-			// 	  return;
-			// 	}
-			// }
-			//event.preventDefault();
-			// if (currentField) {
-			// 	const isValid = await trigger(currentField as any);
-			// 	if (!isValid) {
-			// 	  return;
-			// 	}
-			// }
-			setTimeout(() => {
-				moveToNextElement();
-			}, 2);
+				setTimeout(() => {
+					moveToNextElement();
+				}, 2);
+			});
 		} else if (event.key === 'Tab' && event.shiftKey) {
 			event.preventDefault();
 			moveToPreviousElement();
@@ -194,6 +141,8 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 			setTimeout(() => navigate(-1), 0);
 		}
 	};
+	
+	
 
 	const shouldMoveToPreviousElement = (target: HTMLElement) => {
 		return (

@@ -155,7 +155,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
 	};
 
 	return (
-		<Form.Group style={style} className="input-group">
+		<Form.Group style={style} className="input-group" data-fieldname={name} >
 			{label && (
 				<CustomLabel
 					htmlFor={name}

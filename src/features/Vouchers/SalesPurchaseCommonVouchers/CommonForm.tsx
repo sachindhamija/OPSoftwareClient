@@ -1493,7 +1493,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         }, 0);
     };
     const [showBillNumberExistsPopup, setShowBillNumberExistsPopup] = useState(false);
-    const [showValidationPopup, setShowValidationPopup] = useState(false);
     const [existingVoucher, setExistingVoucher] = useState();
 
     const checkIfBillNumberExists = async (value: string) => {
@@ -1537,28 +1536,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             </CommonModal>
         );
     };
-
-    const ValidationPopup = ({ show, onHide }: { show: boolean, onHide: () => void }) => {
-        return (
-            <CommonModal show={show} onHide={onHide} size="sm">
-                <div className="p-4">
-                    <h5 className="text-center text-danger mb-4" style={{ fontWeight: "600" }}>
-                        This field is required
-                    </h5>
-                    <div className="d-flex justify-content-end mt-4">
-                        <Button
-                            variant="outline-danger"
-                            className="btn-sm px-4"
-                            onClick={onHide}
-                        >
-                            Close
-                        </Button>
-                    </div>
-                </div>
-            </CommonModal>
-        );
-    };
-
     const calculateBillSummary = () => {
         
 
@@ -1948,24 +1925,24 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                             />
                         </Col>
                         <Col xs={12} sm={6} md={5}>
-                        <CustomDropdown
-                            label="Account Name"
-                            name="accountId"
-                            options={displayedAccounts.map(transformAccountToOption)}
-                            control={control}
-                            error={errors.accountId}
-                            validationRules={{ required: 'Account Name is required.' }}
-                            isCreatable
-                            onCreateButtonClick={() => { setShowAccountModal(true); }}
-                            dropDownWidth="800px"
-                            onChangeCallback={handleAccountChange}
-                            badgeText={partyGST}
-                            hideDropdownIcon
-                            hideClearIcon
-                            key={paymentMode}
-                            disabled={(askForCustomerDetailWhenCash && paymentMode?.toLowerCase().includes("cash")) || isBillNumberExists}
+                            <CustomDropdown
+                                label="Account Name"
+                                name="accountId"
+                                options={displayedAccounts.map(transformAccountToOption)}
+                                control={control}
+                                error={errors.accountId}
+                                validationRules={{ required: 'Account Name is required.' }}
+                                isCreatable
+                                onCreateButtonClick={() => { setShowAccountModal(true); }}
+                                dropDownWidth="800px"
+                                onChangeCallback={handleAccountChange}
+                                badgeText={partyGST}
+                                hideDropdownIcon
+                                hideClearIcon
+                                key={paymentMode}
+                                disabled={(askForCustomerDetailWhenCash && paymentMode?.toLowerCase().includes("cash")) || isBillNumberExists}
                             // defaultValue={voucher?.voucherDetails?.accountId}
-                        />
+                            />
                         </Col>
                         <Col xs={12} md={2} className="custom-col-reduced">
                             <CustomInput
@@ -2472,11 +2449,6 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     onHide={() => setShowBillNumberExistsPopup(false)}
                 />
             )}
-
-            <ValidationPopup
-                show={showValidationPopup}
-                onHide={() => setShowValidationPopup(false)}
-            />
 
 
             {showTransportModal &&
