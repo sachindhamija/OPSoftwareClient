@@ -215,6 +215,8 @@ const LedgerReport = ({
 	}, [ledgerEntries]);
 
 	const handleRowClick = (voucher: LedgerReportDto) => {
+		console.log("voucher")
+		console.log(voucher)
 		setSelectedVoucher(voucher);
 		setShowVoucherModal(true);
 	};
@@ -234,6 +236,16 @@ const LedgerReport = ({
 			case VoucherTypeEnum.JournalEntry:
 				return <JournalEntryForm {...commonProps} />;
 			case VoucherTypeEnum.ItemSale:
+				return <SalePurchaseForm {...commonProps} ledgerVoucherDate={voucherDate} voucherType={voucherTypeId} />;
+				case VoucherTypeEnum.ItemPurchase:
+			return <SalePurchaseForm {...commonProps} ledgerVoucherDate={voucherDate} voucherType={voucherTypeId} />;
+				case VoucherTypeEnum.SalesReturn:
+				return <SalePurchaseForm {...commonProps} ledgerVoucherDate={voucherDate} voucherType={voucherTypeId} />;
+			case VoucherTypeEnum.PurchaseReturn:
+				return <SalePurchaseForm {...commonProps} ledgerVoucherDate={voucherDate} voucherType={voucherTypeId} />;
+				case VoucherTypeEnum.CreditNote:
+			return <SalePurchaseForm {...commonProps} ledgerVoucherDate={voucherDate} voucherType={voucherTypeId} />;
+				case VoucherTypeEnum.DebitNote:
 				return <SalePurchaseForm {...commonProps} ledgerVoucherDate={voucherDate} voucherType={voucherTypeId} />;
 			default:
 				return null;

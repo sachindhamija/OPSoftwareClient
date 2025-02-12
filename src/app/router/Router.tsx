@@ -41,13 +41,14 @@ import { PrintInvoicePage } from '../../features/Vouchers/SalesPurchaseCommonVou
 import CreditSaleEntry from '../../features/Vouchers/CreditSaleEntry/CreditSaleEntry';
 import ItemShortageEntry from '../../features/Vouchers/ItemShortageEntry/ItemShortageEntry';
 import ItemStockTransfer from '../../features/Vouchers/ItemStockTransfer/ItemStockTransfer';
-import StudentAdmission from '../../features/Masters/StudentAdmission/StudentAdmission';
-import StudentList from '../../features/Masters/StudentList/StudentList';
-import FeePlan from '../../features/Masters/FeePlan/FeePlan';
-import ClassName from '../../features/Masters/AdmissionClassForm/AdmissionClassForm';
-import SectionForm from '../../features/Masters/SectionForm/SectionForm';
-import CategoryForm from '../../features/Masters/CategoryForm/CategoryForm';
-import FeeHeadingForm from '../../features/Masters/FeeHeadingForm/FeeHeadingForm';
+// import StudentAdmission from '../../features/School/StudentAdmission/StudentAdmission';
+import StudentList from '../../features/School/StudentList/StudentList';
+//import FeePlan from '../../features/Masters/FeePlan/FeePlan';
+import ClassForm from '../../features/School/Class/classForm';
+import SectionForm from '../../features/School/Section/sectionForm';
+import SchoolCategoryForm from '../../features/School/SchoolCategory/schoolCategoryForm';
+import FeeHeadingForm from '../../features/School/FeeHeading/feeHeadingForm';
+import FeePlanForm from '../../features/School/FeePlan/FeePlanForm';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -181,13 +182,13 @@ export const router = createBrowserRouter([
 							/>
 						),
 					},
-					{ path: 'student-admission', element: <StudentAdmission /> },
+//					{ path: 'student-admission', element: <StudentAdmission /> },
 					{ path: 'student-list', element: <StudentList /> },
-					{ path: 'fee-plan', element: <FeePlan /> },
-					{ path: 'class-name', element: <ClassName onSuccess={() => { }} /> },
-					{ path: 'section-name', element: <SectionForm onSuccess={() => { }} /> },
-					{ path: 'category-name', element: <CategoryForm onSuccess={() => { }} /> },
-					{ path: 'fees-head', element: <FeeHeadingForm onSuccess={() => { }} /> },
+					{ path: 'fee-plan', element: <FeePlanForm /> },
+					{ path: 'school-class', element: <ClassForm /> },
+					{ path: 'school-section', element: <SectionForm /> },
+					{ path: 'school-category', element: <SchoolCategoryForm /> },
+					{ path: 'school-feeheading', element: <FeeHeadingForm /> },
 
 				],
 			},

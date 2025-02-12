@@ -7,8 +7,8 @@ import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation'
 import CustomDropdown from '../../../app/components/CustomDropdown';
 // import { useAccountGroups } from '../../../app/hooks/useAccountGroupsOptions';
 import CommonModal from '../../../app/components/CommonModal';
-import AccountGroupForm from '../../Masters/AccountGroup/AccountGroupForm';
-import { OptionType } from '../../../app/models/optionType';
+// import AccountGroupForm from '../../Masters/AccountGroup/AccountGroupForm';
+// import { OptionType } from '../../../app/models/optionType';
 import CustomButton from '../../../app/components/CustomButton';
 import toast from 'react-hot-toast';
 import agent from '../../../app/api/agent';
@@ -19,6 +19,8 @@ import { formatDateForBackend } from '../../../app/utils/dateUtils';
 import { transformAccountToOption } from '../../../app/utils/accountUtils';
 import CustomInput from '../../../app/components/CustomInput';
 import FormNavigator from '../../../app/components/FormNavigator';
+import AccountForm from '../../Masters/Account/AccountForm';
+import { AccountDtoForDropDownList } from '../../Masters/Account/accountDto';
 
 interface OtherChargesModalProps {
   show: boolean;
@@ -36,9 +38,9 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
   // const [isFormValid, setIsFormValid] = useState(false)
   const [charges, setCharges] = useState<OtherChargesDto[]>(defaultOtherCharges);
   const [modalShow, setModalShow] = useState(false);
-  const { control, formState: { errors }, reset } = useForm<OtherChargesDto[]>({ mode: 'all' });
-  const [allAccounts, setAllAccounts] = useState<OptionType[]>([]);
-
+  const { control, formState: { errors }, reset, setFocus } = useForm<OtherChargesDto[]>({ mode: 'all' });
+  const [allAccounts, setAllAccounts] = useState<AccountDtoForDropDownList[]>([]);
+  
   const fetchAccounts = async () => {
     try {
 
@@ -48,8 +50,13 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
         (financialYearFrom == undefined ? '' : financialYearFrom.toString()),
         formatDateForBackend(voucherDate),
       );
-      setAllAccounts(accounts.map(transformAccountToOption));
+      console.log("accounts")
+      console.log(accounts)
+    //  var filteredAccounts = accounts.filter(account => account.accountGroupName === 'PROFIT & LOSS' || account.accountGroupName === 'EXPENSES (DIRECT/MFG.)' || account.accountGroupName === 'EXPENSES (INDIRECT/ADMN.)');
+      console.log("filteredAccounts")
+      console.log(accounts)
 
+      setAllAccounts(accounts);
 
       return Promise.resolve();
     } catch (error) {
@@ -78,7 +85,11 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
 
     };
     setCharges([...charges, newCharge]);
-  };
+    setTimeout(() => {
+      console.log(`${charges.length}.accountId`);
+      setFocus(`${charges.length}.accountId`);
+    }, 0);
+    };
 
 
   useEffect(() => {
@@ -194,16 +205,16 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
     // }
   };
  
-  const getAccountGroupId = (id: string): OptionType => {
-    const val = allAccounts.find(x => x.value === id) as OptionType;
-    return val;
-  };
+  // const getAccountGroupId = (id: string): OptionType => {
+  //   const val = allAccounts.find(x => x.value === id) as OptionType;
+  //   return val;
+  // };
 
   return (
     <>
-      <Modal show={show} onHide={handleSaveAndClose} size="lg">
+      <Modal show={show} onHide={handleSaveAndClose} size="xl">
         <Modal.Header closeButton>
-          <Modal.Title>Customer Details</Modal.Title>
+          <Modal.Title>Other Charges</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <FormNavigator>
@@ -212,7 +223,7 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
               <Table style={{ width: 2000 }} striped bordered hover responsive>
                 <thead>
                   <tr>
-                    <th>Account</th>
+                    <th>Account [F3-New]</th>
                     <th>On Value</th>
                     <th>Charges Percentage</th>
                     <th>Added/Subtracted</th>
@@ -231,15 +242,15 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
                     <tr key={charge.key}>
                       <td>
                         <CustomDropdown
-                          defaultValue={getAccountGroupId(charge.accountId)}
+                          //defaultValue={getAccountGroupId(charge.accountId)}
                           style={{ width: 320 }}
                           name={`accountId[${i}]`}
-                          options={allAccounts}
+                          options={allAccounts.map(transformAccountToOption)}
                           control={control}
                           error={errors[i]?.accountId}
                           validationRules={{ required: 'Account Group is required.' }}
                           onChangeCallback={(e) => handleFieldChange(charge.key, 'accountId', e?.value)}
-                          isCreatable={true}
+                          isCreatable
                           showCreateButton={true}
                           onCreateButtonClick={() => setModalShow(true)}
                         />
@@ -353,14 +364,28 @@ const OtherChargesModal: React.FC<OtherChargesModalProps> = ({ show, onHide, onS
                 </tbody>
               </Table>
             )}
-            <Button onClick={handleAddRow}>Add Row</Button>
+            <Button 
+              onClick={handleAddRow}
+              onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
+                if (e.key === 'Enter') {
+                  handleAddRow(); 
+                }
+              }}
+              >Add Row</Button>
           </div>
           </FormNavigator>
         </Modal.Body>
       </Modal>
       <CommonModal show={modalShow} onHide={() => setModalShow(false)}>
         <Suspense fallback={<div>Loading...</div>}>
-          <AccountGroupForm />
+        <AccountForm
+              isModalOpen={modalShow}
+              onCloseModalAfterSave={() => {
+                  fetchAccounts();
+                  setModalShow(false);
+              }}
+          />
+        {/* <AccountGroupForm /> */}
         </Suspense>
       </CommonModal>
     </>

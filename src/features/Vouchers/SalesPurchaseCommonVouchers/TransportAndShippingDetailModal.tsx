@@ -226,7 +226,7 @@ const TransportAndShippingDetailModal: React.FC<TransportDetailsModalProps> = ({
                   onChangeCallback={(e) =>
                     setFormData({ ...formData, transporterId: e?.value  })
                   }
-                  isCreatable={true}
+                  showF3New
                   showCreateButton={true}
                   onCreateButtonClick={() => {
                     setShowTransporterModal(true);
@@ -245,7 +245,7 @@ const TransportAndShippingDetailModal: React.FC<TransportDetailsModalProps> = ({
                   onChangeCallback={(e) =>
                     setFormData({ ...formData, vehicleId: e?.value  })
                   }
-                  isCreatable={true}
+                  showF3New
                   showCreateButton={true}
                   onCreateButtonClick={() => {
                     setShowVehicleModal(true);

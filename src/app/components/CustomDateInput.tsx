@@ -156,7 +156,7 @@ const CustomDateInputBox: React.FC<CustomDateInputBoxProps> = ({
 
     return (
         <>
-            <Form.Group style={style}>
+            <Form.Group style={style} data-fieldname={name} data-required={validationRules?.required}>
                 {label && (
                     <CustomLabel htmlFor={name} label={label} required={isRequired} badgeText={dayName} />
                 )}

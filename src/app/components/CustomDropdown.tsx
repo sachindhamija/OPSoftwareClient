@@ -155,14 +155,15 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   };
 
   return (
-    <Form.Group as={Col} className={className} style={style}>
+    <Form.Group as={Col} className={className} style={style} data-fieldname={name} data-required={validationRules?.required} >
       {label && (
         <CustomLabel
           htmlFor={name}
           label={
             <>
               {label}
-              {isCreatable && onCreateButtonClick && showF3New && (
+              {/* {isCreatable && onCreateButtonClick && showF3New && ( */}
+              {onCreateButtonClick && showF3New && (
                 <span style={{ color: "red" }}> [F3-NEW]</span>
               )}
             </>

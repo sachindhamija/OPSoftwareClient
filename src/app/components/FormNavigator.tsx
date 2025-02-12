@@ -1,5 +1,6 @@
-import React, { useRef, useEffect, ReactNode } from 'react';
+import React, { useRef, useEffect, ReactNode, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 type FormNavigatorProps = {
@@ -18,6 +19,39 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 	const formRef = useRef<HTMLDivElement>(null);
 	const { handleSubmit } = useForm();
 	const navigate = useNavigate();
+	const [currentField, setCurrentField] = useState<string | null>(null);
+	const [requiredField, setRequiredField] = useState<string | null>(null);
+
+	// useEffect(() => {
+	// 	const handleFocusIn = (event: FocusEvent) => {
+	// 	  const target = event.target as HTMLElement;
+	// 	  const fieldElement = target.closest('[data-fieldname]');
+	// 	  if (fieldElement) {
+	// 		const fieldName = fieldElement.getAttribute('data-fieldname');
+	// 		setCurrentField(fieldName);
+	// 	  } else {
+	// 		setCurrentField(null);
+	// 	  }
+	// 	};
+	// 	formRef.current?.addEventListener('focusin', handleFocusIn);
+	// 	return () => {
+	// 	  formRef.current?.removeEventListener('focusin', handleFocusIn);
+	// 	};
+	// }, []);
+
+	useEffect(() => {
+		const handleFocusIn = (event: FocusEvent) => {
+		  const target = event.target as HTMLElement;
+		  const fieldElement = target.closest('[data-fieldname]');
+		  setCurrentField(fieldElement?.getAttribute('data-fieldname') || null);
+		  const requiredFieldElement = target.closest('[data-required]');
+		  setRequiredField(requiredFieldElement?.getAttribute('data-required') || null);
+		};
+		formRef.current?.addEventListener('focusin', handleFocusIn);
+		return () => {
+		  formRef.current?.removeEventListener('focusin', handleFocusIn);
+		};
+	  }, []);
 
 	useEffect(() => {
 		focusFirstInput();
@@ -62,7 +96,7 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 		}
 	};
 
-	const handleKeyDown = (event: React.KeyboardEvent) => {
+	const handleKeyDown = async (event: React.KeyboardEvent) => {
 		if (
 			event.key === 'Enter' &&
 			event.target instanceof HTMLButtonElement
@@ -72,14 +106,30 @@ const FormNavigator: React.FC<FormNavigatorProps> = ({
 			setTimeout(() => {
 				focusFirstInput();
 			}, 2);
-		} else if (
-			event.key === 'Enter' ||
-			(event.key === 'Tab' && !event.shiftKey)
-		) {
-			event.preventDefault();
-			setTimeout(() => {
-				moveToNextElement();
-			}, 2);
+		} else if (event.key === 'Enter' || (event.key === 'Tab' && !event.shiftKey)) {
+
+				event.preventDefault();
+				setTimeout(() => {
+					const target = event.target as HTMLElement;
+					const fieldElement = (target.closest(`input[name="${currentField}"]`) || 
+										  document.querySelector(`input[name="${currentField}"]`)) as HTMLInputElement | null;
+			
+					//requestAnimationFrame(() => {
+						let CurrentFieldValue = fieldElement ? fieldElement.value || fieldElement.getAttribute('value') : null;
+						CurrentFieldValue = CurrentFieldValue?.trim() || null;
+
+						if (currentField) {
+							if (!CurrentFieldValue && requiredField) {
+								toast.error('This field is required.');
+								event.preventDefault();
+								return;
+							}
+						}
+					//});
+					moveToNextElement();
+				}, 2);
+			
+			
 		} else if (event.key === 'Tab' && event.shiftKey) {
 			event.preventDefault();
 			moveToPreviousElement();

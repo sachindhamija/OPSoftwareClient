@@ -33,7 +33,7 @@ import { SerialNumberDto } from "../../features/Masters/SerialNumberSetting/Seri
 import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetting/AdditionalFieldDto";
 import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
 import { CommissionAgentItemDto } from "../../features/CommissionAgent/CommissionAgentItem/commissionAgentItem";
-import { StudentAdmissionDto } from "../../features/Masters/StudentAdmission/StudentAdmissionDto";
+import { StudentAdmissionDto } from "../../features/School/StudentAdmission/StudentAdmissionDto";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -771,8 +771,6 @@ const Vouchers = {
     });
     // return await requests.get(`voucher/${voucherId}`, params);
     const response = await requests.get(`voucher/${voucherId}`, params);
-    console.log("response");
-    console.log(response);
     // Assuming response.data contains the voucher data
     if (response) {
       const voucherData = response;
@@ -1249,6 +1247,205 @@ const Vehicle = {
   }
 };
 
+const Class = {
+  getAllClasses: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("class/GetAllClasses", params);
+  },
+  getClassById: async (accessId: string, classID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`class/${classID}`, params);
+  },
+  createClass: async (
+    accessId: string,
+    classData: ClassDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "class/CreateClass",
+      classData,
+      params
+    );
+  },
+  updateClass: async (
+    accessId: string,
+    classID: number,
+    classData: ClassDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `class/${classID}`,
+      classData,
+      params
+    );
+  },
+  deleteClass: async (accessId: string, classID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`class/${classID}`, params);
+  },
+};
+
+
+const Section = {
+  getAllSections: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("section/GetAllSections", params);
+  },
+  getSectionById: async (accessId: string, sectionID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`section/${sectionID}`, params);
+  },
+  createSection: async (
+    accessId: string,
+    section: SectionDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "section/CreateSection",
+      section,
+      params
+    );
+  },
+  updateSection: async (
+    accessId: string,
+    sectionID: number,
+    section: SectionDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `section/${sectionID}`,
+      section,
+      params
+    );
+  },
+  deleteSection: async (accessId: string, sectionID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`section/${sectionID}`, params);
+  },
+};
+
+
+const SchoolCategory = {
+  getAllSchoolCategories: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("schoolCategory/GetAllSchoolCategories", params);
+  },
+  getSchoolCategoryById: async (accessId: string, schoolCategoryID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`schoolCategory/${schoolCategoryID}`, params);
+  },
+  createSchoolCategory: async (
+    accessId: string,
+    schoolCategory: SchoolCategoryDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "schoolCategory/CreateSchoolCategory",
+      schoolCategory,
+      params
+    );
+  },
+  updateSchoolCategory: async (
+    accessId: string,
+    schoolCategoryID: number,
+    schoolCategory: SchoolCategoryDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `schoolCategory/${schoolCategoryID}`,
+      schoolCategory,
+      params
+    );
+  },
+  deleteSchoolCategory: async (accessId: string, schoolCategoryID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`schoolCategory/${schoolCategoryID}`, params);
+  },
+};
+
+
+const FeeHeading = {
+  getAllFeeHeadings: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("feeHeading/GetAllFeeHeadings", params);
+  },
+  getFeeHeadingById: async (accessId: string, feeHeadingID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`feeHeading/${feeHeadingID}`, params);
+  },
+  createFeeHeading: async (
+    accessId: string,
+    feeHeading: FeeHeadingDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "feeHeading/CreateFeeHeading",
+      feeHeading,
+      params
+    );
+  },
+  updateFeeHeading: async (
+    accessId: string,
+    feeHeadingID: number,
+    feeHeading: FeeHeadingDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `feeHeading/${feeHeadingID}`,
+      feeHeading,
+      params
+    );
+  },
+  deleteFeeHeading: async (accessId: string, feeHeadingID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`feeHeading/${feeHeadingID}`, params);
+  },
+};
+
+const FeePlan = {
+  getAllFeePlans: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("feePlan/GetAllFeePlans", params);
+  },
+  getFeePlanById: async (accessId: string, feePlanID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`feePlan/${feePlanID}`, params);
+  },
+  createFeePlan: async (
+    accessId: string,
+    feePlan: FeePlanDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+
+    return await requests.post(
+      "feePlan/CreateFeePlan",
+      feePlan,
+      params
+    );
+  },
+  updateFeePlan: async (
+    accessId: string,
+    feePlanID: number,
+    feePlan: FeePlanDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(
+      `feePlan/${feePlanID}`,
+      feePlan,
+      params
+    );
+  },
+  deleteFeePlan: async (accessId: string, feePlanID: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`feePlan/${feePlanID}`, params);
+  },
+};
+
+
 const agent = {
   UserAccount,
   Company,
@@ -1279,7 +1476,12 @@ const agent = {
   Email,
   Transporter,
   Vehicle,
-  Student, // Add  here
+  Student,
+  Class,
+  Section,
+  SchoolCategory,
+  FeeHeading,
+  FeePlan,
 };
 
 export default agent;

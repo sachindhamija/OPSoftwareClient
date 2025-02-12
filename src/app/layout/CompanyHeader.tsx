@@ -397,17 +397,17 @@ function CompanyHeader() {
             <Dropdown.Item as={Link} to={"/fee-plan"}>
               Fee Plan{" "}
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to={"/class-name"}>
-              Class Name
+            <Dropdown.Item as={Link} to={"/school-class"}>
+              Class/Course
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to={"/section-name"}>
+            <Dropdown.Item as={Link} to={"/school-section"}>
               Section Name
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to={"/category-name"}>
+            <Dropdown.Item as={Link} to={"/school-category"}>
               Category Name
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to={"/fees-head"}>
-              Fees Head
+            <Dropdown.Item as={Link} to={"/school-feeheading"}>
+              Fee Heading
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>

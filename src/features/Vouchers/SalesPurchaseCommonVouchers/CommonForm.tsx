@@ -82,7 +82,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [otherCharges, setOtherCharges] = useState<OtherChargesDto[]>([]);
     const [serialNumbers, setSerialNumbers] = useState<SerialNumberDto[]>([]);
     const [showSerialNumberModal, setShowSerialNumberModal] = useState(false);
-    const { register, handleSubmit, setValue, getValues, watch, control, reset, formState: { errors } } = useForm<FieldValues>({
+    const { register, handleSubmit, setFocus, setValue, getValues, watch, control, reset, formState: { errors } } = useForm<FieldValues>({
         mode: "all",
         defaultValues: {
             billBookId: null,
@@ -239,6 +239,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         voucherDate = ledgerVoucherDate;
     }
     const getVoucherById = async (voucherId: string) => {
+        console.log("voucherId")
+        console.log(voucherId)
         const resp = await agent.Vouchers.getVoucherById(accessId, voucherId);
         setVoucher(resp)
     }
@@ -1327,6 +1329,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             if (fields.length === 1) {
                 append(defaultItems); 
             }
+            setFocus(`items[${index}].itemId`)
             return;
         }
 
@@ -1337,11 +1340,14 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             if (fields.length === 1) {
                 append(defaultItems); 
             }
-            return;        }
+            setFocus(`items[${index}].itemId`)
+            return; 
+        }
     
         if (selectedTaxType === "Exclusive" && gstSlabValue && gstSlabValue > 0) {
             toast.error("Exclusive type doesn't include items with tax.");
             setValue(`items[${index}].itemId`, null); 
+            setFocus("items[${index}].itemId")
             remove(index);
             if (fields.length === 1) {
                 append(defaultItems); 
@@ -1385,19 +1391,21 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                 ...prevOptions,
                 [index]: pricePerOptionsForItem
             }));
-
+                console.log("voucherType")
+                console.log(voucherType)
             if (voucherType == VoucherTypeEnum.ItemSale) {
                 const matchingOption = pricePerOptionsForItem.find(option => option.label.includes(itemDetails.applySalesPriceOn as string));
                 const pricePerValue = matchingOption ? matchingOption.value : 'main';
+
                 setValue(`items[${index}].pricePer`, pricePerValue);
-                setValue(`items[${index}].rate`, itemDetails.salePrice);
+                setValue(`items[${index}].rate`, itemDetails.salePrice != 0 ? itemDetails.salePrice : "");
                 setValue(`items[${index}].discountPercentage`, itemDetails.itemDiscountOnSalePercentage);
             }
             else if (voucherType == VoucherTypeEnum.ItemPurchase) {
                 const matchingOption = pricePerOptionsForItem.find(option => option.label.includes(itemDetails.applyPurchasePriceOn as string));
                 const pricePerValue = matchingOption ? matchingOption.value : 'main';
                 setValue(`items[${index}].pricePer`, pricePerValue);
-                setValue(`items[${index}].rate`, itemDetails.purchasePrice);
+                setValue(`items[${index}].rate`, itemDetails.purchasePrice != 0 ? itemDetails.purchasePrice : "");
                 setValue(`items[${index}].discountPercentage`, itemDetails.itemDiscountOnPurchasePercentage);
 
             }
@@ -1479,7 +1487,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             setValue(`items[${index}].cGST`, cGST.toFixed(2));
             setValue(`items[${index}].netAmount`, netAmount.toFixed(2));
 
-            if (item.itemId && item.basicAmount > 0) {
+            //if (item.itemId && item.basicAmount > 0) {
+            if (item.itemId) {
                 const items = getValues('items');
                 if (index === items.length - 1) {
                     append(defaultItems);
@@ -1661,6 +1670,222 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                     onSuccessfulSubmit();
                 }
             }
+            else if (voucherType == VoucherTypeEnum.ItemPurchase) {
+                if (voucherId || voucher) {
+                    // update the invoice   
+                    await agent.SalePurchase.updateVoucher(accessId, finalData);
+                    toast.success('Voucher updated successfully');
+                    reset()
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                }
+                else {
+                    var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    debugger;
+                    reset({
+                        billBookId: "",
+                        voucherDate: "",
+                        paymentMode: "",
+                        items: [defaultItems],
+                    });
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                    voucherId = newVoucherId;
+                    sessionStorage.setItem('voucherId',JSON.stringify(newVoucherId));
+                    toast.success('Voucher created successfully');
+                    if (invoiceAfterSave && window.confirm("Do you want to print the invoice?")) {                        
+                        await invoiceHtmlData(true)
+                    }else{
+                        reset({
+                            billBookId: "",
+                            voucherDate: "",
+                            paymentMode: "",
+                            items: [defaultItems],
+                        });
+                        setTransportDetails(defaultTransportDetails);
+                        setCustomerDetail(defaultCustomerDetails);
+                        setBillSummary(defaultBillSummary);
+                    }
+                }
+                if (isInModal && onSuccessfulSubmit) {
+                    onSuccessfulSubmit();
+                }
+            }
+            else if (voucherType == VoucherTypeEnum.SalesReturn) {
+                if (voucherId || voucher) {
+                    // update the invoice   
+                    await agent.SalePurchase.updateVoucher(accessId, finalData);
+                    toast.success('Voucher updated successfully');
+                    reset()
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                }
+                else {
+                    var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    debugger;
+                    reset({
+                        billBookId: "",
+                        voucherDate: "",
+                        paymentMode: "",
+                        items: [defaultItems],
+                    });
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                    voucherId = newVoucherId;
+                    sessionStorage.setItem('voucherId',JSON.stringify(newVoucherId));
+                    toast.success('Voucher created successfully');
+                    if (invoiceAfterSave && window.confirm("Do you want to print the invoice?")) {                        
+                        await invoiceHtmlData(true)
+                    }else{
+                        reset({
+                            billBookId: "",
+                            voucherDate: "",
+                            paymentMode: "",
+                            items: [defaultItems],
+                        });
+                        setTransportDetails(defaultTransportDetails);
+                        setCustomerDetail(defaultCustomerDetails);
+                        setBillSummary(defaultBillSummary);
+                    }
+                }
+                if (isInModal && onSuccessfulSubmit) {
+                    onSuccessfulSubmit();
+                }
+            }
+            else if (voucherType == VoucherTypeEnum.PurchaseReturn) {
+                if (voucherId || voucher) {
+                    // update the invoice   
+                    await agent.SalePurchase.updateVoucher(accessId, finalData);
+                    toast.success('Voucher updated successfully');
+                    reset()
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                }
+                else {
+                    var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    debugger;
+                    reset({
+                        billBookId: "",
+                        voucherDate: "",
+                        paymentMode: "",
+                        items: [defaultItems],
+                    });
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                    voucherId = newVoucherId;
+                    sessionStorage.setItem('voucherId',JSON.stringify(newVoucherId));
+                    toast.success('Voucher created successfully');
+                    if (invoiceAfterSave && window.confirm("Do you want to print the invoice?")) {                        
+                        await invoiceHtmlData(true)
+                    }else{
+                        reset({
+                            billBookId: "",
+                            voucherDate: "",
+                            paymentMode: "",
+                            items: [defaultItems],
+                        });
+                        setTransportDetails(defaultTransportDetails);
+                        setCustomerDetail(defaultCustomerDetails);
+                        setBillSummary(defaultBillSummary);
+                    }
+                }
+                if (isInModal && onSuccessfulSubmit) {
+                    onSuccessfulSubmit();
+                }
+            }
+            else if (voucherType == VoucherTypeEnum.DebitNote) {
+                if (voucherId || voucher) {
+                    // update the invoice   
+                    await agent.SalePurchase.updateVoucher(accessId, finalData);
+                    toast.success('Voucher updated successfully');
+                    reset()
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                }
+                else {
+                    var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    debugger;
+                    reset({
+                        billBookId: "",
+                        voucherDate: "",
+                        paymentMode: "",
+                        items: [defaultItems],
+                    });
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                    voucherId = newVoucherId;
+                    sessionStorage.setItem('voucherId',JSON.stringify(newVoucherId));
+                    toast.success('Voucher created successfully');
+                    if (invoiceAfterSave && window.confirm("Do you want to print the invoice?")) {                        
+                        await invoiceHtmlData(true)
+                    }else{
+                        reset({
+                            billBookId: "",
+                            voucherDate: "",
+                            paymentMode: "",
+                            items: [defaultItems],
+                        });
+                        setTransportDetails(defaultTransportDetails);
+                        setCustomerDetail(defaultCustomerDetails);
+                        setBillSummary(defaultBillSummary);
+                    }
+                }
+                if (isInModal && onSuccessfulSubmit) {
+                    onSuccessfulSubmit();
+                }
+            }
+            else if (voucherType == VoucherTypeEnum.CreditNote) {
+                if (voucherId || voucher) {
+                    // update the invoice   
+                    await agent.SalePurchase.updateVoucher(accessId, finalData);
+                    toast.success('Voucher updated successfully');
+                    reset()
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                }
+                else {
+                    var newVoucherId = await agent.SalePurchase.saveVoucher(accessId, finalData, "");
+                    debugger;
+                    reset({
+                        billBookId: "",
+                        voucherDate: "",
+                        paymentMode: "",
+                        items: [defaultItems],
+                    });
+                    setTransportDetails(defaultTransportDetails);
+                    setCustomerDetail(defaultCustomerDetails);
+                    setBillSummary(defaultBillSummary);
+                    voucherId = newVoucherId;
+                    sessionStorage.setItem('voucherId',JSON.stringify(newVoucherId));
+                    toast.success('Voucher created successfully');
+                    if (invoiceAfterSave && window.confirm("Do you want to print the invoice?")) {                        
+                        await invoiceHtmlData(true)
+                    }else{
+                        reset({
+                            billBookId: "",
+                            voucherDate: "",
+                            paymentMode: "",
+                            items: [defaultItems],
+                        });
+                        setTransportDetails(defaultTransportDetails);
+                        setCustomerDetail(defaultCustomerDetails);
+                        setBillSummary(defaultBillSummary);
+                    }
+                }
+                if (isInModal && onSuccessfulSubmit) {
+                    onSuccessfulSubmit();
+                }
+            }
+
 
         } catch (error) {
             console.error('Error in onSubmit:', error);
@@ -1883,7 +2108,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                             <CustomDropdown
                                 // defaultValue={voucher?.voucherMasterExtended?.billBookId}
                                 name="billBookId"
-                                label="Bill Book [F3-New]"
+                                label="Bill Book"
                                 options={billBookList}
                                 control={control}
                                 onCreateButtonClick={() => { setShowBillBookModal(true); }}
@@ -1932,7 +2157,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 control={control}
                                 error={errors.accountId}
                                 validationRules={{ required: 'Account Name is required.' }}
-                                isCreatable
+                                showF3New
                                 onCreateButtonClick={() => { setShowAccountModal(true); }}
                                 dropDownWidth="800px"
                                 onChangeCallback={handleAccountChange}
@@ -1949,6 +2174,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 label="Bill Number"
                                 name="voucherNo"
                                 register={register}
+                                validationRules={{ required: 'Bill number is required.' }}
                                 maxLength={12}
                                 isTextCenter
                                 autoFocus={focusBillNo}
@@ -1996,11 +2222,11 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                             </thead>
                             <tbody>
                             {fields.map((field, index) => {
-                                const mainQty = watch(`items[${index}].mainQty`); // Watch mainQty
-                                const rate = watch(`items[${index}].rate`); // Watch rate
+                                //onst mainQty = watch(`items[${index}].mainQty`); // Watch mainQty
+                                //onst rate = watch(`items[${index}].rate`); // Watch rate
 
-                                const disableFieldsAfterMainQty = !mainQty || parseFloat(mainQty) === 0;
-                                const disableFieldsAfterRate = !rate || parseFloat(rate) === 0;
+                                //const disableFieldsAfterMainQty = !mainQty || parseFloat(mainQty) === 0;
+                                //const disableFieldsAfterRate = !rate || parseFloat(rate) === 0;
 
                                 return (
                                     <tr key={field.id}>
@@ -2012,6 +2238,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 control={control}
                                                 isCreatable
                                                 onCreateButtonClick={() => { setShowItemModal(true); }}
+                                                validationRules={{ required: 'Item is required.' }}
                                                 dropDownWidth="800px"
                                                 onChangeCallback={(selectedOption: OptionType | null) => {
                                                     if (selectedOption) {
@@ -2030,6 +2257,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                             <CustomInput
                                                 name={`items[${index}].mainQty`}
                                                 register={register}
+                                                validationRules={{ required: 'Main qty is required.' }}
                                                 allowedChars="numericDecimal"
                                                 onChange={(e) => calculateItemRow(index, 'mainQty', e.target.value)}
                                                 disabled={!isMainQty || isBillNumberExists}
@@ -2043,7 +2271,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     register={register}
                                                     allowedChars="numericDecimal"
                                                     onChange={(e) => calculateItemRow(index, 'altQty', e.target.value)}
-                                                    disabled={disableFieldsAfterMainQty || isBillNumberExists}
+                                                    disabled={isBillNumberExists}
+                                                    //disabled={disableFieldsAfterMainQty || isBillNumberExists}
                                                 />
                                             </td>
                                         )}
@@ -2054,7 +2283,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     name={`items[${index}].free`}
                                                     register={register}
                                                     allowedChars="numericDecimal"
-                                                    disabled={disableFieldsAfterMainQty || isBillNumberExists}
+                                                    disabled={isBillNumberExists}
+                                                    //disabled={disableFieldsAfterMainQty || isBillNumberExists}
                                                 />
                                             </td>
                                         )}
@@ -2064,6 +2294,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].rate`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
+                                                validationRules={{ required: 'Rate is required.' }}
                                                 onChange={(e) => {
                                                     calculateItemRow(index, 'rate', e.target.value);
                                                     const rateValue = parseFloat(e.target.value) || 0;
@@ -2077,7 +2308,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         setFocusInclusiveRateInput(`items[${index}].inclusiveRate`);
                                                     }
                                                 }}
-                                                disabled={disableFieldsAfterMainQty || !isRateSale || isBillNumberExists}
+                                                disabled={!isRateSale || isBillNumberExists}
+                                                //disabled={disableFieldsAfterMainQty || !isRateSale || isBillNumberExists}
                                             />
                                              {showInclusiveRateInput === index && (
                                                 <CustomInput
@@ -2129,8 +2361,12 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                             <CustomInput
                                                 name={`items[${index}].basicAmount`}
                                                 register={register}
+                                                
+                                                onChange={(e) => {
+                                                    calculateItemRow(index, 'basicAmount', e.target.value);
+                                                }}
                                                 allowedChars="numericDecimal"
-                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || getValues(`items[${index}].isRateZero`)}
+                                                //disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || getValues(`items[${index}].isRateZero`)}
                                             />
                                         </td>
 
@@ -2141,7 +2377,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 allowedChars="numericDecimal"
                                                 onChange={(e) => calculateItemRow(index, 'discountPercentage', e.target.value)}
                                                 maxLength={2}
-                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || !isDiscountPercentage || getValues(`items[${index}].isRateZero`) }
+                                                //disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || !isDiscountPercentage || getValues(`items[${index}].isRateZero`) }
+                                                disabled={!isDiscountPercentage || getValues(`items[${index}].isRateZero`) }
                                             />
                                         </td>
 
@@ -2151,7 +2388,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 register={register}
                                                 allowedChars="numericDecimal"
                                                 onChange={(e) => calculateItemRow(index, 'discountAmount', e.target.value)}
-                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || !isDiscount || getValues(`items[${index}].isRateZero`)}
+                                                disabled={!isDiscount || getValues(`items[${index}].isRateZero`)}
+                                                //disabled={disableFieldsAfterMainQty || disableFieldsAfterRate || !isDiscount || getValues(`items[${index}].isRateZero`)}
                                             />
                                         </td>
 
@@ -2161,7 +2399,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                     name={`items[${index}].iGST`}
                                                     register={register}
                                                     allowedChars="numericDecimal"
-                                                    disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
+                                                    //disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                                 />
                                             </td>
                                         ) : (
@@ -2171,7 +2409,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         name={`items[${index}].sGST`}
                                                         register={register}
                                                         allowedChars="numericDecimal"
-                                                        disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
+                                                        //disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                                     />
                                                 </td>
                                                 <td>
@@ -2179,7 +2417,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                         name={`items[${index}].cGST`}
                                                         register={register}
                                                         allowedChars="numericDecimal"
-                                                        disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
+                                                        //disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                                     />
                                                 </td>
                                             </>
@@ -2190,7 +2428,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 name={`items[${index}].netAmount`}
                                                 register={register}
                                                 allowedChars="numericDecimal"
-                                                disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
+                                                //disabled={disableFieldsAfterMainQty || disableFieldsAfterRate}
                                             />
                                         </td>
                                         <td>
