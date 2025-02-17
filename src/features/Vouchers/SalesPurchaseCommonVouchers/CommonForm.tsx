@@ -350,7 +350,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             //const voucherNo = watch("voucherNo");
             //if (voucherNo) return;
             try {
-                const lastVoucherInfo = await agent.SalePurchase.getLastVoucherInfoBySaleBillBookId(accessId, selectedOption.value);
+                const lastVoucherInfo = await agent.SalePurchase.getLastVoucherInfoBySaleBillBookId(accessId, selectedOption.value, voucherType);
                 //const { LastVoucherPrefix } = lastVoucherInfo.lastVoucherPrefix || 0 ;
                 //let { LastVoucherNumber } = lastVoucherInfo.lastVoucherNumber;
                 //LastVoucherNumber = String(parseInt(lastVoucherInfo.lastVoucherNumberr) || 0);

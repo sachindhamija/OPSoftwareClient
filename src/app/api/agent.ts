@@ -34,6 +34,7 @@ import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetti
 import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
 import { CommissionAgentItemDto } from "../../features/CommissionAgent/CommissionAgentItem/commissionAgentItem";
 import { StudentAdmissionDto } from "../../features/School/StudentAdmission/StudentAdmissionDto";
+import { ItemSaleRegisterDto } from "../../features/Reports/ItemSaleRegister/ItemSaleRegister";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -880,6 +881,22 @@ const Reports = {
     });
     return await requests.get(`reports/LedgerReport`, params);
   },
+
+  ItemSaleRegister: async (
+    accessId: string,
+    fromDate: string,
+    toDate: string,
+    financialYearFrom: string
+  ): Promise<ItemSaleRegisterDto[]> => {
+    const params = new URLSearchParams({
+      accessId,
+      fromDate,
+      toDate,
+      financialYearFrom,
+    });
+    return await requests.get(`reports/ItemSaleRegister`, params);
+  },
+
   getTrailBalanceReport: async (
     accessId: string,
     fromDate: string,
@@ -943,13 +960,18 @@ const SalePurchase = {
   },
   getLastVoucherInfoBySaleBillBookId: async (
     accessId: string,
-    billBookId: string
-  ) => {
-    const params = new URLSearchParams({ accessId, billBookId });
+    billBookId: string,
+    voucherType: VoucherTypeEnum
+) => {
+    const params = new URLSearchParams({ 
+        accessId, 
+        billBookId, 
+        voucherType: String(voucherType) // Convert enum to string
+    });
     return await requests.get(
-      `SalePurchase/GetLastVoucherNoBySaleBillBookId?${params.toString()}`
+        `SalePurchase/GetLastVoucherNoBySaleBillBookId?${params.toString()}`
     );
-  },
+},
   saveVoucher: async (
     accessId: string,
     dto: ItemSalePurchaseVoucherDto,

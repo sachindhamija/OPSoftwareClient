@@ -300,6 +300,9 @@ function CompanyHeader() {
             <Dropdown.Item as={Link} to={"/Report/Ledger"}>
               Ledger <span style={{ marginLeft: "120px" }}>[Ctrl+L]</span>
             </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/Report/ItemSaleRegister"}>
+            Item Sale Register
+            </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Report/TrialBalance"}>
               Trial Balance <span style={{ marginLeft: "68px" }}>[Ctrl+G]</span>

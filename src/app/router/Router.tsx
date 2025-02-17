@@ -49,6 +49,7 @@ import SectionForm from '../../features/School/Section/sectionForm';
 import SchoolCategoryForm from '../../features/School/SchoolCategory/schoolCategoryForm';
 import FeeHeadingForm from '../../features/School/FeeHeading/feeHeadingForm';
 import FeePlanForm from '../../features/School/FeePlan/FeePlanForm';
+import ItemSaleRegister from '../../features/Reports/ItemSaleRegister/ItemSaleRegister';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -163,6 +164,7 @@ export const router = createBrowserRouter([
 					{ path: 'Voucher/StockShortageEntry', element: <ItemShortageEntry /> },
 					{ path: 'Voucher/ItemStockTransfer', element: <ItemStockTransfer /> },
 					{ path: 'Report/Ledger', element: <LedgerReport /> },
+					{ path: 'Report/ItemSaleRegister', element: <ItemSaleRegister /> },
 					{
 						path: 'Report/TrialBalance',
 						element: <TrialBalanceReport />,
