@@ -49,7 +49,13 @@ import SectionForm from '../../features/School/Section/sectionForm';
 import SchoolCategoryForm from '../../features/School/SchoolCategory/schoolCategoryForm';
 import FeeHeadingForm from '../../features/School/FeeHeading/feeHeadingForm';
 import FeePlanForm from '../../features/School/FeePlan/FeePlanForm';
-import ItemSaleRegister from '../../features/Reports/ItemSaleRegister/ItemSaleRegister';
+import SaleRegister from '../../features/Reports/SaleRegister/SaleRegister';
+import PurchaseRegister from '../../features/Reports/PurchaseRegister/PurchaseRegister';
+import SaleReturnRegister from '../../features/Reports/SaleReturnRegister/SaleReturnRegister';
+import PurchaseReturnRegister from '../../features/Reports/PurchaseReturnRegister/PurchaseReturnRegister';
+import CreditNoteRegister from '../../features/Reports/CreditNoteRegister/CreditNoteRegister';
+import DebitNoteRegister from '../../features/Reports/DebitNoteRegister/DebitNoteRegister';
+
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -164,7 +170,12 @@ export const router = createBrowserRouter([
 					{ path: 'Voucher/StockShortageEntry', element: <ItemShortageEntry /> },
 					{ path: 'Voucher/ItemStockTransfer', element: <ItemStockTransfer /> },
 					{ path: 'Report/Ledger', element: <LedgerReport /> },
-					{ path: 'Report/ItemSaleRegister', element: <ItemSaleRegister /> },
+					{ path: 'Report/SaleRegister', element: <SaleRegister /> },
+					{ path: 'Report/PurchaseRegister', element: <PurchaseRegister /> },
+					{ path: 'Report/SaleReturnRegister', element: <SaleReturnRegister /> },
+					{ path: 'Report/PurchaseReturnRegister', element: <PurchaseReturnRegister /> },
+					{ path: 'Report/CreditNoteRegister', element: <CreditNoteRegister /> },
+					{ path: 'Report/DebitNoteRegister', element: <DebitNoteRegister /> },
 					{
 						path: 'Report/TrialBalance',
 						element: <TrialBalanceReport />,

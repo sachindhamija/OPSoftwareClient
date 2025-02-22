@@ -34,7 +34,7 @@ import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetti
 import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
 import { CommissionAgentItemDto } from "../../features/CommissionAgent/CommissionAgentItem/commissionAgentItem";
 import { StudentAdmissionDto } from "../../features/School/StudentAdmission/StudentAdmissionDto";
-import { ItemSaleRegisterDto } from "../../features/Reports/ItemSaleRegister/ItemSaleRegister";
+import { ItemRegisterDto } from "../../features/Reports/SaleRegister/SaleRegister";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -881,20 +881,21 @@ const Reports = {
     });
     return await requests.get(`reports/LedgerReport`, params);
   },
-
-  ItemSaleRegister: async (
+  ItemRegister: async (
     accessId: string,
     fromDate: string,
     toDate: string,
-    financialYearFrom: string
-  ): Promise<ItemSaleRegisterDto[]> => {
+    financialYearFrom: string,
+    voucherType: VoucherTypeEnum
+  ): Promise<ItemRegisterDto[]> => {
     const params = new URLSearchParams({
       accessId,
       fromDate,
       toDate,
       financialYearFrom,
+      voucherType: String(voucherType)
     });
-    return await requests.get(`reports/ItemSaleRegister`, params);
+    return await requests.get(`reports/ItemRegister`, params);
   },
 
   getTrailBalanceReport: async (

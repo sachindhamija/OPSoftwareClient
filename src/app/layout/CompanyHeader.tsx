@@ -300,8 +300,23 @@ function CompanyHeader() {
             <Dropdown.Item as={Link} to={"/Report/Ledger"}>
               Ledger <span style={{ marginLeft: "120px" }}>[Ctrl+L]</span>
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to={"/Report/ItemSaleRegister"}>
-            Item Sale Register
+            <Dropdown.Item as={Link} to={"/Report/SaleRegister"}>
+            Sale Register
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/Report/PurchaseRegister"}>
+            Purchase Register
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/Report/SaleReturnRegister"}>
+            Sale Return Register
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/Report/PurchaseReturnRegister"}>
+            Purchase Return Register
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/Report/CreditNoteRegister"}>
+            Credit Note Register
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/Report/DebitNoteRegister"}>
+            Debit Note Register
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/Report/TrialBalance"}>

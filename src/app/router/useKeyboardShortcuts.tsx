@@ -24,6 +24,9 @@ const useKeyboardShortcuts = () => {
       else if (event.altKey && event.key.toLowerCase() === "c") {
         event.preventDefault();
         navigate("Voucher/CreditSaleEntry");
+      } if (event.key === 'Escape') {
+        event.preventDefault();
+        setTimeout(() => navigate(-1), 0);
       }else {
         switch (event.key) {
           case "F5":
