@@ -124,6 +124,7 @@ export function getDefaultFormData(): AccountDto {
     companyGSTIN: "",
     companyPAN: "",
     companyState: "",
+    natureOfBusiness: "",
   };
 
   // If there is company information, merge it into the default form data

@@ -20,7 +20,7 @@ import { AccountDtoForDropDownList } from "../../Masters/Account/accountDto";
 import { transformAccountToOption } from "../../../app/utils/accountUtils";
 import AccountForm from "../../Masters/Account/AccountForm";
 import ItemForm from "../../Masters/Item/ItemForm";
-import { ItemDetailDto } from "../../Masters/Item/ItemDto";
+import { BatchNumberDto, ItemDetailDto } from "../../Masters/Item/ItemDto";
 import './Common.scss'
 import { formatNumberIST } from "../../../app/utils/numberUtils";
 import TransportAndShippingDetailModal from "./TransportAndShippingDetailModal";
@@ -36,6 +36,7 @@ import { ControlOptionDto } from "../VoucherCommon/controlOptionDto";
 import ControlPanelForm from "../VoucherCommon/ControlPanelForm";
 import EmailForm from "./EmailForm";
 import { fetchItemListForDropdown } from "../../../app/utils/itemUtils";
+import BatchForm from "../../Masters/Batch/BatchForm";
 
 const PAYMENT_MODE_OPTIONS = [
     { label: "Cash", value: "CASH" },
@@ -62,8 +63,10 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
     const [allAccounts, setAllAccounts] = useState<AccountDtoForDropDownList[]>([]);
     const [showAccountModal, setShowAccountModal] = useState(false);
     const [showItemModal, setShowItemModal] = useState(false);
+    const [showBatchModal, setShowBatchModal] = useState(false);
     const [displayedAccounts, setDisplayedAccounts] = useState<AccountDtoForDropDownList[]>([]);
     const [itemDropDownList, setItemDropDownList] = useState<OptionType[]>([]);
+    const [batchDropDownList, setBatchDropDownList] = useState<OptionType[]>([]);
     const [showInclusiveRateInput, setShowInclusiveRateInput] = useState<number | null>(null);
     const [inclusiveRate, setInclusiveRate] = useState("");
     const [focusInclusiveRateInput, setFocusInclusiveRateInput] = useState<string | null>(null);
@@ -301,6 +304,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
             
             voucher.voucherItemDetails.forEach((item: ItemsInVoucherDto, index: number) => {
                 setValue(`items[${index}].itemId`, item.itemId);
+                setValue(`items[${index}].batchId`, item.batchId);
                 setValue(`items[${index}].mainQty`, item.mainQty);
                 setValue(`items[${index}].altQty`, item.altQty);
                 setValue(`items[${index}].free`, item.free);
@@ -332,8 +336,22 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
         }
     };
 
+    const fetchBatchListForDropdown = async () => {
+        try {
+            const response = await agent.BatchNumber.getAllBatches(accessId);
+            const formattedOptions = response.map((batch: BatchNumberDto) => ({
+                label: `${batch.batchId} | ${batch.batchNo}`,
+                value: batch.batchId,
+            }));
+            setBatchDropDownList(formattedOptions);    
+        } catch (error) {
+            console.error("Error fetching batchs:", error);
+        }
+    };
+
     useEffect(() => {
         loadBillBookOptions();
+        fetchBatchListForDropdown();
     }, [accessId]);
 
     const handleBillBookChange = async (selectedOption: OptionType | null) => {
@@ -1378,7 +1396,10 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
         try {
             const itemDetails: ItemDetailDto = await agent.Item.getItemDetailById(accessId, itemId);
+            console.log("itemDetails")
+            console.log(itemDetails)
             setValue(`items[${index}].itemDetail`, itemDetails);
+            setValue(`items[${index}].requiresBatch`, itemDetails.useBatchNumber === 'Y');
             setValue(`items[${index}].itemId`, itemDetails.itemId);
             setValue(`items[${index}].itemDetail.mainUnitName`, itemDetails.mainUnitName);
 
@@ -2189,6 +2210,7 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 <tr>
                                     <th style={{ width: '4%', textAlign: 'center' }}>SrNo</th>
                                     <th style={{ width: '20%', textAlign: 'center' }}>Item Name [F3-New]</th>
+                                    <th style={{ width: '20%', textAlign: 'center' }}>Batch Number [F3-New]</th>
                                     <th style={{ width: '10%', textAlign: 'center' }}>Main Qty</th>
 
                                     {useAltQty && (
@@ -2227,6 +2249,8 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
 
                                 //const disableFieldsAfterMainQty = !mainQty || parseFloat(mainQty) === 0;
                                 //const disableFieldsAfterRate = !rate || parseFloat(rate) === 0;
+                                const requiresBatch = watch(`items[${index}].requiresBatch`);
+                                const batchId = watch(`items[${index}].batchId`);
 
                                 return (
                                     <tr key={field.id}>
@@ -2252,6 +2276,39 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                                 disabled={isBillNumberExists}
                                             />
                                         </td>
+
+                                        <td>
+                                            {(requiresBatch || batchId) && (
+                                                <CustomDropdown
+                                                    name={`items[${index}].batchId`}
+                                                    options={batchDropDownList}
+                                                    control={control}
+                                                    isCreatable
+                                                    onCreateButtonClick={() => setShowBatchModal(true)}
+                                                    dropDownWidth="800px"
+                                                    hideDropdownIcon
+                                                    hideClearIcon
+                                                    isInTable
+                                                    disabled={isBillNumberExists}
+                                                />
+                                            )}
+                                        </td>
+
+                                        {/* <td>
+                                            <CustomDropdown
+                                                name={`items[${index}].batchId`}
+                                                options={batchDropDownList}
+                                                control={control}
+                                                isCreatable
+                                                onCreateButtonClick={() => { setShowBatchModal(true); }}
+                                                dropDownWidth="800px"
+                                                hideDropdownIcon
+                                                hideClearIcon
+                                                isInTable
+                                                onFocus={index === fields.length - 1 ? scrollToBottom : undefined}
+                                                disabled={isBillNumberExists}
+                                            />
+                                        </td> */}
 
                                         <td>
                                             <CustomInput
@@ -2567,6 +2624,18 @@ export function SalePurchaseForm({ voucherType, voucherId = undefined, isInModal
                                 setItemDropDownList(options);
                             }
                             setShowItemModal(false);
+                        }}
+                    />
+                </Suspense>
+            </CommonModal>
+
+            <CommonModal show={showBatchModal} onHide={() => { setShowBatchModal(false); }} size='xl'>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <BatchForm
+                        isModalOpen={showBatchModal}
+                        onSaveSuccess={async () => {
+                            fetchBatchListForDropdown();
+                            setShowBatchModal(false);
                         }}
                     />
                 </Suspense>

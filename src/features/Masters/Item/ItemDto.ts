@@ -14,6 +14,7 @@ export interface ItemFormDto {
   itemName: string;
   applyPurchasePriceOn?: string;
   applySalesPriceOn?: string;
+  technicalAccount?: string;
   itemPacking?: string;
   hsnCode?: string;
   conversion?: number;
@@ -97,13 +98,13 @@ export interface ItemDetailDto {
   extraColumn8?: string;
   extraColumn9?: string;
   extraColumn10?: string;
+  batchId?: number|null;
   batchNumbers?: BatchNumberDto[];
 }
 
 export interface BatchNumberDto {
   batchId: number;
   batchNo?: string;
-  itemId: number;
   manufacturingDate?: string;
   expiryDate?: string;
   mrp: number;

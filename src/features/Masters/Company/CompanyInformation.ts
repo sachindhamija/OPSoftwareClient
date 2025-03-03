@@ -9,6 +9,7 @@ export interface CompanyInformation {
   companyPAN?: string;
   companyPANNo?: string;
   companyState: string;
+  natureOfBusiness: string;
 }
 
 /**
