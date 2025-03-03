@@ -15,6 +15,7 @@ import { Button, Container, DropdownDivider } from "react-bootstrap";
 import {
   deleteStoredCompanyInformation,
   getAccessIdOrRedirect,
+  getCompanyInformationOrRedirect,
 } from "../../features/Masters/Company/CompanyInformation";
 import { FinancialYearDto } from "../../features/Masters/FinancialYear/financialYearDto";
 import { CommonModal } from "../components/Components";
@@ -78,6 +79,9 @@ function CompanyHeader() {
     getCompanyDetails();
   }, [accessId]);
 
+
+    var companyinfo = getCompanyInformationOrRedirect();
+  
   useEffect(() => {
     if (!currentFinancialYear) {
       dispatch(getCurrentFinancialYear());
@@ -175,6 +179,11 @@ function CompanyHeader() {
               GST Slab
             </Dropdown.Item>
             <Dropdown.Divider />
+            {companyinfo?.natureOfBusiness != "1" && (
+            <Dropdown.Item as={Link} to={"/itemV2"}>
+              New Item <span style={{ marginLeft: "100px" }}>[Ctrl+I]</span>
+            </Dropdown.Item>
+					  )}
             <Dropdown.Item as={Link} to={"/item"}>
               New Item <span style={{ marginLeft: "100px" }}>[Ctrl+I]</span>
             </Dropdown.Item>
@@ -185,6 +194,9 @@ function CompanyHeader() {
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={"/sale-billbook"}>
               Sale BillBook
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to={"/batch"}>
+               Batch
             </Dropdown.Item>
             <Dropdown.Divider />
           </Dropdown.Menu>

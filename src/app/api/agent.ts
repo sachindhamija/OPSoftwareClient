@@ -24,6 +24,7 @@ import {
 } from "../../features/Vouchers/BankEntry/bankEntryDto";
 import { LedgerReportDto } from "../../features/Reports/Ledger/LedgerReport";
 import {
+  BatchNumberDto,
   ItemDetailDto,
   ItemDropDownListDto,
   ItemFormDto,
@@ -1469,6 +1470,33 @@ const FeePlan = {
 };
 
 
+const BatchNumber = {
+  getAllBatches: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("batch", params);
+  },
+  getBatchById: async (accessId: string, batchId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`batch/${batchId}`, params);
+  },
+  createBatch: async (accessId: string, batchNumberDto: BatchNumberDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post("batch", batchNumberDto, params);
+  },
+  updateBatch: async (
+    accessId: string,
+    batchId: number,
+    batchNumberDto: BatchNumberDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`batch/${batchId}`, batchNumberDto, params);
+  },
+  deleteBatch: async (accessId: string, batchId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`batch/${batchId}`, params);
+  },
+};
+
 const agent = {
   UserAccount,
   Company,
@@ -1505,6 +1533,7 @@ const agent = {
   SchoolCategory,
   FeeHeading,
   FeePlan,
+  BatchNumber
 };
 
 export default agent;

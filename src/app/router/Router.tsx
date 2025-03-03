@@ -55,6 +55,7 @@ import SaleReturnRegister from '../../features/Reports/SaleReturnRegister/SaleRe
 import PurchaseReturnRegister from '../../features/Reports/PurchaseReturnRegister/PurchaseReturnRegister';
 import CreditNoteRegister from '../../features/Reports/CreditNoteRegister/CreditNoteRegister';
 import DebitNoteRegister from '../../features/Reports/DebitNoteRegister/DebitNoteRegister';
+import BatchForm from '../../features/Masters/Batch/BatchForm';
 
 export const router = createBrowserRouter([
 	{
@@ -85,6 +86,7 @@ export const router = createBrowserRouter([
 					{ path: 'city', element: <CityForm /> },
 					{ path: 'item-unit', element: <ItemUnitForm /> },
 					{ path: 'gst-slab', element: <GSTSlabForm /> },
+					{ path: 'batch', element: <BatchForm /> },
 					{ path: 'account', element: <AccountForm /> },
 					{
 						path: 'account/edit/:accountId',

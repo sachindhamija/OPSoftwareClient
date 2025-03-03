@@ -26,6 +26,7 @@ import {
 import { useStates } from "../../../app/hooks/useStatesOptions";
 import { format } from "date-fns";
 import { formatDateForBackend } from "../../../app/utils/dateUtils";
+import { OptionType } from "../../../app/models/optionType";
 
 function CreateCompany() {
   const accessId = getAccessId();
@@ -51,6 +52,12 @@ function CreateCompany() {
   const [isPanManuallyEdited, setIsPanManuallyEdited] = useState(false);
   const stateOptions = useStates();
   const gstin = watch("gstNo");
+
+  const businessTypeOptions: OptionType[] = [
+    { label: "General Accounting", value: "1" },
+    { label: "Medicine Market", value: "2" },
+    { label: "Pesticides/Seeds/Fertilizers", value: "3" },
+  ];
 
   // Load company data and set form values
   useEffect(() => {
@@ -212,6 +219,18 @@ function CreateCompany() {
                   defaultValue={defaultFinancialYearFrom}
                 />
               </Col>
+              <Col md={4} sm={12}>
+              <CustomDropdown
+                name="natureOfBusiness"
+                label="Select Business Type"
+                options={businessTypeOptions} // Use it directly
+                control={control}
+                error={errors.natureOfBusiness}
+                validationRules={{
+                  required: "Business type is required",
+                }}
+              />
+            </Col>
             </>
           )}
         </Row>

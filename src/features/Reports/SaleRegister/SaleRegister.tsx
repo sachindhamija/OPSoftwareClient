@@ -13,7 +13,7 @@ import { formatDateForBackend, formatDateForFrontend, getFirstMonthDates } from 
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { formatNumberIST } from '../../../app/utils/numberUtils';
-// import getLastVoucherDate from '../../../app/hooks/useLastVoucherDate';
+import getLastVoucherDate from '../../../app/hooks/useLastVoucherDate';
 import { getAccessIdOrRedirect } from '../../Masters/Company/CompanyInformation';
 import agent from '../../../app/api/agent';
 import { VoucherTypeEnum } from '../../Vouchers/VoucherCommon/voucherTypeEnum';
@@ -21,7 +21,6 @@ import PaymentAndReceiptForm from '../../Vouchers/VoucherCommon/PaymentAndReceip
 import BankEntryForm from '../../Vouchers/BankEntry/BankEntryForm';
 import JournalEntryForm from '../../Vouchers/JournalEntry/JournalEntryForm';
 import { SalePurchaseForm } from '../../Vouchers/SalesPurchaseCommonVouchers/CommonForm';
-import { useNavigate } from 'react-router-dom';
 
 export interface ItemRegisterDto {
   date: Date;
@@ -56,8 +55,9 @@ const SaleRegister = ({ isInModal = false, saleRegisterParams = null, onSuccessf
   const accessId = getAccessIdOrRedirect();
   const financialYear = useAppSelector(selectCurrentFinancialYear);
   const [saleRegisterEntries, setSaleRegisterEntries] = useState<ItemRegisterDto[]>([]);
+  const [lastVoucherDate, setLastVoucherDate] = useState<Date | null>(null);
   const [showVoucherModal, setShowVoucherModal] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(true);
   const [selectedVoucher, setSelectedVoucher] = useState<ItemRegisterDto | null>(null);
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -65,22 +65,18 @@ const SaleRegister = ({ isInModal = false, saleRegisterParams = null, onSuccessf
 
   const { register, handleSubmit, setValue, watch, reset } = useForm<FieldValues>({ mode: 'all' });
 
-    const navigate = useNavigate();
-  
-    useEffect(() => {
-      const handleKeyDown = (event: KeyboardEvent) => {
-        console.log(showFilterModal)
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          setTimeout(() => navigate(-1), 0);
-        }
-      };
-  
-      window.addEventListener("keydown", handleKeyDown);
-      return () => {
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [navigate]);
+
+
+  useEffect(() => {
+    if (accessId && financialYear && !isInModal) {
+      getLastVoucherDate(accessId, null, financialYear)
+        .then((date) => setLastVoucherDate(date))
+        .catch((error) => {
+          console.error('Error fetching last voucher date:', error);
+          toast.error('Failed to fetch last voucher date.');
+        });
+    }
+  }, [accessId, financialYear]);
 
   useEffect(() => {
     if (financialYear?.financialYearFrom && !initialDatesSet) {
@@ -96,27 +92,16 @@ const SaleRegister = ({ isInModal = false, saleRegisterParams = null, onSuccessf
     }
   }, [financialYear, initialDatesSet, reset]);
 
-  // useEffect(() => {
-  //   if (accessId && financialYear && !isInModal) {
-  //     getLastVoucherDate(accessId, null, financialYear)
-  //       .then((date) => setLastVoucherDate(date))
-  //       .catch((error) => {
-  //         console.error('Error fetching last voucher date:', error);
-  //         toast.error('Failed to fetch last voucher date.');
-  //       });
-  //   }
-  // }, [accessId, financialYear]);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
-        e.preventDefault();
-        setShowFilterModal(true);
-      }
+        if (e.key.toLowerCase() === 'd') {
+                e.preventDefault();
+                setShowFilterModal(true);
+            }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+}, []);
 
   const fetchSaleRegisterData = async (fromDate: string, toDate: string) => {
     try {
@@ -226,13 +211,14 @@ const SaleRegister = ({ isInModal = false, saleRegisterParams = null, onSuccessf
         header="Sale Register" 
         size="100%"
       >
-                  <CustomButton 
-            text="Filter" 
-            onClick={() => setShowFilterModal(true)}
-            variant="outline-primary"
-            className="ms-2"
-          />
-
+      <div className="d-flex justify-content-end mb-3">
+        <CustomButton 
+          text="Filter [D]" 
+          onClick={() => setShowFilterModal(true)}
+          variant="outline-primary"
+          className="me-2"
+        />
+      </div>
         <FormNavigator onSubmit={() => {}} isModalOpen={isInModal}>
           <Row>
             <div className="custom-table-container">
@@ -312,7 +298,8 @@ const SaleRegister = ({ isInModal = false, saleRegisterParams = null, onSuccessf
         show={showFilterModal}
         onHide={() => setShowFilterModal(false)}
         title="Date Filter"
-        size="lg"
+        size="sm"
+        backdropStyle={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
       >
         <FormNavigator onSubmit={handleSubmit(handleFilterSubmit)}>
           <Row className="mb-3">
@@ -324,7 +311,7 @@ const SaleRegister = ({ isInModal = false, saleRegisterParams = null, onSuccessf
                 register={register}
                 setValue={setValue}
                 financialYear={financialYear}
-                //defaultDate={financialYear}
+                defaultDate={financialYear?.financialYearFrom}
               />
             </Col>
             <Col xs={12} className="mt-2">
@@ -335,7 +322,7 @@ const SaleRegister = ({ isInModal = false, saleRegisterParams = null, onSuccessf
                 register={register}
                 setValue={setValue}
                 financialYear={financialYear}
-                //defaultDate={financialYear}
+                defaultDate={lastVoucherDate}
               />
             </Col>
           </Row>
