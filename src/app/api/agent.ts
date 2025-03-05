@@ -24,6 +24,7 @@ import {
 } from "../../features/Vouchers/BankEntry/bankEntryDto";
 import { LedgerReportDto } from "../../features/Reports/Ledger/LedgerReport";
 import {
+  BatchNumberDto,
   ItemDetailDto,
   ItemDropDownListDto,
   ItemFormDto,
@@ -34,7 +35,7 @@ import { AdditionalFieldDto } from "../../features/Masters/AdditionalFieldsSetti
 import { MandiDto } from "../../features/CommissionAgent/Mandi/mandiDto";
 import { CommissionAgentItemDto } from "../../features/CommissionAgent/CommissionAgentItem/commissionAgentItem";
 import { StudentAdmissionDto } from "../../features/School/StudentAdmission/StudentAdmissionDto";
-import { ItemSaleRegisterDto } from "../../features/Reports/ItemSaleRegister/ItemSaleRegister";
+import { ItemRegisterDto } from "../../features/Reports/SaleRegister/SaleRegister";
 
 let baseURL;
 baseURL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -881,20 +882,21 @@ const Reports = {
     });
     return await requests.get(`reports/LedgerReport`, params);
   },
-
-  ItemSaleRegister: async (
+  ItemRegister: async (
     accessId: string,
     fromDate: string,
     toDate: string,
-    financialYearFrom: string
-  ): Promise<ItemSaleRegisterDto[]> => {
+    financialYearFrom: string,
+    voucherType: VoucherTypeEnum
+  ): Promise<ItemRegisterDto[]> => {
     const params = new URLSearchParams({
       accessId,
       fromDate,
       toDate,
       financialYearFrom,
+      voucherType: String(voucherType)
     });
-    return await requests.get(`reports/ItemSaleRegister`, params);
+    return await requests.get(`reports/ItemRegister`, params);
   },
 
   getTrailBalanceReport: async (
@@ -1468,6 +1470,33 @@ const FeePlan = {
 };
 
 
+const BatchNumber = {
+  getAllBatches: async (accessId: string) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get("batch", params);
+  },
+  getBatchById: async (accessId: string, batchId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.get(`batch/${batchId}`, params);
+  },
+  createBatch: async (accessId: string, batchNumberDto: BatchNumberDto) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.post("batch", batchNumberDto, params);
+  },
+  updateBatch: async (
+    accessId: string,
+    batchId: number,
+    batchNumberDto: BatchNumberDto
+  ) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.put(`batch/${batchId}`, batchNumberDto, params);
+  },
+  deleteBatch: async (accessId: string, batchId: number) => {
+    const params = new URLSearchParams({ accessId });
+    return await requests.delete(`batch/${batchId}`, params);
+  },
+};
+
 const agent = {
   UserAccount,
   Company,
@@ -1504,6 +1533,7 @@ const agent = {
   SchoolCategory,
   FeeHeading,
   FeePlan,
+  BatchNumber
 };
 
 export default agent;

@@ -20,7 +20,7 @@ import {
 } from '../../../app/utils/numberUtils';
 import toast from 'react-hot-toast';
 import handleApiErrors from '../../../app/errors/handleApiErrors';
-import { getAccessIdOrRedirect } from '../Company/CompanyInformation';
+import { getAccessIdOrRedirect, getCompanyInformationOrRedirect } from '../Company/CompanyInformation';
 import useDebounce from '../../../app/utils/useDebounce';
 import { ItemFormDto } from './ItemDto';
 import ItemCategoryForm from '../ItemCategory/ItemCategoryForm';
@@ -71,6 +71,7 @@ function ItemForm({
 	const [godownModalShow, setGodownModalShow] = useState(false);
 	const [mainUnitModalShow, setMainUnitModalShow] = useState(false);
 
+	var companyinfo = getCompanyInformationOrRedirect();
 	//Load Units
 	const loadUnits = async () => {
 		try {
@@ -293,6 +294,8 @@ function ItemForm({
 				processedData,
 				fieldsToProcessForNull
 			);
+			console.log("finalProcessedData")
+			console.log(finalProcessedData)
 			if (itemID) {
 				await agent.Item.updateItem(
 					accessId,
@@ -367,6 +370,34 @@ function ItemForm({
 							error={errors.itemName}
 						/>
 					</Col>
+					{companyinfo?.natureOfBusiness != "1" && (
+					<>
+						<Col xs={12} md={4}>
+							<CustomInput
+								label="Technical Account"
+								name="technicalAccount"
+								register={register}
+								validationRules={{
+									required: 'Technical account is required.',
+								}}
+								maxLength={300}
+								error={errors.technicalAccount}
+							/>
+						</Col>
+						<Col xs={12} md={4}>
+							<CustomInput
+								label="Packing"
+								name="itemPacking"
+								register={register}
+								validationRules={{
+									required: 'Packing is required.',
+								}}
+								maxLength={300}
+								error={errors.itemPacking}
+							/>
+						</Col>
+					</>
+					)}
 					<Col xs={12} md={4}>
 						<CustomDropdown
 							label="GST Slab"
@@ -582,7 +613,7 @@ function ItemForm({
 					<Col xs={12} md={2}>
 						<CustomDropdown
 							label="Use Batch No"
-							name="useBatchNo"
+							name="useBatchNumber"
 							control={control}
 							options={[]}
 							YesNo
