@@ -1,6 +1,9 @@
 interface CompaniesMasterDto {
   companyId: string | null;
   companyName: string | null;
+  userName: string | null;
+  password: string | null;
+  isEInvoice: string;
   address1?: string | null;
   address2?: string | null;
   state: string | null;

@@ -52,6 +52,8 @@ function CreateCompany() {
   const stateOptions = useStates();
   const gstin = watch("gstNo");
 
+  const IsEinvoiceApplicable = [{ label: 'Yes', value: '1' }, { label: 'No', value: '0' }]
+
   // Load company data and set form values
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -69,6 +71,12 @@ function CreateCompany() {
               setValue(safeKey, companyData[safeKey]);
             }
           });
+
+          const matchingEinvValue =
+            IsEinvoiceApplicable.find((option) => option.value.includes(companyData.isEInvoice));
+          if (matchingEinvValue) {
+            setValue("isEInvoice", matchingEinvValue.value);
+          }
         }
       } catch (error) {
         console.error("Error fetching company details:", error);
@@ -90,6 +98,7 @@ function CreateCompany() {
           stateCode &&
           stateOptions.find((option) => option.label.includes(stateCode));
         if (matchingState) {
+          
           setValue("state", matchingState.value);
         }
       }
@@ -162,9 +171,9 @@ function CreateCompany() {
               label="PAN Number"
               name="panNo"
               register={register}
-            //   validationRules={{
-            //     required: "PAN No. is required",
-            //   }}
+              //   validationRules={{
+              //     required: "PAN No. is required",
+              //   }}
               error={errors.panNo}
               maxLength={10}
               onChange={handlePanChange}
@@ -180,9 +189,9 @@ function CreateCompany() {
               control={control}
               error={errors.state}
               disabled={!!gstin}
-              // validationRules={{
-              //   required: "State is required",
-              // }}
+            // validationRules={{
+            //   required: "State is required",
+            // }}
             />
           </Col>
         </Row>
@@ -214,6 +223,45 @@ function CreateCompany() {
               </Col>
             </>
           )}
+        </Row>
+        <Row className="mb-2">
+          {/* Company Name, Financial Year From, Nature of Business */}
+          <Col md={5} sm={12}>
+            <CustomInput
+              type="text"
+              label="Username"
+              name="userName"
+              register={register}
+              error={errors.userName}
+              maxLength={200}
+              validationRules={{
+                required: "Username is required",
+              }}
+            />
+          </Col>
+          <Col md={5} sm={12}>
+            <CustomInput
+              type="password"
+              label="Password"
+              name="password"
+              register={register}
+              error={errors.password}
+              maxLength={200}
+              validationRules={{
+                required: "Password is required",
+              }}
+            />
+          </Col>
+          <Col md={2} sm={12}>
+            <CustomDropdown
+              name="isEInvoice"
+              label="Is EInv Applicable?"
+              options={IsEinvoiceApplicable}
+              control={control}
+              error={errors.isEInvoice}
+              validationRules={{ required: 'Option is required' }}
+            />
+          </Col>
         </Row>
         <Row className="mb-2">
           {/* Address Line 1, 2, and City */}
